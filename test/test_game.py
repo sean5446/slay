@@ -1,7 +1,7 @@
 import unittest
 
 from slay.game import Game
-from slay.models import *
+from slay.models import UserModel
 
 
 class TestGame(unittest.TestCase):

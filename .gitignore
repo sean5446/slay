@@ -6,3 +6,5 @@
 **/.DS_Store
 **/*.db
 **/__pycache__
+**/*egg-info
+
