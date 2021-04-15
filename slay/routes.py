@@ -29,10 +29,10 @@ def get_random_board():
 
 @app.route('/user/create', methods=['POST'])
 def create_user():
-    ok = request.get_json()
-    email = request.form.get('email', None)
-    username = request.form.get('username', None)
-    password = request.form.get('password', None)
+    req = request.get_json()
+    email = req.get('email')
+    username = req.get('username')
+    password = req.get('password')
     # TODO: validate inputs
     ret = Game.create_user(email, username, password)
     if type(ret) is not Exception:
@@ -75,14 +75,9 @@ def get_game(game_id):
 
 @app.route('/game/create', methods=['POST'])
 def create_game():
-    users = unpack_flask(request)
+    users = request.get_json()
     game = Game.create_game(users)
     if game:
         return json.dumps(game), 200, {'ContentType': 'application/json'}
     else:
         return 500
-
-
-# this is a disgusting hack?
-def unpack_flask(req):
-    return json.loads(list(req.form.keys())[0])['data']

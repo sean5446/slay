@@ -35,18 +35,21 @@ $(document).ready(function () {
 		});
 
 		$.ajax({
-			type: "POST",
-			dataType: "json",
 			url: "/game/create",
-			data: JSON.stringify({data: checkedItems}),
-			complete: function(data) {
-					$('#main').html(data.responseText);
-			}
-		});
+			type: "POST",
+			contentType: 'application/json',
+			data: JSON.stringify(checkedItems),
+			success: function (data) {
+				console.log(data.responseText);
+			},
+            error: function (data) {
+                console.log(data.responseText);
+            }
+         });
 	});
 
-	$('#buttonJoinGame').click(function() {
-		// TODO: implement something
+	$('#buttonJoinGame').click(function () {
+		alert('join game pressed!')
 	});
 
 });
