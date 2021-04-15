@@ -29,14 +29,14 @@ $(function() {
 		var color = classes.filter(function(n) {
 			return PlayerColorsEnum.indexOf(n) !== -1;
 		});
-    return color;
+	return color;
 	}
 
 	function getUnit(classes) {
 		var unit = classes.filter(function(n) {
 			return UnitEnum[n];
 		});
-    return unit;
+	return unit;
 	}
 
 	function getUnitFromStrength(strength) {
@@ -123,11 +123,11 @@ $(function() {
 
 	$('#buttonReset').click(function() {
 		//window.location.reload(true)
-    location.reload(true);
+	location.reload(true);
 	});
 
 	$('#buttonEndTurn').click(function() {
-    if (confirm('Are you sure you want to end the turn?')) {
+	if (confirm('Are you sure you want to end the turn?')) {
 			alert('Turn ended!');
 		}
 	});

@@ -1,7 +1,8 @@
 **/.idea
 **/.vscode
 **/.vs
+**/*.pyproj
+**/*.pyproj.user
 **/.DS_Store
-**/slay.pyproj
 **/*.db
 **/__pycache__

@@ -1,43 +1,43 @@
 body {
-  font-family: Sans-Serif;
+	font-family: Sans-Serif;
 	font-size: 18px;
 	background-color: #CCC;
 }
 
 .hex {
 	float: left;
-  position: relative;
-  width: 104px;
-  height: 60.04px;
-  margin: 15px 0;
-  border-left: solid 1px #333333;
-  border-right: solid 1px #333333;
+	position: relative;
+	width: 104px;
+	height: 60.04px;
+	margin: 15px 0;
+	border-left: solid 1px #333333;
+	border-right: solid 1px #333333;
 }
 
 .hex:before,
 .hex:after {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  width: 73.54px;
-  height: 73.54px;
-  -webkit-transform: scaleY(0.5774) rotate(-45deg);
-  -ms-transform: scaleY(0.5774) rotate(-45deg);
-  transform: scaleY(0.5774) rotate(-45deg);
-  background-color: inherit;
-  left: 14.2304px;
+	content: "";
+	position: absolute;
+	z-index: -1;
+	width: 73.54px;
+	height: 73.54px;
+	-webkit-transform: scaleY(0.5774) rotate(-45deg);
+	-ms-transform: scaleY(0.5774) rotate(-45deg);
+	transform: scaleY(0.5774) rotate(-45deg);
+	background-color: inherit;
+	left: 14.2304px;
 }
 
 .hex:before {
-  top: -36.7696px;
-  border-top: solid 1.4142px #333333;
-  border-right: solid 1.4142px #333333;
+	top: -36.7696px;
+	border-top: solid 1.4142px #333333;
+	border-right: solid 1.4142px #333333;
 }
 
 .hex:after {
-  bottom: -36.7696px;
-  border-bottom: solid 1.4142px #333333;
-  border-left: solid 1.4142px #333333;
+	bottom: -36.7696px;
+	border-bottom: solid 1.4142px #333333;
+	border-left: solid 1.4142px #333333;
 }
 
 .hex-row {
@@ -182,21 +182,21 @@ body {
 }
 
 #economy {
-    float: left;
-    padding: 30px;
+	float: left;
+	padding: 30px;
 }
 
 #players {
-    float: left;
-    padding: 30px;
+	float: left;
+	padding: 30px;
 }
 
 #wages {
-    float: left;
-    padding: 30px;
+	float: left;
+	padding: 30px;
 }
 
 #buttons {
-    float: left;
-    padding: 30px;
+	float: left;
+	padding: 30px;
 }

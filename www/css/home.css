@@ -1,0 +1,17 @@
+
+body {
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-rows: 100px 350px 50px;
+	justify-items: center;
+	align-items: center;
+}
+
+#logo {
+	width: 200px;
+}
+
+.list-widget {
+	float: left;
+}
+

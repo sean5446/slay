@@ -7,6 +7,7 @@ salt = 'salty-brine'
 user_schema = UserSchema(only=['id', 'username', 'score'])
 users_schema = UserSchema(only=['id', 'username', 'score'], many=True)
 game_schema = GameSchema()
+board_schema = BoardSchema()
 
 
 class Game:
@@ -69,9 +70,14 @@ class Game:
         board_model = Game.create_board(str(board_rand))
         game = GameModel(players=str(players), current_board_id=board_model.id,
                          turn_player_id=int(current_player_turn), history='')
+        db.session.add(board_rand)
         db.session.add(game)
         db.session.commit()
-        return game_schema.dump(game)
+        return {
+            "game": game_schema.dump(game),
+            "board": board_schema.dump(board),
+            "turn": current_player_turn
+        }
 
     @staticmethod
     def get_game_board(game_id):
