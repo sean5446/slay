@@ -35,7 +35,7 @@ def create_user():
     password = req.get('password')
     # TODO: validate inputs
     ret = Game.create_user(email, username, password)
-    if type(ret) is not Exception:
+    if not isinstance(ret, Exception):
         return json.dumps(ret), 200, {'ContentType': 'application/json'}
     else:
         return str(ret), 500
@@ -43,10 +43,11 @@ def create_user():
 
 @app.route('/user/update', methods=['POST'])
 def update_user():
-    username = request.form.get('username', None)
-    score = request.form.get('score', None)
+    req = request.get_json()
+    username = req.get('username', None)
+    score = req.get('score', None)
     ret = Game.update_user(username, score)
-    if type(ret) is not Exception:
+    if not isinstance(ret, Exception):
         return json.dumps(ret), 200, {'ContentType': 'application/json'}
     else:
         return str(ret), 500
@@ -75,8 +76,8 @@ def get_game(game_id):
 
 @app.route('/game/create', methods=['POST'])
 def create_game():
-    users = request.get_json()
-    game = Game.create_game(users)
+    data = request.get_json()
+    game = Game.create_game(data['name'], data['users'])
     if game:
         return json.dumps(game), 200, {'ContentType': 'application/json'}
     else:

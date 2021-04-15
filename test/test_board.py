@@ -47,3 +47,6 @@ class TestBoard(unittest.TestCase):
                          (0, 2): [(0, 2), (1, 2), (2, 2), (3, 2)],
                          (0, 4): [(0, 4), (1, 4), (2, 4), (3, 4)]}
 
+
+if __name__ == '__main__':
+    unittest.main()

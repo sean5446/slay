@@ -59,7 +59,7 @@ class Game:
             return ex
 
     @staticmethod
-    def create_game(users):
+    def create_game(name, users):
         players = []
         for username in users:
             user_id = Game.get_user(username, False).id
@@ -68,14 +68,14 @@ class Game:
         board_rand = Game.get_random_board(num_players=len(players))
         current_player_turn = list(board_rand.get_player_turn_order().keys())[0]
         board_model = Game.create_board(str(board_rand))
-        game = GameModel(players=str(players), current_board_id=board_model.id,
-                         turn_player_id=int(current_player_turn), history='')
-        db.session.add(board_rand)
-        db.session.add(game)
+        game_model = GameModel(players=str(players), name=name, current_board_id=board_model.id,
+                               turn_player_id=int(current_player_turn), history='')
+        db.session.add(board_model)
+        db.session.add(game_model)
         db.session.commit()
         return {
-            "game": game_schema.dump(game),
-            "board": board_schema.dump(board),
+            "game": game_schema.dump(game_model),
+            "board": board_schema.dump(board_rand),
             "turn": current_player_turn
         }
 

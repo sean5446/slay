@@ -4,6 +4,7 @@ from . import ma
 
 
 class BoardModel(db.Model):
+    __tablename__ = "boards"
     id = db.Column(db.Integer, primary_key=True)
     board = db.Column(db.String(999))
 
@@ -17,29 +18,32 @@ class BoardSchema(ma.Schema):
 
 
 class GameModel(db.Model):
+    __tablename__ = "games"
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(16), unique=True)
     players = db.Column(db.String(999))
-    current_board_id = db.Column(db.Integer)
+    current_board_id = db.Column(db.Integer, db.ForeignKey('boards.id'))
     turn_player_id = db.Column(db.Integer)
     history = db.Column(db.String(999))
 
     def __repr__(self):
-        return f'game: {self.id}'
+        return f'game: {self.id}, name: {self.name}, current_board_id: {self.current_board_id}'
 
 
 class GameSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'players', 'current_board_id', 'player_turn_id', 'history')
+        fields = ('id', 'name', 'players', 'current_board_id', 'player_turn_id', 'history')
 
 
 class PlayerModel(db.Model):
+    __tablename__ = "players"
     id = db.Column(db.Integer, primary_key=True)
     bank = db.Column(db.Integer)
-    user_id = db.Column(db.Integer)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     last_turn_time = db.Column(db.Integer)
 
     def __repr__(self):
-        return f'player: {self.id}'
+        return f'player: {self.id}, bank: {self.bank}, user_id: {self.user_id}, last_turn_time: {self.last_turn_time}'
 
 
 class PlayerSchema(ma.Schema):
@@ -48,6 +52,7 @@ class PlayerSchema(ma.Schema):
 
 
 class UserModel(db.Model):
+    __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(99), unique=True)
     email = db.Column(db.String(99), unique=True)

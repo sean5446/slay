@@ -62,13 +62,19 @@ function getNewGame() {
 	if (checkedItems.length <= 2) {
 		alert('Must select at least 3 users!');
 		return;
-    }
+	}
+
+	name = prompt('Enter game name');
+	if (name.length == 0) {
+		alert('Enter a game name!');
+		return;
+	}
 
 	$.ajax({
 		url: "/game/create",
 		type: "POST",
 		contentType: 'application/json',
-		data: JSON.stringify(checkedItems),
+		data: JSON.stringify({ 'name': name, 'users': checkedItems } ),
 		success: function (data) {
 			// document.write(data.responseText);
 			console.log(data.responseText);

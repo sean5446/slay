@@ -20,3 +20,7 @@ class TestGame(unittest.TestCase):
     def tearDownClass(cls):
         db.session.query(UserModel).filter(UserModel.username == 'Sean').delete()
         db.session.commit()
+
+
+if __name__ == '__main__':
+    unittest.main()

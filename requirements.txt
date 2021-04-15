@@ -3,3 +3,4 @@ flask_SQLAlchemy
 flask_marshmallow
 marshmallow-sqlalchemy
 requests
+pyopenssl
