@@ -1,0 +1,202 @@
+body {
+  font-family: Sans-Serif;
+	font-size: 18px;
+	background-color: #CCC;
+}
+
+.hex {
+	float: left;
+  position: relative;
+  width: 104px;
+  height: 60.04px;
+  margin: 15px 0;
+  border-left: solid 1px #333333;
+  border-right: solid 1px #333333;
+}
+
+.hex:before,
+.hex:after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 73.54px;
+  height: 73.54px;
+  -webkit-transform: scaleY(0.5774) rotate(-45deg);
+  -ms-transform: scaleY(0.5774) rotate(-45deg);
+  transform: scaleY(0.5774) rotate(-45deg);
+  background-color: inherit;
+  left: 14.2304px;
+}
+
+.hex:before {
+  top: -36.7696px;
+  border-top: solid 1.4142px #333333;
+  border-right: solid 1.4142px #333333;
+}
+
+.hex:after {
+  bottom: -36.7696px;
+  border-bottom: solid 1.4142px #333333;
+  border-left: solid 1.4142px #333333;
+}
+
+.hex-row {
+	clear: left;
+}
+
+.hex-row.odd {
+	margin-top: 50px;
+	margin-left: 53px;
+}
+
+.hex.green {
+	background-color: rgb(58, 117, 36);
+}
+
+.hex.red {
+	background-color: rgb(151, 4, 11);
+}
+
+.hex.blue {
+	background-color: rgb(25, 89, 201);
+}
+
+.hex.yellow {
+	background-color: rgb(240, 193, 67);
+}
+
+.hex.black {
+	background-color: rgb(10, 20, 30);
+}
+
+.hex.transparent {
+	opacity: 0;
+}
+
+.hex.hut {
+	background-image: url("../img/hut.png");
+	background-position: 50% 50%;
+	background-size: 50px;
+	background-repeat: no-repeat;
+}
+
+.hex.castle {
+	background-image: url("../img/castle.png");
+	background-position: 50% 50%;
+	background-size: 40px;
+	background-repeat: no-repeat;
+}
+
+.hex.tree {
+	background-image: url("../img/tree.png");
+	background-position: 50% 50%;
+	background-size: 50px;
+	background-repeat: no-repeat;
+}
+
+.hex.grave {
+	background-image: url("../img/grave.png");
+	background-position: 50% 50%;
+	background-size: 50px;
+	background-repeat: no-repeat;
+}
+
+.hex.man {
+	background-image: url("../img/man.png");
+	background-position: 50% 50%;
+	background-size: 45px;
+	background-repeat: no-repeat;
+}
+
+.hex.spearman {
+	background-image: url("../img/spearman.png");
+	background-position: 50% 50%;
+	background-size: 40px;
+	background-repeat: no-repeat;
+}
+
+.hex.knight {
+	background-image: url("../img/knight.png");
+	background-position: 50% 50%;
+	background-size: 40px;
+	background-repeat: no-repeat;
+}
+
+.hex.barron {
+	background-image: url("../img/barron.png");
+	background-position: 50% 50%;
+	background-size: 60px;
+	background-repeat: no-repeat;
+}
+
+.draggable {
+	position: absolute;
+	z-index: 9;
+}
+
+.unit {
+	border-style: hidden;
+}
+.unit::after {
+	border-style: hidden;
+}
+.unit::before {
+	border-style: hidden;
+}
+
+.vertical-map {
+	position: absolute;
+	border: solid 1px;
+	background-repeat: repeat;
+	background-image: url("../img/water.png");
+	height: calc(75% + 15px);
+	width: calc(100% - 20px);
+	z-index: -2;
+}
+
+.vertical-panel {
+	position: absolute;
+	top: calc(75% + 30px);
+	width: 100%;
+}
+
+.horizontal-map {
+	position: absolute;
+	border: solid 1px;
+	background-repeat: repeat;
+	background-image: url("../img/water.png");
+	height: calc(100% + 15px);
+	width: calc(80% - 20px);
+	z-index: -2;
+}
+
+.horizontal-panel {
+	position: absolute;
+	left: calc(80% + 15px);
+	height: calc(100% + 15px);
+	width: 20%;
+}
+
+#tiles {
+	margin-top: 15px;
+}
+
+#economy {
+    float: left;
+    padding: 30px;
+}
+
+#players {
+    float: left;
+    padding: 30px;
+}
+
+#wages {
+    float: left;
+    padding: 30px;
+}
+
+#buttons {
+    float: left;
+    padding: 30px;
+}

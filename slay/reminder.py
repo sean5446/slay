@@ -1,0 +1,45 @@
+import smtplib
+import ssl
+import os
+
+# https://myaccount.google.com/lesssecureapps
+
+import _thread
+import time
+
+
+class Reminder:
+    @staticmethod
+    def run(delay=120):
+        _thread.start_new_thread(Reminder.remind_players, ("thread1", delay,))
+
+    @staticmethod
+    def remind_players(thread_name, delay):
+        count = 0
+        while True:
+            time.sleep(delay)
+            count += 1
+            print("%s: %s" % (thread_name, time.ctime(time.time())))
+
+
+class SendMail:
+    @staticmethod
+    def send_mail(to_email, message):
+        port = 465
+        smtp_server = "smtp.gmail.com"
+        sender_email = "robovencheck@gmail.com"
+        receiver_email = to_email
+        password = os.environ['GMAIL_PASSWORD']
+        context = ssl.create_default_context()
+
+        with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+            server.login(sender_email, password)
+            server.sendmail(sender_email, receiver_email, message)
+
+    @staticmethod
+    def send_your_turn_mail(to_email):
+        link = ''
+        msg = f"""
+        Its your turn in {link}
+        """
+        SendMail.send_mail(to_email, msg)

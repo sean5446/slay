@@ -1,0 +1,134 @@
+$(function() {
+
+	if (window.innerWidth > 1000) {
+		$('#map').removeClass('vertical-map').addClass('horizontal-map');
+		$('#panel').removeClass('vertical-panel').addClass('horizontal-panel');
+	}
+
+//	$.ajax({
+//		url: "/board/random",
+//		cache: false
+//	})
+//  .done(function( html ) {
+//    $( "#tiles" ).html( html );
+//  });
+
+	const UnitEnum = Object.freeze({
+		'grave': 1, 'tree': 2, 'man': 4, 'spearman': 8, 'hut': 9, 'knight': 12, 'castle': 13, 'barron': 16
+	});
+
+	const PlayerColorsEnum = Object.freeze([
+		'red', 'green', 'blue', 'yellow', 'black'
+	]);
+
+	function getPlayerColor() {
+		return 'green';
+	}
+
+	function getColor(classes) {
+		var color = classes.filter(function(n) {
+			return PlayerColorsEnum.indexOf(n) !== -1;
+		});
+    return color;
+	}
+
+	function getUnit(classes) {
+		var unit = classes.filter(function(n) {
+			return UnitEnum[n];
+		});
+    return unit;
+	}
+
+	function getUnitFromStrength(strength) {
+		for (const [key, value] of Object.entries(UnitEnum)) {
+			if (value == strength) return key;
+		}
+	}
+
+	function unitsAtPosition(top, left) {
+		return $("#map").find('.unit').filter(function() {
+			e = $(this)
+			if (e.offset().top == top && e.offset().left == left) return e;
+		});
+	}
+
+	function drop(draggable, droppable) {
+		dropClasses = droppable.attr("class").split(/\s+/);
+		dragClasses = draggable.attr("class").split(/\s+/);
+		dragUnit = getUnit(dragClasses)[0];
+		hexColor = getColor(dropClasses)[0];
+		hexUnit = getUnit(dropClasses)[0];
+		dragUnitStrength = UnitEnum[dragUnit];
+		hexUnitStrength = UnitEnum[hexUnit];
+		playerColor = getPlayerColor();
+
+		if (playerColor == hexColor) {
+			console.log('on friendly territory');
+			// position unit
+			pos_top = Math.round(droppable.position().top + (droppable.height() / 2) - (draggable.height() / 2))
+			pos_left = Math.round(droppable.position().left + (droppable.width() / 2) - (draggable.width() / 2))
+			draggable.css({top: pos_top, left: pos_left});
+
+			// looking to level up
+			units = unitsAtPosition(draggable.offset().top, draggable.offset().left);
+			if (units.length > 1) {
+				totalStrength = 0;
+				for (i = 0; i < units.length; i++) {
+					e = $(units[i])
+					unit = getUnit(e.attr("class").split(/\s+/));
+					totalStrength += UnitEnum[unit];
+					e.remove();
+				}
+				upgradedUnit = getUnitFromStrength(totalStrength);
+				elementUnit = $(`<div class="hex ${upgradedUnit} draggable unit" style="top: ${pos_top}px; left: ${pos_left}px;"></div>`)
+				$('#map').append(elementUnit);
+				elementUnit.draggable();
+			}
+			// just place the unit
+			else {
+				draggable.css({top: pos_top, left: pos_left});
+			}
+		}
+		else {
+			console.log('on enemy territory');
+			// win battle
+			if (dragUnitStrength > hexUnitStrength) {
+				draggable.remove();
+				droppable.removeClass([hexColor, hexUnit]);
+				droppable.addClass([playerColor, dragUnit]);
+			}
+			// can't battle - reset position
+			else {
+				draggable.css({top: dragStartPosition.top, left: dragStartPosition.left});
+			}
+		}
+	}
+
+	dragStartPosition = null;
+	$(".draggable").draggable({
+			revert: 'invalid',
+			start: function(event, ui) {
+				dragStartPosition = ui.helper.position();
+			}
+	});
+
+	$(".droppable").droppable({
+		accept: '.draggable',
+		drop: function(event, ui) {
+			draggable = $(ui.draggable[0])
+			droppable = $(this)
+			drop(draggable, droppable);
+		}
+	});
+
+	$('#buttonReset').click(function() {
+		//window.location.reload(true)
+    location.reload(true);
+	});
+
+	$('#buttonEndTurn').click(function() {
+    if (confirm('Are you sure you want to end the turn?')) {
+			alert('Turn ended!');
+		}
+	});
+});

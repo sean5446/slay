@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Slay Game</title>
+
+	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+	<meta content="utf-8" http-equiv="encoding">
+
+	<meta http-equiv="Cache-control" content="no-cache">
+	<meta http-equiv="Expires" content="-1">
+
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+	<script src="js/jquery.ui.touch-punch.min.js"></script>
+	<script src="js/slay.js"></script>
+
+	<link rel="stylesheet" href="css/slay.css">
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+</head>
+<body>
+
+<div id="map" class="vertical-map">
+
+	<div class="hex man draggable unit" style="top:15px; left:106px;"></div>
+	<div class="hex man draggable unit" style="top:15px; left:212px;"></div>
+	<div class="hex spearman draggable unit" style="top:15px; left:318px;"></div>
+
+	<div id="tiles">
+		<div class="hex-row">
+			<div class="hex green grave droppable"></div>
+			<div class="hex green droppable"></div>
+			<div class="hex green droppable"></div>
+			<div class="hex green droppable"></div>
+			<div class="hex green droppable"></div>
+			<div class="hex green droppable"></div>
+			<div class="hex green castle droppable"></div>
+			<div class="hex green tree droppable"></div>
+			<div class="hex green hut droppable"></div>
+		</div>
+		<div class="hex-row odd">
+			<div class="hex red man droppable"></div>
+			<div class="hex red spearman droppable"></div>
+			<div class="hex red barron droppable"></div>
+			<div class="hex red castle droppable"></div>
+			<div class="hex red transparent droppable"></div>
+			<div class="hex red hut droppable"></div>
+			<div class="hex red knight droppable"></div>
+			<div class="hex red grave droppable"></div>
+		</div>
+		<div class="hex-row">
+			<div class="hex blue grave"></div>
+			<div class="hex blue man"></div>
+			<div class="hex blue transparent"></div>
+			<div class="hex blue castle"></div>
+			<div class="hex blue tree"></div>
+			<div class="hex blue spearman"></div>
+			<div class="hex blue hut"></div>
+			<div class="hex blue castle"></div>
+			<div class="hex blue knight"></div>
+		</div>
+		<div class="hex-row odd">
+			<div class="hex yellow man"></div>
+			<div class="hex yellow hut"></div>
+			<div class="hex yellow grave"></div>
+			<div class="hex yellow castle"></div>
+			<div class="hex yellow tree"></div>
+			<div class="hex yellow transparent"></div>
+			<div class="hex yellow knight"></div>
+			<div class="hex yellow"></div>
+		</div>
+		<div class="hex-row">
+			<div class="hex black barron"></div>
+			<div class="hex black man"></div>
+			<div class="hex black transparent"></div>
+			<div class="hex black tree"></div>
+			<div class="hex black knight"></div>
+			<div class="hex black grave"></div>
+			<div class="hex black hut"></div>
+			<div class="hex black castle"></div>
+		</div>
+	</div>
+</div>
+
+<div id="panel" class="vertical-panel">
+
+	<div id="economy">
+		<div id=savings>Savings: 0</div>
+		<div id="income">Income: 0</div>
+		<div id="ewages">Wages: 0</div>
+		<div id="balance">Balance: 0</div>
+		<div id="money">Money: 0</div>
+	</div>
+
+	<div id="players">
+		<div style="color: green;" id="player1">player1: 0</div>
+		<div style="color: red;" id="player2">player2: 0</div>
+		<div style="color: blue;" id="player3">player3: 0</div>
+		<div style="color: yellow;" id="player4">player4: 0</div>
+		<div style="color: black;" id="player5">player5: 0</div>
+	</div>
+
+	<div id="wages">
+		<div>Wages</div>
+		<div><img src="img/man.png" height="50">: 2</div>
+		<div><img src="img/spearman.png" height="50">: 6</div>
+		<div><img src="img/knight.png" height="50">: 18</div>
+		<div><img src="img/barron.png" height="50">: 54</div>
+	</div>
+
+	<div id="buttons">
+		<button id="buttonEndTurn" class="ui-button ui-widget ui-corner-all">End turn</button>
+		<br /><br />
+		<button id="buttonReset" class="ui-button ui-widget ui-corner-all">Reset</button>
+	</div>
+
+</div>
+
+</body>
+</html>
