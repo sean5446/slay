@@ -4,3 +4,4 @@
 **/.DS_Store
 **/slay.pyproj
 **/*.db
+**/__pycache__
