@@ -10,11 +10,13 @@ setup(
     packages=find_packages(),
     install_requires=[
         'Flask',
+        'Flask-Limiter',
         'flask_SQLAlchemy',
         'flask_marshmallow',
         'marshmallow-sqlalchemy',
         'requests',
         'pyopenssl',
         'gunicorn',
+        'psycopg2-binary'
     ],
 )

@@ -10,8 +10,8 @@ import time
 
 class Reminder:
     @staticmethod
-    def run(delay=120):
-        _thread.start_new_thread(Reminder.remind_players, ("thread1", delay,))
+    def run(delay=5 * 60):
+        _thread.start_new_thread(Reminder.remind_players, ("reminder thread", delay,))
 
     @staticmethod
     def remind_players(thread_name, delay):
@@ -19,7 +19,7 @@ class Reminder:
         while True:
             time.sleep(delay)
             count += 1
-            print("%s: %s" % (thread_name, time.ctime(time.time())))
+            print(f"{thread_name}: {time.ctime(time.time())}")
 
 
 class SendMail:

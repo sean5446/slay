@@ -32,9 +32,8 @@ def create_user():
     req = request.get_json()
     email = req.get('email')
     username = req.get('username')
-    password = req.get('password')
     # TODO: validate inputs
-    ret = Game.create_user(email, username, password)
+    ret = Game.create_user(email, username)
     if not isinstance(ret, Exception):
         return json.dumps(ret), 200, {'ContentType': 'application/json'}
     else:
@@ -75,6 +74,7 @@ def get_game(game_id):
 
 
 @app.route('/game/create', methods=['POST'])
+# @limiter.limit("1 per day")
 def create_game():
     data = request.get_json()
     game = Game.create_game(data['name'], data['users'])

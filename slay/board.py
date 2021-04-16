@@ -34,9 +34,13 @@ class Board:
     def get_neighbors(self, row, col):
         # this only works for this particular kind of hex grid
         if row % 2 == 0:
-            all_possible = [(row-1, col-1), (row-1, col), (row, col-1), (row, col+1), (row+1, col-1), (row+1, col)]
+            all_possible = [
+                (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col)
+            ]
         else:
-            all_possible = [(row-1, col), (row-1, col+1), (row, col-1), (row, col+1), (row+1, col), (row+1, col+1)]
+            all_possible = [
+                (row - 1, col), (row - 1, col + 1), (row, col - 1), (row, col + 1), (row + 1, col), (row + 1, col + 1)
+            ]
         neighbors = []
         for n in all_possible:
             if 0 <= n[0] < len(self.board[0]) and 0 <= n[1] < len(self.board):
@@ -85,7 +89,7 @@ class Board:
         avg = sum(player_counts.values()) / len(player_counts)
         total = 0
         for k, v in player_counts.items():
-            total += (v-avg) ** 2
+            total += (v - avg) ** 2
         return (total / len(player_counts)) ** 0.5
 
     def fair_random_board(self, accept_std_dev=1.2):

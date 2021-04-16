@@ -1,5 +1,3 @@
-import hashlib
-
 from .board import Board
 from .models import *
 
@@ -27,10 +25,10 @@ class Game:
         return BoardModel.query.filter(BoardModel.id == board_id)
 
     @staticmethod
-    def create_user(email, username, password):
+    def create_user(email, username):
         try:
-            password_hash = hashlib.sha3_512((salt + password).encode()).hexdigest()
-            db.session.add(UserModel(email=email, username=username, password=password_hash, score=0))
+            # password_hash = hashlib.sha3_512((salt + password).encode()).hexdigest()
+            db.session.add(UserModel(email=email, username=username, score=0))
             db.session.commit()
             return {'success': True}
         except Exception as ex:
@@ -84,7 +82,7 @@ class Game:
         game = GameModel.query.filter(GameModel.id == game_id).first()
         board_id = game.current_board_id()
         board = Game.get_board(board_id)
-        pass
+        return board
 
     @staticmethod
     def update_game():

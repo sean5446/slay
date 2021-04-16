@@ -1,44 +1,17 @@
 
-$(document).ready(function () {
-
-	if (getCookie('user') === null) {
-		//email = prompt('Enter email');
-		//password = prompt('Enter password');
-		// TODO: validate password
-		// throw new Error("Wrong password!");
-		// setCookie('user', email, 30);
-	}
-
-	getUserList();
-	getGamesList();
-
-	$('#buttonNewGame').click(function() {
-		getNewGame();
-	});
-
-	$('#buttonJoinGame').click(function () {
-		alert('join game pressed!')
-	});
-
-});
-
 function getUserList() {
 	$.ajax({
 		type: "GET",
 		dataType: "json",
 		url: "/user",
 		success: function (data) {
-			users = data;
-			source = [];
+			var users = data;
+			var source = [];
 			for (var i = 0; i < users.length; i++) {
 				var entry = users[i].username + ' (' + users[i].score + ')'
 				source.push(entry);
 			}
-			$("#listboxUsers").jqxListBox({ width: 300, source: source, checkboxes: true, height: 300 });
-			//$("#listboxUsers").on('checkChange', function (event) {
-			//	var args = event.args;
-			//	if (args.checked) {
-			//});
+			return source;
 		},
 		error: function (data) {
 			// error
@@ -46,9 +19,37 @@ function getUserList() {
 	});
 }
 
-function getGamesList() {
+function getUser(username) {
+	$.ajax({
+		type: "GET",
+		dataType: "json",
+		url: `/user/${username}`,
+		success: function (data) {
+			return data;
+		},
+		error: function (data) {
+			// error
+		}
+	});
+}
+
+function createUser(username, email) {
+	$.ajax({
+		url: "/user/create",
+		type: "POST",
+		contentType: 'application/json',
+		data: JSON.stringify({ 'username': username, 'email': email } ),
+		success: function (data) {
+			console.log(data.responseText);
+		},
+		error: function (data) {
+			console.log(data.responseText);
+		}
+	});
+}
+
+function getGamesList(user) {
 	source = [];
-	$("#listboxGames").jqxListBox({ width: 300, source: source, checkboxes: true, height: 300 });
 }
 
 function getNewGame() {
@@ -64,7 +65,7 @@ function getNewGame() {
 		return;
 	}
 
-	name = prompt('Enter game name');
+	var name = prompt('Enter game name');
 	if (name.length == 0) {
 		alert('Enter a game name!');
 		return;
@@ -76,7 +77,7 @@ function getNewGame() {
 		contentType: 'application/json',
 		data: JSON.stringify({ 'name': name, 'users': checkedItems } ),
 		success: function (data) {
-			// document.write(data.responseText);
+			// document.write(data.responseText);  // writes head and body
 			console.log(data.responseText);
 		},
 		error: function (data) {

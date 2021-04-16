@@ -2,7 +2,15 @@
 body {
 	display: grid;
 	grid-template-columns: 1fr;
-	grid-template-rows: 100px 350px 50px;
+	grid-template-rows: 100px 500px;
+	justify-items: center;
+	align-items: center;
+}
+
+#main-menu {
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-rows: 10px 400px 100px;
 	justify-items: center;
 	align-items: center;
 }

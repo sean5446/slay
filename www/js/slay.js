@@ -53,14 +53,14 @@ $(function() {
 	}
 
 	function drop(draggable, droppable) {
-		dropClasses = droppable.attr("class").split(/\s+/);
-		dragClasses = draggable.attr("class").split(/\s+/);
-		dragUnit = getUnit(dragClasses)[0];
-		hexColor = getColor(dropClasses)[0];
-		hexUnit = getUnit(dropClasses)[0];
-		dragUnitStrength = UnitEnum[dragUnit];
-		hexUnitStrength = UnitEnum[hexUnit];
-		playerColor = getPlayerColor();
+		var dropClasses = droppable.attr("class").split(/\s+/);
+		var dragClasses = draggable.attr("class").split(/\s+/);
+		var dragUnit = getUnit(dragClasses)[0];
+		var hexColor = getColor(dropClasses)[0];
+		var hexUnit = getUnit(dropClasses)[0];
+		var dragUnitStrength = UnitEnum[dragUnit];
+		var hexUnitStrength = UnitEnum[hexUnit];
+		var playerColor = getPlayerColor();
 
 		if (playerColor == hexColor) {
 			console.log('on friendly territory');
@@ -72,15 +72,15 @@ $(function() {
 			// looking to level up
 			units = unitsAtPosition(draggable.offset().top, draggable.offset().left);
 			if (units.length > 1) {
-				totalStrength = 0;
+				var totalStrength = 0;
 				for (i = 0; i < units.length; i++) {
-					e = $(units[i])
-					unit = getUnit(e.attr("class").split(/\s+/));
+					var e = $(units[i])
+					var unit = getUnit(e.attr("class").split(/\s+/));
 					totalStrength += UnitEnum[unit];
 					e.remove();
 				}
-				upgradedUnit = getUnitFromStrength(totalStrength);
-				elementUnit = $(`<div class="hex ${upgradedUnit} draggable unit" style="top: ${pos_top}px; left: ${pos_left}px;"></div>`)
+				var upgradedUnit = getUnitFromStrength(totalStrength);
+				var elementUnit = $(`<div class="hex ${upgradedUnit} draggable unit" style="top: ${pos_top}px; left: ${pos_left}px;"></div>`)
 				$('#map').append(elementUnit);
 				elementUnit.draggable();
 			}
@@ -123,7 +123,7 @@ $(function() {
 
 	$('#buttonReset').click(function() {
 		//window.location.reload(true)
-	location.reload(true);
+		location.reload(true);
 	});
 
 	$('#buttonEndTurn').click(function() {
