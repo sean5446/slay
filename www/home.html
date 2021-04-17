@@ -21,68 +21,23 @@
 	<link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.8.0/firebase-ui-auth.css" />
 
 	<script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-app.js"></script>
-	<script>
-		var firebaseConfig = {
-
-		};
-		firebase.initializeApp(firebaseConfig);
-	</script>
-
 	<script src="https://www.gstatic.com/firebasejs/ui/4.8.0/firebase-ui-auth.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-auth.js"></script>
+
 	<script type="text/javascript">
-		function initMainMenu(displayName) {
-			console.log(`displayName: ${displayName}`)
-			$('#firebaseui-auth-container').hide();
-			$('#sign-in-status').html(`${displayName}`);
-			var source = getUserList();
-			$("#listboxUsers").jqxListBox({ width: 300, source: source, checkboxes: true, height: 300 });
-			//$("#listboxUsers").on('checkChange', function (event) {
-			//	var args = event.args;
-			//	if (args.checked) {
-			//});
-			getGamesList(displayName);
-			$('#buttonNewGame').click(function() {
-				getNewGame();
-			});
-			$('#buttonJoinGame').click(function () {
-				alert('join game pressed!')
-			});
-		}
-
-		initApp = function() {
-			firebase.auth().onAuthStateChanged(function(user) {
-				if (user) {
-					// User is signed in
-					user.getIdToken().then(function(accessToken) {
-						// user.email
-						// user.displayName
-					});
-					initMainMenu(user.displayName);
-				} else {
-					// User is signed out
-					var uiConfig = {
-						signInSuccessUrl: '/home.html',
-						signInOptions: [
-							firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-							firebase.auth.FacebookAuthProvider.PROVIDER_ID,
-							firebase.auth.EmailAuthProvider.PROVIDER_ID,
-						],
-						tosUrl: '<your-tos-url>',
-						privacyPolicyUrl: function() {
-							window.location.assign('<your-privacy-policy-url>');
-						}
-					};
-					var ui = new firebaseui.auth.AuthUI(firebase.auth());
-					ui.start('#firebaseui-auth-container', uiConfig);
-				}
-			}, function(error) {
-				console.log(error);
-			});
-		};
-
 		$(document).ready(function() {
-			initApp();  // firebase auth
+			$.ajax({
+				type: "GET",
+				dataType: "json",
+				url: `/firebase`,
+				success: function(data) {
+					firebase.initializeApp(data);
+					initApp();  // firebase auth
+				},
+				error: function(data) {
+					console.log(data)
+				}
+			});
 		});
 	</script>
 </head>

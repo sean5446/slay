@@ -85,6 +85,11 @@ class Game:
         return board
 
     @staticmethod
+    def get_games(user_id):
+        players = PlayerModel.query.filter(PlayerModel.user_id == user_id)
+        return players
+
+    @staticmethod
     def update_game():
         pass
 

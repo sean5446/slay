@@ -1,10 +1,24 @@
 
 import json
+import os
 
 from flask import send_from_directory, request, render_template
 from flask import current_app as app
 
 from .game import Game
+
+
+firebase = None
+if os.environ.get('FIREBASE'):
+    firebase = os.environ.get('FIREBASE')
+else:
+    with open('firebase.json', 'r') as auth_file:
+        firebase = auth_file.read()
+
+
+@app.route('/firebase')
+def get_firebase():
+    return firebase
 
 
 @app.route('/<path:path>')
@@ -54,11 +68,14 @@ def update_user():
 
 @app.route('/user/<username>', methods=['POST', 'GET'])
 def get_user(username):
-    ret = Game.get_user(username)
-    if ret:
-        return json.dumps(ret), 200, {'ContentType': 'application/json'}
+    user = Game.get_user(username)
+    if user == {}:
+        return 404
+    games = Game.get_games(user.id)
+    if not isinstance(user, Exception) and not isinstance(games, Exception):
+        return json.dumps([user, games]), 200, {'ContentType': 'application/json'}
     else:
-        return ret, 404, {'ContentType': 'application/json'}
+        return 404
 
 
 @app.route('/user', methods=['POST', 'GET'])
@@ -78,7 +95,7 @@ def get_game(game_id):
 def create_game():
     data = request.get_json()
     game = Game.create_game(data['name'], data['users'])
-    if game:
+    if not isinstance(game, Exception):
         return json.dumps(game), 200, {'ContentType': 'application/json'}
     else:
         return 500

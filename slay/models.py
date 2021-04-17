@@ -55,13 +55,13 @@ class PlayerModel(db.Model):
     last_turn_time = db.Column(db.Integer)
 
     def __repr__(self):
-        return f'player: {self.id}, bank: {self.bank}, ' + \
+        return f'player: {self.id}, bank: {self.bank}, game_id: {self.game_id} ' + \
                f'user_id: {self.user_id}, last_turn_time: {self.last_turn_time}'
 
 
 class PlayerSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'user_id', 'bank', 'last_turn_time')
+        fields = ('id', 'user_id', 'game_id', 'bank', 'last_turn_time')
 
 
 class UserModel(db.Model):

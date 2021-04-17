@@ -18,7 +18,7 @@ app = Flask(__name__, template_folder=template_dir)
 limiter = Limiter(
     app,
     key_func=get_remote_address,
-    default_limits=["200 per day", "50 per hour"]
+    default_limits=[]  # "200 per day", "50 per hour"]
 )
 
 db_file = os.path.join(os.getcwd(), 'slay.db')
