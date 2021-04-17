@@ -26,6 +26,7 @@
 
 	<script type="text/javascript">
 		$(document).ready(function() {
+			$('#main-menu').hide();
 			$.ajax({
 				type: "GET",
 				dataType: "json",
@@ -52,22 +53,22 @@
 		</div>
 
 		<div>
-			<div id='jqxUsersWidget' class="list-widget">
-				<div id="listboxUsers"></div>
+			<div id='jqx-widget-users' class="list-widget">
+				<div id="listbox-users"></div>
 				<div id="Events"></div>
 				<div id="CheckedItems"></div>
 			</div>
 
-			<div id='jqxGamesWidget' class="list-widget">
-				<div id="listboxGames"></div>
+			<div id='jqx-widget-games' class="list-widget">
+				<div id="listbox-games"></div>
 				<div id="Events2"></div>
 				<div id="CheckedItems2"></div>
 			</div>
 		</div>
 
 		<div id="buttons">
-			<button style="padding:20px" id="buttonNewGame" class="ui-button ui-widget ui-corner-all">New Game</button>
-			<button style="padding:20px" id="buttonJoinGame" class="ui-button ui-widget ui-corner-all">Join Game</button>
+			<button style="padding:20px" id="button-create-game" class="ui-button ui-widget ui-corner-all">New Game</button>
+			<button style="padding:20px" id="button-join-game" class="ui-button ui-widget ui-corner-all">Join Game</button>
 		</div>
 	</div>
 </body>

@@ -29,11 +29,6 @@ req = requests.get(f'{host}/user/adfgsasdfs')
 print(req.status_code)
 print(req.json())
 
-for user in users:
-    req = requests.post(f'{host}/user/update', json={'username': user.get('username'), 'score': 99})
-    print(req.status_code)
-    print(req.json())
-
 req = requests.get(f'{host}/user')
 print(req.status_code)
 print(req.json())

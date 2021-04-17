@@ -17,21 +17,42 @@ class BoardSchema(ma.Schema):
         fields = ('id', 'board', 'game_id')
 
 
+class PlayerModel(db.Model):
+    __tablename__ = "players"
+    id = db.Column(db.Integer, primary_key=True)
+    color = db.Column(db.Integer)
+    bank = db.Column(db.Integer)
+    game_id = db.Column(db.Integer, db.ForeignKey('games.id'))  # ondelete='CASCADE'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    last_turn_time = db.Column(db.Integer)
+
+    def __repr__(self):
+        return f'player: {self.id}, color: {self.color}, bank: {self.bank}, game_id: {self.game_id} ' + \
+               f'user_id: {self.user_id}, last_turn_time: {self.last_turn_time}'
+
+
+class PlayerSchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'color', 'user_id', 'game_id', 'bank', 'last_turn_time')
+
+
 class GameModel(db.Model):
     __tablename__ = "games"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(16), unique=True)
     current_board_id = db.Column(db.Integer, db.ForeignKey('boards.id'))
-    turn_player_id = db.Column(db.Integer)
+    turn_colors = db.Column(db.String(36))
+
+    players = db.relationship(PlayerModel, backref='games', passive_deletes=True)
 
     def __repr__(self):
         return f'game: {self.id}, name: {self.name}, ' + \
-               f'current_board_id: {self.current_board_id}, turn_player_id: {self.turn_player_id}'
+               f'current_board_id: {self.current_board_id}, turn_colors: {self.turn_colors}'
 
 
 class GameSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'name', 'players', 'current_board_id', 'turn_player_id')
+        fields = ('id', 'name', 'players', 'current_board_id', 'turn_colors')
 
 
 class GameHistoryModel(db.Model):
@@ -44,24 +65,6 @@ class GameHistoryModel(db.Model):
 class GameHistorySchema(ma.Schema):
     class Meta:
         fields = ('id', 'game_id', 'board_id')
-
-
-class PlayerModel(db.Model):
-    __tablename__ = "players"
-    id = db.Column(db.Integer, primary_key=True)
-    bank = db.Column(db.Integer)
-    game_id = db.Column(db.Integer, db.ForeignKey('games.id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    last_turn_time = db.Column(db.Integer)
-
-    def __repr__(self):
-        return f'player: {self.id}, bank: {self.bank}, game_id: {self.game_id} ' + \
-               f'user_id: {self.user_id}, last_turn_time: {self.last_turn_time}'
-
-
-class PlayerSchema(ma.Schema):
-    class Meta:
-        fields = ('id', 'user_id', 'game_id', 'bank', 'last_turn_time')
 
 
 class UserModel(db.Model):

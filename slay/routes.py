@@ -2,7 +2,7 @@
 import json
 import os
 
-from flask import send_from_directory, request, render_template
+from flask import send_from_directory, request, render_template, Markup
 from flask import current_app as app
 
 from .game import Game
@@ -36,11 +36,6 @@ def get_board(board_id):
     return str(Game.get_board(board_id))
 
 
-@app.route('/board/random')
-def get_random_board():
-    return str(Game.get_random_board(num_players=5).render_to_html())
-
-
 @app.route('/user/create', methods=['POST'])
 def create_user():
     req = request.get_json()
@@ -54,26 +49,11 @@ def create_user():
         return str(ret), 500
 
 
-@app.route('/user/update', methods=['POST'])
-def update_user():
-    req = request.get_json()
-    username = req.get('username', None)
-    score = req.get('score', None)
-    ret = Game.update_user(username, score)
-    if not isinstance(ret, Exception):
-        return json.dumps(ret), 200, {'ContentType': 'application/json'}
-    else:
-        return str(ret), 500
-
-
 @app.route('/user/<username>', methods=['POST', 'GET'])
 def get_user(username):
     user = Game.get_user(username)
-    if user == {}:
-        return 404
-    games = Game.get_games(user.id)
-    if not isinstance(user, Exception) and not isinstance(games, Exception):
-        return json.dumps([user, games]), 200, {'ContentType': 'application/json'}
+    if not isinstance(user, Exception):
+        return json.dumps(user), 200, {'ContentType': 'application/json'}
     else:
         return 404
 
@@ -84,10 +64,10 @@ def get_all_users():
     return json.dumps(ret), 200, {'ContentType': 'application/json'}
 
 
-@app.route('/game/<game_id>', methods=['GET', 'POST'])
+@app.route('/game/<game_id>')
 def get_game(game_id):
-    Game.get_game(game_id)
-    return render_template('game.html', title='Testing123', tiles="TILES!!!")
+    board_html = Game.get_game_board_html(game_id)
+    return render_template('game.html', title='Slay Game', tiles=Markup(board_html))
 
 
 @app.route('/game/create', methods=['POST'])

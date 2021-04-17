@@ -1,11 +1,11 @@
 function initMainMenu(displayName, email) {
 	$('#firebaseui-auth-container').hide();
+	$('#main-menu').show();
 	$('#sign-in-status').html(`Logged in: ${displayName}`);
-
-	$('#buttonNewGame').click(function() {
-		createNewGame();
+	$('#button-create-game').click(function() {
+		createGame(displayName);
 	});
-	$('#buttonJoinGame').click(function () {
+	$('#button-join-game').click(function () {
 		alert('join game pressed!')
 	});
 	getUserList(displayName, email);
@@ -62,7 +62,7 @@ function getUserList(displayName, email) {
 			if (!found) {
 				createUser(displayName, email);
 			}
-			$("#listboxUsers").jqxListBox({ width: 300, source: source, checkboxes: true, height: 300 });
+			$("#listbox-users").jqxListBox({ width: 300, source: source, checkboxes: true, height: 300 });
 		},
 		error: function(data) {
 			// error
@@ -87,19 +87,19 @@ function createUser(username, email) {
 
 function getGamesList(user) {
 	var source = [];
-	$("#listboxGames").jqxListBox({ width: 300, source: source, checkboxes: true, height: 300 });
+	$("#listbox-games").jqxListBox({ width: 300, source: source, checkboxes: true, height: 300 });
 }
 
-function createNewGame() {
-	var items = $("#listboxUsers").jqxListBox('getCheckedItems');
-	var checkedItems = [];
-	$.each(items, function (index) {
-		var user = this.label.match(/^(\w+)/);
+function createGame(displayName) {
+	var items = $("#listbox-users").jqxListBox('getCheckedItems');
+	var checkedItems = [displayName];
+	$.each(items, function(index) {
+		var user = this.label.match(/^(.+)/).trim();
 		checkedItems.push(user[0]);
 	});
 
-	if (checkedItems.length <= 2) {
-		alert('Must select at least 3 users!');
+	if (checkedItems.length < 2 || checkedItems.length > 4) {
+		alert('Must select at 2-4 users!');
 		return;
 	}
 
@@ -114,11 +114,11 @@ function createNewGame() {
 		type: "POST",
 		contentType: 'application/json',
 		data: JSON.stringify({ 'name': name, 'users': checkedItems } ),
-		success: function (data) {
-			// document.write(data.responseText);  // writes head and body
-			console.log(data.responseText);
+		success: function(data) {
+			board = JSON.parse(data);
+			window.location.replace('/game/' + board.id)
 		},
-		error: function (data) {
+		error: function(data) {
 			console.log(data.responseText);
 		}
 	});

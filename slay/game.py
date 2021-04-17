@@ -1,9 +1,10 @@
+from random import shuffle
+
 from .board import Board
 from .models import *
 
-salt = 'salty-brine'
-user_schema = UserSchema(only=['id', 'username', 'score'])
-users_schema = UserSchema(only=['id', 'username', 'score'], many=True)
+user_schema = UserSchema()
+users_schema = UserSchema(many=True)
 game_schema = GameSchema()
 board_schema = BoardSchema()
 
@@ -21,13 +22,15 @@ class Game:
         return new_board
 
     @staticmethod
-    def get_board(board_id):
-        return BoardModel.query.filter(BoardModel.id == board_id)
+    def get_game_board_html(game_id):
+        game = GameModel.query.filter(GameModel.id == game_id).first()
+        board = BoardModel.query.filter(BoardModel.id == game.current_board_id).first()
+        html = Board.str_to_html(board.board)
+        return html
 
     @staticmethod
     def create_user(email, username):
         try:
-            # password_hash = hashlib.sha3_512((salt + password).encode()).hexdigest()
             db.session.add(UserModel(email=email, username=username, score=0))
             db.session.commit()
             return {'success': True}
@@ -58,24 +61,23 @@ class Game:
 
     @staticmethod
     def create_game(name, users):
-        players = []
+        shuffle(users)
+        board_rand = Game.get_random_board(num_players=len(users))
+        turn_colors = board_rand.get_player_turn_order()
+        i = 0
         for username in users:
             user_id = Game.get_user(username, False).id
-            player = Game.create_player(user_id)
-            players.append(player.id)
-        board_rand = Game.get_random_board(num_players=len(players))
-        current_player_turn = list(board_rand.get_player_turn_order().keys())[0]
+            player = PlayerModel(user_id=user_id, color=turn_colors[i], bank=0, last_turn_time=0)
+            db.session.add(player)
+            i += 1
         board_model = Game.create_board(str(board_rand))
-        game_model = GameModel(players=str(players), name=name, current_board_id=board_model.id,
-                               turn_player_id=int(current_player_turn), history='')
+        game_model = GameModel(name=name, current_board_id=board_model.id, turn_colors=str(turn_colors))
+        history_model = GameHistoryModel(game_id=game_model.id, board_id=board_model.id)
+        db.session.add(history_model)
         db.session.add(board_model)
         db.session.add(game_model)
         db.session.commit()
-        return {
-            "game": game_schema.dump(game_model),
-            "board": board_schema.dump(board_rand),
-            "turn": current_player_turn
-        }
+        return game_schema.dump(game_model)
 
     @staticmethod
     def get_game_board(game_id):
@@ -92,13 +94,6 @@ class Game:
     @staticmethod
     def update_game():
         pass
-
-    @staticmethod
-    def create_player(user_id):
-        player = PlayerModel(user_id=user_id, bank=0, last_turn_time=0)
-        db.session.add(player)
-        db.session.commit()
-        return player
 
     @staticmethod
     def get_player(user_id):
