@@ -97,19 +97,35 @@ initGame = function(displayName, email) {
 		$('#panel').removeClass('vertical-panel').addClass('horizontal-panel');
 	}
 	
-	$(".draggable").draggable({
-		revert: 'invalid',
-		start: function(event, ui) {
-			dragStartPosition = ui.helper.position();
-		}
-	});
+	$.ajax({
+		type: "GET",
+		dataType: "json",
+		url: `${window.location.pathname}/${username}`,
+		success: function(data) {
+			playerColor = PlayerColorsEnum[data.player.color];
 
-	$(".droppable").droppable({
-		accept: '.draggable',
-		drop: function(event, ui) {
-			draggable = $(ui.draggable[0])
-			droppable = $(this)
-			drop(draggable, droppable);
+			$(`.${playerColor}`).each(function() {
+				$(this).addClass('droppable');
+			});
+
+			$(".draggable").draggable({
+				revert: 'invalid',
+				start: function(event, ui) {
+					dragStartPosition = ui.helper.position();
+				}
+			});
+		
+			$(".droppable").droppable({
+				accept: '.draggable',
+				drop: function(event, ui) {
+					draggable = $(ui.draggable[0])
+					droppable = $(this)
+					drop(draggable, droppable);
+				}
+			});
+		},
+		error: function(data) {
+			console.log(data);
 		}
 	});
 
@@ -119,21 +135,8 @@ initGame = function(displayName, email) {
 	});
 
 	$('#buttonEndTurn').click(function() {
-	if (confirm('Are you sure you want to end the turn?')) {
+		if (confirm('Are you sure you want to end the turn?')) {
 			alert('Turn ended!');
-		}
-	});
-
-	$.ajax({
-		type: "GET",
-		dataType: "json",
-		url: `${window.location.pathname}/${username}`,
-		success: function(data) {
-			console.log(data);
-			playerColor = PlayerColorsEnum[data.player.color];
-		},
-		error: function(data) {
-			console.log(data);
 		}
 	});
 }
