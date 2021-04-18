@@ -1,8 +1,8 @@
 
 body {
 	display: grid;
-	grid-template-columns: 1fr;
-	grid-template-rows: 100px 500px;
+	grid-template-columns: 100%;
+	grid-template-rows: 10% 90%;
 	justify-items: center;
 	align-items: center;
 }
@@ -14,7 +14,7 @@ body {
 #main-menu {
 	display: grid;
 	grid-template-columns: 1fr;
-	grid-template-rows: 10px 400px 100px;
+	grid-template-rows: 10% 70% 20%;
 	justify-items: center;
 	align-items: center;
 }

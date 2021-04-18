@@ -14,7 +14,7 @@ class BoardModel(db.Model):
 
 class BoardSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'board', 'game_id')
+        fields = ('id', 'board')
 
 
 class PlayerModel(db.Model):
@@ -27,7 +27,7 @@ class PlayerModel(db.Model):
     last_turn_time = db.Column(db.Integer)
 
     def __repr__(self):
-        return f'player: {self.id}, color: {self.color}, bank: {self.bank}, game_id: {self.game_id} ' + \
+        return f'player: {self.id}, color: {self.color}, bank: {self.bank}, game_id: {self.game_id}, ' + \
                f'user_id: {self.user_id}, last_turn_time: {self.last_turn_time}'
 
 
@@ -43,7 +43,7 @@ class GameModel(db.Model):
     current_board_id = db.Column(db.Integer, db.ForeignKey('boards.id'))
     turn_colors = db.Column(db.String(36))
 
-    players = db.relationship(PlayerModel, backref='games', passive_deletes=True)
+    # players = db.relationship(PlayerModel, backref='games', passive_deletes=True)
 
     def __repr__(self):
         return f'game: {self.id}, name: {self.name}, ' + \

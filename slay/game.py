@@ -43,11 +43,16 @@ class Game:
         return users_schema.dump(all_users)
 
     @staticmethod
-    def get_user(username, external=True):
-        if external:
-            return user_schema.dump(UserModel.query.filter(UserModel.username == username).first())
-        else:
-            return UserModel.query.filter(UserModel.username == username).first()
+    def get_user(username):
+        user = UserModel.query.filter(UserModel.username == username).first()
+        players = PlayerModel.query.filter(PlayerModel.user_id == user.id)
+        user_with_games = user_schema.dump(user)
+        games = {}
+        for player in players:
+            game = GameModel.query.filter(GameModel.id == player.game_id).first()
+            games[player.game_id] = game.name
+        user_with_games['games'] = games
+        return user_with_games
 
     @staticmethod
     def update_user(username, score):
@@ -64,18 +69,19 @@ class Game:
         shuffle(users)
         board_rand = Game.get_random_board(num_players=len(users))
         turn_colors = board_rand.get_player_turn_order()
-        i = 0
-        for username in users:
-            user_id = Game.get_user(username, False).id
-            player = PlayerModel(user_id=user_id, color=turn_colors[i], bank=0, last_turn_time=0)
-            db.session.add(player)
-            i += 1
         board_model = Game.create_board(str(board_rand))
         game_model = GameModel(name=name, current_board_id=board_model.id, turn_colors=str(turn_colors))
         history_model = GameHistoryModel(game_id=game_model.id, board_id=board_model.id)
         db.session.add(history_model)
         db.session.add(board_model)
         db.session.add(game_model)
+        db.session.commit()
+        i = 0
+        for username in users:
+            user_id = Game.get_user(username)['id']
+            player = PlayerModel(user_id=user_id, game_id=game_model.id, color=turn_colors[i], bank=0, last_turn_time=0)
+            db.session.add(player)
+            i += 1
         db.session.commit()
         return game_schema.dump(game_model)
 
@@ -90,15 +96,3 @@ class Game:
     def get_games(user_id):
         players = PlayerModel.query.filter(PlayerModel.user_id == user_id)
         return players
-
-    @staticmethod
-    def update_game():
-        pass
-
-    @staticmethod
-    def get_player(user_id):
-        pass
-
-    @staticmethod
-    def update_player(bank, last_turn_time):
-        pass

@@ -33,10 +33,10 @@
 				url: `/firebase`,
 				success: function(data) {
 					firebase.initializeApp(data);
-					initApp();  // firebase auth
+					initApp(initMainMenu);  // firebase auth
 				},
 				error: function(data) {
-					console.log(data)
+					window.location.replace('/')
 				}
 			});
 		});

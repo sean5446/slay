@@ -13,7 +13,6 @@ users = [
     {'username': 'Computer2', 'email': 'computer2@gmail.com'},
     {'username': 'Computer3', 'email': 'computer3@gmail.com'},
     {'username': 'Computer4', 'email': 'computer4@gmail.com'},
-    {'username': 'Computer5', 'email': 'computer5@gmail.com'},
 ]
 
 for user in users:
@@ -27,7 +26,6 @@ for user in users:
 
 req = requests.get(f'{host}/user/adfgsasdfs')
 print(req.status_code)
-print(req.json())
 
 req = requests.get(f'{host}/user')
 print(req.status_code)

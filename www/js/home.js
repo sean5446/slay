@@ -1,4 +1,4 @@
-function initMainMenu(displayName, email) {
+initMainMenu = function(displayName, email) {
 	$('#firebaseui-auth-container').hide();
 	$('#main-menu').show();
 	$('#sign-in-status').html(`Logged in: ${displayName}`);
@@ -6,18 +6,18 @@ function initMainMenu(displayName, email) {
 		createGame(displayName);
 	});
 	$('#button-join-game').click(function () {
-		alert('join game pressed!')
+		joinGame();
 	});
 	getUserList(displayName, email);
-	getGamesList(displayName);
+	getGameList(displayName);
 }
 
-function initApp() {
+function initApp(callback) {
 	firebase.auth().onAuthStateChanged(function(user) {
 		if (user) {
 			// User is signed in
 			user.getIdToken().then(function(accessToken) {
-				initMainMenu(user.displayName, user.email);
+				callback(user.displayName, user.email);
 			});
 		} else {
 			// User is signed out
@@ -65,7 +65,7 @@ function getUserList(displayName, email) {
 			$("#listbox-users").jqxListBox({ width: 300, source: source, checkboxes: true, height: 300 });
 		},
 		error: function(data) {
-			// error
+			console.log(data);
 		}
 	});
 }
@@ -85,7 +85,25 @@ function createUser(username, email) {
 	});
 }
 
-function getGamesList(user) {
+function getGameList(user) {
+	$.ajax({
+		type: "GET",
+		dataType: "json",
+		url: `/user/${user}`,
+		success: function(data) {
+			var games = data.games;
+			var source = [];
+			for (const [key, value] of Object.entries(games)) {
+				var entry = `${key}: ${value}`
+				source.push(entry);
+			}
+			$("#listbox-games").jqxListBox({ width: 300, source: source, checkboxes: true, height: 300 });
+		},
+		error: function(data) {
+			console.log(data);
+		}
+	});
+
 	var source = [];
 	$("#listbox-games").jqxListBox({ width: 300, source: source, checkboxes: true, height: 300 });
 }
@@ -94,11 +112,11 @@ function createGame(displayName) {
 	var items = $("#listbox-users").jqxListBox('getCheckedItems');
 	var checkedItems = [displayName];
 	$.each(items, function(index) {
-		var user = this.label.match(/^(.+)/).trim();
-		checkedItems.push(user[0]);
+		var user = this.label.match(/^(.+) /)[0].trim();
+		checkedItems.push(user);
 	});
 
-	if (checkedItems.length < 2 || checkedItems.length > 4) {
+	if (checkedItems.length < 2 || checkedItems.length > 5) {
 		alert('Must select at 2-4 users!');
 		return;
 	}
@@ -116,12 +134,27 @@ function createGame(displayName) {
 		data: JSON.stringify({ 'name': name, 'users': checkedItems } ),
 		success: function(data) {
 			board = JSON.parse(data);
-			window.location.replace('/game/' + board.id)
+			window.location.replace('/game/' + board.id);
 		},
 		error: function(data) {
 			console.log(data.responseText);
 		}
 	});
+}
+
+function joinGame() {
+	var items = $("#listbox-games").jqxListBox('getCheckedItems');
+	var checkedItems = [];
+	$.each(items, function(index) {
+		var user = this.label.match(/^(\d+)/)[0].trim();
+		checkedItems.push(user);
+	});
+
+	if (checkedItems.length > 1) {
+		alert('Can only join one game!');
+		return;
+	}
+	window.location.replace('/game/' + checkedItems[0]);
 }
 
 function setCookie(name,value,days) {

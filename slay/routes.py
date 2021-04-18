@@ -49,7 +49,7 @@ def create_user():
         return str(ret), 500
 
 
-@app.route('/user/<username>', methods=['POST', 'GET'])
+@app.route('/user/<username>')
 def get_user(username):
     user = Game.get_user(username)
     if not isinstance(user, Exception):
@@ -58,7 +58,7 @@ def get_user(username):
         return 404
 
 
-@app.route('/user', methods=['POST', 'GET'])
+@app.route('/user')
 def get_all_users():
     ret = Game.get_all_users()
     return json.dumps(ret), 200, {'ContentType': 'application/json'}
@@ -76,6 +76,7 @@ def create_game():
     data = request.get_json()
     game = Game.create_game(data['name'], data['users'])
     if not isinstance(game, Exception):
+        s = str(game)
         return json.dumps(game), 200, {'ContentType': 'application/json'}
     else:
         return 500

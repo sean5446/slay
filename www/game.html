@@ -13,9 +13,29 @@
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 	<script src="../../js/jquery.ui.touch-punch.min.js"></script>
 	<script src="../../js/slay.js"></script>
+	<script src="../../js/home.js"></script>
 
 	<link rel="stylesheet" href="../../css/slay.css" />
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" />
+
+	<script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-auth.js"></script>
+
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$.ajax({
+				type: "GET",
+				dataType: "json",
+				url: `/firebase`,
+				success: function(data) {
+					firebase.initializeApp(data);
+					initApp(function(x, y) {});  // firebase auth
+				},
+				error: function(data) {
+					console.log(data)
+				}
+			});
+		});
+	</script>
 </head>
 <body>
 
