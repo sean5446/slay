@@ -6,13 +6,10 @@
 	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 	<meta content="utf-8" http-equiv="encoding">
 
-	<meta http-equiv="Cache-control" content="no-cache">
-	<meta http-equiv="Expires" content="-1">
-
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 	<script src="../../js/jquery.ui.touch-punch.min.js"></script>
-	<script src="../../js/slay.js"></script>
+	<script src="../../js/game.js"></script>
 	<script src="../../js/home.js"></script>
 
 	<link rel="stylesheet" href="../../css/slay.css" />
@@ -28,7 +25,7 @@
 				url: `/firebase`,
 				success: function(data) {
 					firebase.initializeApp(data);
-					initApp(function(x, y) {});  // firebase auth
+					initApp(initGame);  // firebase auth
 				},
 				error: function(data) {
 					console.log(data)
@@ -42,6 +39,9 @@
 <div id="map" class="vertical-map">
 
 	<!-- player units ! -->
+	<div class="hex man draggable unit" style="top:15px; left:106px;"></div>
+	<div class="hex man draggable unit" style="top:15px; left:212px;"></div>
+	<div class="hex spearman draggable unit" style="top:15px; left:318px;"></div>
 
 	<div id="tiles">
 		{{tiles}}

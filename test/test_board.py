@@ -7,7 +7,7 @@ from slay.board import Board
 class TestBoard(unittest.TestCase):
 
     def test_get_neighbors(self):
-        board = Board(num_rows=4, num_cols=4, num_players=1, board_type=5.0)
+        board = Board(board_type=5.0, num_rows=4, num_cols=4, num_players=1)
         assert board.get_neighbors(0, 0) == [(0, 1), (1, 0)]
         assert board.get_neighbors(1, 0) == [(0, 0), (0, 1), (1, 1), (2, 0), (2, 1)]
         assert board.get_neighbors(3, 0) == [(2, 0), (2, 1), (3, 1)]
@@ -19,7 +19,7 @@ class TestBoard(unittest.TestCase):
         print('tests passed!')
 
     def test_fair_random_board(self):
-        board = Board(num_rows=5, num_cols=9, num_players=5, board_type=1.2)
+        board = Board(board_type=1.2, num_rows=5, num_cols=9, num_players=5)
         fair_grid, player_tiles, std_dev, num_generated = board.fair_random_board(1.2)
         print(board)
         print(f"std dev: {std_dev}")
@@ -28,20 +28,20 @@ class TestBoard(unittest.TestCase):
         assert len(board.get_player_tile_count().keys()) == 6  # 6 with trees
 
     def test_get_player_turn_order(self):
-        board = Board(num_cols=5, num_rows=5, num_players=5, board_type=1.2)
+        board = Board(board_type=1.2, num_cols=5, num_rows=5, num_players=5)
         print(board.get_player_turn_order())
 
     def test_render_to_html(self):
-        board = Board(num_cols=5, num_rows=5, num_players=5, board_type=1.2)
+        board = Board(board_type=1.2, num_cols=5, num_rows=5, num_players=5)
         print(board.render_to_html())
 
     def test_get_contiguous_player_tiles(self):
-        board = Board(num_cols=5, num_rows=5, num_players=2, board_type='horz')
+        board = Board(board_type='horz', num_cols=5, num_rows=5, num_players=2)
         tiles = board.get_contiguous_player_tiles(1)
         assert tiles == {(0, 0): [(0, 0), (0, 1), (0, 2), (0, 3)],
                          (2, 0): [(2, 0), (2, 1), (2, 2), (2, 3)],
                          (4, 0): [(4, 0), (4, 1), (4, 2), (4, 3)]}
-        board = Board(num_cols=5, num_rows=5, num_players=2, board_type='vert')
+        board = Board(board_type='vert', num_cols=5, num_rows=5, num_players=2)
         tiles = board.get_contiguous_player_tiles(1)
         assert tiles == {(0, 0): [(0, 0), (1, 0), (2, 0), (3, 0)],
                          (0, 2): [(0, 2), (1, 2), (2, 2), (3, 2)],

@@ -7,19 +7,20 @@ user_schema = UserSchema()
 users_schema = UserSchema(many=True)
 game_schema = GameSchema()
 board_schema = BoardSchema()
+player_schema = PlayerSchema()
 
 
 class Game:
     @staticmethod
     def get_random_board(num_rows=13, num_cols=8, num_players=5, std_dev=1.2):
-        return Board(num_rows, num_cols, num_players, std_dev)
+        return Board(std_dev, num_rows, num_cols, num_players)
 
     @staticmethod
     def get_board_html(board_id):
         board = BoardModel.query.filter(BoardModel.id == board_id).first()
         if not board:
             return None
-        return Board(0, 0, 0, board.board).render_to_html()
+        return Board(board.board).render_to_html()
 
     @staticmethod
     def create_board(board):
@@ -34,7 +35,7 @@ class Game:
         if not game:
             return None, None
         board = BoardModel.query.filter(BoardModel.id == game.current_board_id).first()
-        board_html = Board(0, 0, 0, board.board).render_to_html()
+        board_html = Board(board.board).render_to_html()
         players_html = Game.game_to_html(game)
         return board_html, players_html
 
@@ -106,6 +107,14 @@ class Game:
         return board
 
     @staticmethod
+    def get_game_user(game_id, username):
+        user = Game.get_user(username)
+        user_id = int(user['id'])
+        player = PlayerModel.query.filter(PlayerModel.user_id == user_id).filter(PlayerModel.game_id == game_id).first()
+        user['player'] = player_schema.dump(player)
+        return user
+
+    @staticmethod
     def get_games(user_id):
         players = PlayerModel.query.filter(PlayerModel.user_id == user_id)
         return players
@@ -115,7 +124,7 @@ class Game:
         players_html = ''
         players = PlayerModel.query.filter(PlayerModel.game_id == game.id)
         board_model = BoardModel.query.filter(BoardModel.id == game.current_board_id).first()
-        board = Board(0, 0, 0, board_model.board)
+        board = Board(board_model.board)
         counts = board.get_player_tile_count()
         for player in players:
             user = UserModel.query.filter(UserModel.id == player.user_id).first()

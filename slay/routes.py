@@ -76,6 +76,12 @@ def get_game(game_id):
     return render_template('game.html', title='Slay Game', tiles=Markup(board_html), players=Markup(players_html))
 
 
+@app.route('/game/<game_id>/<username>')
+def get_game_user(game_id, username):
+    user = Game.get_game_user(game_id, username)
+    return json.dumps(user), 200, {'ContentType': 'application/json'}
+
+
 @app.route('/game/create', methods=['POST'])
 # @limiter.limit("1 per day")
 def create_game():

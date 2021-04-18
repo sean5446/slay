@@ -10,7 +10,7 @@ class Board:
         '09': 'hut', '12': 'knight', '13': 'castle', '16': 'barron'
     }
 
-    def __init__(self, num_rows, num_cols, num_players, board_type):
+    def __init__(self, board_type, num_rows=0, num_cols=0, num_players=0):
         self.num_rows = num_rows
         self.num_cols = num_cols
         self.num_players = num_players
