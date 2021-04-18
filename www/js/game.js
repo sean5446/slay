@@ -55,14 +55,15 @@ function drop(draggable, droppable) {
 		if (units.length > 1) {
 			var totalStrength = 0;
 			for (i = 0; i < units.length; i++) {
-				var e = $(units[i])
+				var e = $(units[i]);
 				var unit = getUnit(e.attr("class").split(/\s+/));
 				totalStrength += UnitEnum[unit];
 				e.remove();
 			}
 			var upgradedUnit = getUnitFromStrength(totalStrength);
-			var elementUnit = $(`<div class="hex ${upgradedUnit} draggable unit" style="top: ${pos_top}px; left: ${pos_left}px;"></div>`)
+			var elementUnit = $(`<div class="hex ${upgradedUnit} draggable unit" style="top: ${pos_top}px; left: ${pos_left}px;"></div>`);
 			$('#map').append(elementUnit);
+			setDraggable();
 			elementUnit.draggable();
 		}
 		// just place the unit
@@ -83,6 +84,15 @@ function drop(draggable, droppable) {
 			draggable.css({top: dragStartPosition.top, left: dragStartPosition.left});
 		}
 	}
+}
+
+function setDraggable() {
+	$(".draggable").draggable({
+		revert: 'invalid',
+		start: function(event, ui) {
+			dragStartPosition = ui.helper.position();
+		}
+	});
 }
 
 dragStartPosition = null;
@@ -108,12 +118,7 @@ initGame = function(displayName, email) {
 				$(this).addClass('droppable');
 			});
 
-			$(".draggable").draggable({
-				revert: 'invalid',
-				start: function(event, ui) {
-					dragStartPosition = ui.helper.position();
-				}
-			});
+			setDraggable();
 		
 			$(".droppable").droppable({
 				accept: '.draggable',
