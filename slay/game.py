@@ -15,6 +15,13 @@ class Game:
         return Board(num_rows, num_cols, num_players, std_dev)
 
     @staticmethod
+    def get_board_html(board_id):
+        board = BoardModel.query.filter(BoardModel.id == board_id).first()
+        if not board:
+            return None
+        return Board(0, 0, 0, board.board).render_to_html()
+
+    @staticmethod
     def create_board(board):
         new_board = BoardModel(board=board)
         db.session.add(new_board)
@@ -24,9 +31,12 @@ class Game:
     @staticmethod
     def get_game_board_html(game_id):
         game = GameModel.query.filter(GameModel.id == game_id).first()
+        if not game:
+            return None, None
         board = BoardModel.query.filter(BoardModel.id == game.current_board_id).first()
-        html = Board.str_to_html(board.board)
-        return html
+        board_html = Board(0, 0, 0, board.board).render_to_html()
+        players_html = Game.game_to_html(game)
+        return board_html, players_html
 
     @staticmethod
     def create_user(email, username):
@@ -45,6 +55,8 @@ class Game:
     @staticmethod
     def get_user(username):
         user = UserModel.query.filter(UserModel.username == username).first()
+        if not user:
+            return user
         players = PlayerModel.query.filter(PlayerModel.user_id == user.id)
         user_with_games = user_schema.dump(user)
         games = {}
@@ -69,17 +81,18 @@ class Game:
         shuffle(users)
         board_rand = Game.get_random_board(num_players=len(users))
         turn_colors = board_rand.get_player_turn_order()
-        board_model = Game.create_board(str(board_rand))
-        game_model = GameModel(name=name, current_board_id=board_model.id, turn_colors=str(turn_colors))
+        board_model = Game.create_board(str(board_rand))  # adds and commits
+        game_model = GameModel(name=name, current_board_id=board_model.id,
+                               turn_colors=turn_colors, current_turn=turn_colors[0])
         history_model = GameHistoryModel(game_id=game_model.id, board_id=board_model.id)
         db.session.add(history_model)
-        db.session.add(board_model)
         db.session.add(game_model)
         db.session.commit()
         i = 0
         for username in users:
             user_id = Game.get_user(username)['id']
-            player = PlayerModel(user_id=user_id, game_id=game_model.id, color=turn_colors[i], bank=0, last_turn_time=0)
+            player = PlayerModel(user_id=user_id, game_id=game_model.id, color=turn_colors.split(',')[i],
+                                 bank=0, last_turn_time=0)
             db.session.add(player)
             i += 1
         db.session.commit()
@@ -96,3 +109,16 @@ class Game:
     def get_games(user_id):
         players = PlayerModel.query.filter(PlayerModel.user_id == user_id)
         return players
+
+    @staticmethod
+    def game_to_html(game):
+        players_html = ''
+        players = PlayerModel.query.filter(PlayerModel.game_id == game.id)
+        board_model = BoardModel.query.filter(BoardModel.id == game.current_board_id).first()
+        board = Board(0, 0, 0, board_model.board)
+        counts = board.get_player_tile_count()
+        for player in players:
+            user = UserModel.query.filter(UserModel.id == player.user_id).first()
+            players_html += f'<div style="color: {Board.PLAYER_COLORS[str(player.color)]};">' + \
+                            f'{user.username}: {counts[str(player.color)]}</div>\n'
+        return players_html

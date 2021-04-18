@@ -2,7 +2,7 @@
 import json
 import os
 
-from flask import send_from_directory, request, render_template, Markup
+from flask import send_from_directory, request, render_template, abort, Markup
 from flask import current_app as app
 
 from .game import Game
@@ -33,7 +33,11 @@ def serve_index():
 
 @app.route('/board/<board_id>')
 def get_board(board_id):
-    return str(Game.get_board(board_id))
+    board = Game.get_board_html(board_id)
+    if not board:
+        abort(404)
+    board_html = Game.get_board_html(board)
+    return render_template('game.html', title='Slay Game', tiles=Markup(board_html))
 
 
 @app.route('/user/create', methods=['POST'])
@@ -52,10 +56,10 @@ def create_user():
 @app.route('/user/<username>')
 def get_user(username):
     user = Game.get_user(username)
-    if not isinstance(user, Exception):
+    if user and not isinstance(user, Exception):
         return json.dumps(user), 200, {'ContentType': 'application/json'}
     else:
-        return 404
+        abort(404)
 
 
 @app.route('/user')
@@ -66,8 +70,10 @@ def get_all_users():
 
 @app.route('/game/<game_id>')
 def get_game(game_id):
-    board_html = Game.get_game_board_html(game_id)
-    return render_template('game.html', title='Slay Game', tiles=Markup(board_html))
+    board_html, players_html = Game.get_game_board_html(game_id)
+    if not board_html:
+        abort(404)
+    return render_template('game.html', title='Slay Game', tiles=Markup(board_html), players=Markup(players_html))
 
 
 @app.route('/game/create', methods=['POST'])

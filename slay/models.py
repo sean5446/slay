@@ -42,17 +42,18 @@ class GameModel(db.Model):
     name = db.Column(db.String(16), unique=True)
     current_board_id = db.Column(db.Integer, db.ForeignKey('boards.id'))
     turn_colors = db.Column(db.String(36))
+    current_turn = db.Column(db.Integer)
 
     # players = db.relationship(PlayerModel, backref='games', passive_deletes=True)
 
     def __repr__(self):
-        return f'game: {self.id}, name: {self.name}, ' + \
+        return f'game: {self.id}, name: {self.name}, current_turn: {self.current_turn}, ' + \
                f'current_board_id: {self.current_board_id}, turn_colors: {self.turn_colors}'
 
 
 class GameSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'name', 'players', 'current_board_id', 'turn_colors')
+        fields = ('id', 'name', 'players', 'current_board_id', 'turn_colors', 'current_turn')
 
 
 class GameHistoryModel(db.Model):

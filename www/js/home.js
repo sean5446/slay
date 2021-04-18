@@ -5,9 +5,6 @@ initMainMenu = function(displayName, email) {
 	$('#button-create-game').click(function() {
 		createGame(displayName);
 	});
-	$('#button-join-game').click(function () {
-		joinGame();
-	});
 	getUserList(displayName, email);
 	getGameList(displayName);
 }
@@ -98,6 +95,10 @@ function getGameList(user) {
 				source.push(entry);
 			}
 			$("#listbox-games").jqxListBox({ width: 300, source: source, checkboxes: true, height: 300 });
+			$("#listbox-games").on('checkChange', function(event) {
+				var id = event.args.item.label.match(/^(\d+)/)[0].trim();
+				window.location.assign('/game/' + id);
+			});
 		},
 		error: function(data) {
 			console.log(data);
@@ -140,21 +141,6 @@ function createGame(displayName) {
 			console.log(data.responseText);
 		}
 	});
-}
-
-function joinGame() {
-	var items = $("#listbox-games").jqxListBox('getCheckedItems');
-	var checkedItems = [];
-	$.each(items, function(index) {
-		var user = this.label.match(/^(\d+)/)[0].trim();
-		checkedItems.push(user);
-	});
-
-	if (checkedItems.length > 1) {
-		alert('Can only join one game!');
-		return;
-	}
-	window.location.assign('/game/' + checkedItems[0]);
 }
 
 function setCookie(name,value,days) {

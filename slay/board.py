@@ -1,29 +1,30 @@
 from random import randint
 
 
-PLAYER_COLORS = {
-    '0': 'transparent', '1': 'green', '2': 'red', '3': 'blue', '4': 'yellow', '5': 'black'
-}
-UNIT_VALUES = {
-    '00': '', '01': 'grave', '02': 'tree', '04': 'man', '08': 'spearman',
-    '09': 'hut', '12': 'knight', '13': 'castle', '16': 'barron'
-}
-
-
 class Board:
-    def __init__(self, num_rows, num_cols, num_players, std_dev):
+    PLAYER_COLORS = {
+        '0': 'transparent', '1': 'green', '2': 'red', '3': 'blue', '4': 'yellow', '5': 'black'
+    }
+    UNIT_VALUES = {
+        '00': '', '01': 'grave', '02': 'tree', '04': 'man', '08': 'spearman',
+        '09': 'hut', '12': 'knight', '13': 'castle', '16': 'barron'
+    }
+
+    def __init__(self, num_rows, num_cols, num_players, board_type):
         self.num_rows = num_rows
         self.num_cols = num_cols
         self.num_players = num_players
         self.board = []
         for i in range(num_rows):
             self.board.append([''] * num_cols)
-        if type(std_dev) is float:
-            self.fair_random_board(std_dev)
-        elif std_dev == 'vert':
+        if type(board_type) is float:
+            self.fair_random_board(board_type)
+        elif board_type == 'vert':
             self.simple_board_vert()
-        else:
+        elif board_type == 'horz':
             self.simple_board_horz()
+        else:
+            self.board_from_str(board_type)
 
     def __repr__(self):
         board = ''
@@ -111,7 +112,7 @@ class Board:
         player_tiles = self.get_player_tile_count()
         order = {k: v for k, v in sorted(player_tiles.items(), key=lambda item: item[1])}
         del order['0']  # 0 is not a player
-        return list(order.keys())
+        return ','.join(order.keys())
 
     def is_in_map(self, player_tiles, neighbors):
         for pk, pv in player_tiles.items():
@@ -150,28 +151,28 @@ class Board:
         for row in range(len(self.board)):
             html += f'\t<div class="hex-row{"" if row % 2 == 0 else " odd"}">\n'
             for col in range(len(self.board[row])):
-                color = PLAYER_COLORS[self.board[row][col][:1]]
+                color = Board.PLAYER_COLORS[self.board[row][col][:1]]
                 unit_id = self.board[row][col][1:3]
-                unit = UNIT_VALUES[unit_id]
+                unit = Board.UNIT_VALUES[unit_id]
                 tile_id = f'{row}-{col}'
                 html += f'\t\t<div id="tile-{tile_id}" class="hex {color} {unit}"></div>\n'
             html += '\t</div>\n'
         return html
 
-    @staticmethod
-    def str_to_html(board):
-        html = ''
-        i = 0
+    def board_from_str(self, board):
+        self.num_rows = len(board.split('\n')) - 1
+        self.num_cols = len(board.split('\n')[0].split(' ')) - 1
+        self.board = []
+        num_players = {}
         for row in board.split('\n'):
-            html += f'\t<div class="hex-row{"" if i % 2 == 0 else " odd"}">\n'
+            if len(row) == 0:
+                continue
+            column = []
             for col in row.split(' '):
                 if len(col) != 3:
                     continue
-                color = PLAYER_COLORS[col[:1]]
-                unit_id = col[1:3]
-                unit = UNIT_VALUES[unit_id]
-                tile_id = f'{row}-{col}'
-                html += f'\t\t<div id="tile-{tile_id}" class="hex {color} {unit}"></div>\n'
-            html += '\t</div>\n'
-            i += 1
-        return html
+                column.append(col)
+                if col[:1] != '0':  # 0 is not a player
+                    num_players[col[:1]] = ''
+            self.board.append(column)
+        self.num_players = len(num_players.keys())
