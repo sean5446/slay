@@ -134,7 +134,7 @@ function createGame(displayName) {
 		data: JSON.stringify({ 'name': name, 'users': checkedItems } ),
 		success: function(data) {
 			board = JSON.parse(data);
-			window.location.replace('/game/' + board.id);
+			window.location.assign('/game/' + board.id);
 		},
 		error: function(data) {
 			console.log(data.responseText);
@@ -154,7 +154,7 @@ function joinGame() {
 		alert('Can only join one game!');
 		return;
 	}
-	window.location.replace('/game/' + checkedItems[0]);
+	window.location.assign('/game/' + checkedItems[0]);
 }
 
 function setCookie(name,value,days) {

@@ -76,7 +76,6 @@ def create_game():
     data = request.get_json()
     game = Game.create_game(data['name'], data['users'])
     if not isinstance(game, Exception):
-        s = str(game)
         return json.dumps(game), 200, {'ContentType': 'application/json'}
     else:
         return 500
