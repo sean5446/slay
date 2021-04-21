@@ -16,28 +16,11 @@ class Game:
         return Board(std_dev, num_rows, num_cols, num_players)
 
     @staticmethod
-    def get_board_html(board_id):
-        board = BoardModel.query.filter(BoardModel.id == board_id).first()
-        if not board:
-            return None
-        return Board(board.board).render_to_html()
-
-    @staticmethod
     def create_board(board):
         new_board = BoardModel(board=board)
         db.session.add(new_board)
         db.session.commit()
         return new_board
-
-    @staticmethod
-    def get_game_board_html(game_id):
-        game = GameModel.query.filter(GameModel.id == game_id).first()
-        if not game:
-            return None, None
-        board = BoardModel.query.filter(BoardModel.id == game.current_board_id).first()
-        board_html = Board(board.board).render_to_html()
-        players_html = Game.game_to_html(game)
-        return board_html, players_html
 
     @staticmethod
     def create_user(email, username):
@@ -120,14 +103,28 @@ class Game:
         return players
 
     @staticmethod
+    def get_game_board_html(game_id):
+        game = GameModel.query.filter(GameModel.id == game_id).first()
+        if not game:
+            return None, None
+        board_html = Board(game.board.board).render_to_html()
+        players_html = Game.game_to_html(game)
+        return board_html, players_html
+
+    @staticmethod
+    def get_board_html(board_id):
+        board = BoardModel.query.filter(BoardModel.id == board_id).first()
+        if not board:
+            return None
+        return Board(board.board).render_to_html()
+
+    @staticmethod
     def game_to_html(game):
         players_html = ''
-        players = PlayerModel.query.filter(PlayerModel.game_id == game.id)
-        board_model = BoardModel.query.filter(BoardModel.id == game.current_board_id).first()
-        board = Board(board_model.board)
+        board = Board(game.board.board)
         counts = board.get_player_tile_count()
-        for player in players:
-            user = UserModel.query.filter(UserModel.id == player.user_id).first()
+        for player in game.players:
+            user = player.user
             players_html += f'<div style="color: {Board.PLAYER_COLORS[str(player.color)]};">' + \
                             f'{user.username}: {counts[str(player.color)]}</div>\n'
         return players_html

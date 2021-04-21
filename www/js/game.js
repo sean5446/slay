@@ -4,7 +4,7 @@ const UnitEnum = Object.freeze({
 });
 
 const PlayerColorsEnum = Object.freeze([
-	'red', 'green', 'blue', 'yellow', 'black'
+	'transparent', 'red', 'green', 'blue', 'yellow', 'black'
 ]);
 
 function getColor(classes) {

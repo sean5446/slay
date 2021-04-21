@@ -59,7 +59,7 @@ function getUserList(displayName, email) {
 			if (!found) {
 				createUser(displayName, email);
 			}
-			$("#listbox-users").jqxListBox({ width: 300, source: source, checkboxes: true, height: 300 });
+			$("#listbox-users").jqxListBox({ width: $(window).width()/2-10, source: source, checkboxes: true, height: 300 });
 		},
 		error: function(data) {
 			console.log(data);
@@ -94,7 +94,7 @@ function getGameList(user) {
 				var entry = `${key}: ${value}`
 				source.push(entry);
 			}
-			$("#listbox-games").jqxListBox({ width: 300, source: source, checkboxes: true, height: 300 });
+			$("#listbox-games").jqxListBox({ width: $(window).width()/2-10, source: source, checkboxes: true, height: 300 });
 			$("#listbox-games").on('checkChange', function(event) {
 				var id = event.args.item.label.match(/^(\d+)/)[0].trim();
 				window.location.assign('/game/' + id);
@@ -106,7 +106,7 @@ function getGameList(user) {
 	});
 
 	var source = [];
-	$("#listbox-games").jqxListBox({ width: 300, source: source, checkboxes: true, height: 300 });
+	$("#listbox-games").jqxListBox({ width: $(window).width()/2-10, source: source, checkboxes: true, height: 300 });
 }
 
 function createGame(displayName) {

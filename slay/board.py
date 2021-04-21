@@ -3,7 +3,7 @@ from random import randint
 
 class Board:
     PLAYER_COLORS = {
-        '0': 'transparent', '1': 'green', '2': 'red', '3': 'blue', '4': 'yellow', '5': 'black'
+        '0': 'transparent', '1': 'red', '2': 'green', '3': 'blue', '4': 'yellow', '5': 'black'
     }
     UNIT_VALUES = {
         '00': '', '01': 'grave', '02': 'tree', '04': 'man', '08': 'spearman',
@@ -46,7 +46,7 @@ class Board:
             ]
         neighbors = []
         for n in all_possible:
-            if 0 <= n[0] < len(self.board[0]) and 0 <= n[1] < len(self.board):
+            if 0 <= n[0] < len(self.board) and 0 <= n[1] < len(self.board[1]):
                 neighbors.append(n)
         return neighbors
 
@@ -106,7 +106,15 @@ class Board:
             std_dev = self.std_dev_player_tiles()
             num_generated += 1
             if std_dev < accept_std_dev:
-                return self.board, player_tiles, std_dev, num_generated
+                break
+
+        for player in range(1, self.num_players + 1):
+            regions = self.get_contiguous_player_tiles(player)
+            for k, v in regions.items():
+                if len(v) > 1:
+                    self.board[k[0]][k[1]] = self.board[k[0]][k[1]][:1] + '09'
+
+        return self.board, player_tiles, std_dev, num_generated
 
     def get_player_turn_order(self):
         player_tiles = self.get_player_tile_count()
@@ -135,8 +143,8 @@ class Board:
                 if n in discovered:
                     continue
                 discovered += [n]
-                is_player = self.board[n[0]][n[1]][:1] == player
-                if is_player:
+                tile = self.board[n[0]][n[1]][:1]
+                if tile == player:
                     k = self.is_in_map(regions, neighbors)
                     if k:
                         regions[k] += [t, n]
@@ -151,7 +159,8 @@ class Board:
         for row in range(len(self.board)):
             html += f'\t<div class="hex-row{"" if row % 2 == 0 else " odd"}">\n'
             for col in range(len(self.board[row])):
-                color = Board.PLAYER_COLORS[self.board[row][col][:1]]
+                player = self.board[row][col][:1]
+                color = Board.PLAYER_COLORS[player]
                 unit_id = self.board[row][col][1:3]
                 unit = Board.UNIT_VALUES[unit_id]
                 tile_id = f'{row}-{col}'

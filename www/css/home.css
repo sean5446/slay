@@ -9,12 +9,13 @@ body {
 
 #logo {
 	width: 200px;
+	padding-top: 35px
 }
 
 #main-menu {
 	display: grid;
 	grid-template-columns: 1fr;
-	grid-template-rows: 10% 70% 20%;
+	grid-template-rows: 10% 90% 10%;
 	justify-items: center;
 	align-items: center;
 }
