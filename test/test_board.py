@@ -38,14 +38,14 @@ class TestBoard(unittest.TestCase):
     def test_get_contiguous_player_tiles(self):
         board = Board(board_type='horz', num_cols=5, num_rows=5, num_players=2)
         tiles = board.get_contiguous_player_tiles(1)
-        assert tiles == {(0, 0): [(0, 0), (0, 1), (0, 2), (0, 3)],
-                         (2, 0): [(2, 0), (2, 1), (2, 2), (2, 3)],
-                         (4, 0): [(4, 0), (4, 1), (4, 2), (4, 3)]}
+        assert tiles == {(0, 0): [(0, 0), (0, 1), (0, 2), (0, 3), (0, 4)],
+                         (2, 0): [(2, 0), (2, 1), (2, 2), (2, 3), (2, 4)],
+                         (4, 0): [(4, 0), (4, 1), (4, 2), (4, 3), (4, 4)]}
         board = Board(board_type='vert', num_cols=5, num_rows=5, num_players=2)
         tiles = board.get_contiguous_player_tiles(1)
-        assert tiles == {(0, 0): [(0, 0), (1, 0), (2, 0), (3, 0)],
-                         (0, 2): [(0, 2), (1, 2), (2, 2), (3, 2)],
-                         (0, 4): [(0, 4), (1, 4), (2, 4), (3, 4)]}
+        assert tiles == {(0, 0): [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0)],
+                         (0, 2): [(0, 2), (1, 2), (2, 2), (3, 2), (4, 2)],
+                         (0, 4): [(0, 4), (1, 4), (2, 4), (3, 4), (4, 4)]}
 
 
 if __name__ == '__main__':

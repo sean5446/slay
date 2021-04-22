@@ -49,13 +49,18 @@ body {
 	margin-left: 53px;
 }
 
-.hex.green {
-	background-color: rgb(58, 117, 36);
+.white {
+	background-color: rgb(255, 255, 255);
 }
 
 .hex.red {
 	background-color: rgb(151, 4, 11);
 }
+
+.hex.green {
+	background-color: rgb(58, 117, 36);
+}
+
 
 .hex.blue {
 	background-color: rgb(25, 89, 201);

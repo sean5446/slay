@@ -15,6 +15,7 @@ class Board:
         self.num_cols = num_cols
         self.num_players = num_players
         self.board = []
+        self.board_type = board_type
         for i in range(num_rows):
             self.board.append([''] * num_cols)
         if type(board_type) is float:
@@ -35,7 +36,7 @@ class Board:
         return board
 
     def get_neighbors(self, row, col):
-        # this only works for this particular kind of hex grid
+        # this only works for a grid where even are shifted left, odd shifted right
         if row % 2 == 0:
             all_possible = [
                 (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col)
@@ -122,37 +123,37 @@ class Board:
         del order['0']  # 0 is not a player
         return ','.join(order.keys())
 
-    def is_in_map(self, player_tiles, neighbors):
-        for pk, pv in player_tiles.items():
-            for nv in neighbors:
-                if nv in pv:
-                    return pk
+    def in_dict_of_list(self, item, dict_list):
+        for k, v in dict_list.items():
+            if item in v:
+                return k
         return None
 
     def get_contiguous_player_tiles(self, player):
         player = str(player)
         tiles = self.get_player_tiles()[player]
         regions = {}
-        discovered = []
         for t in tiles:
-            if t in discovered:
+            t_color = self.board[t[0]][t[1]][:1]
+            if not t_color == player:
                 continue
-            discovered += [t]
             neighbors = self.get_neighbors(t[0], t[1])
             for n in neighbors:
-                if n in discovered:
-                    continue
-                discovered += [n]
-                tile = self.board[n[0]][n[1]][:1]
-                if tile == player:
-                    k = self.is_in_map(regions, neighbors)
-                    if k:
-                        regions[k] += [t, n]
-                    else:
+                n_color = self.board[n[0]][n[1]][:1]
+                if n_color == player:
+                    kn = self.in_dict_of_list(n, regions)
+                    kt = self.in_dict_of_list(t, regions)
+                    if not kn and not kt:
                         regions[t] = [t, n]
+                    elif not kn and kt:
+                        regions[kt] += [n]
         return regions
 
     def render_to_html(self):
+        regions = {}
+        for player in range(1, self.num_players + 1):
+            regions[player] = self.get_contiguous_player_tiles(player)
+
         html = ''
         # insert current men
         html += ''
@@ -160,11 +161,17 @@ class Board:
             html += f'\t<div class="hex-row{"" if row % 2 == 0 else " odd"}">\n'
             for col in range(len(self.board[row])):
                 player = self.board[row][col][:1]
+                region = ''
+                if player != '0':
+                    player_regions = regions[int(player)]
+                    for k, v in player_regions.items():
+                        if len(v) > 1 and (row, col) in v:
+                            region = f'region{k[0]}-{k[1]}'
                 color = Board.PLAYER_COLORS[player]
                 unit_id = self.board[row][col][1:3]
                 unit = Board.UNIT_VALUES[unit_id]
                 tile_id = f'{row}-{col}'
-                html += f'\t\t<div id="tile-{tile_id}" class="hex {color} {unit}"></div>\n'
+                html += f'\t\t<div id="tile-{tile_id}" class="hex {color} {unit} {region}"></div>\n'
             html += '\t</div>\n'
         return html
 

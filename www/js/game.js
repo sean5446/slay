@@ -128,6 +128,22 @@ initGame = function(displayName, email) {
 					drop(draggable, droppable);
 				}
 			});
+
+			$(document).on('click touchstart', '.hex', function() {
+				$(`[class*=region][class*=white]`).each(function() {
+					$(this).removeClass('white').addClass(playerColor);
+				});
+
+				if ($(this).attr('class').includes(playerColor)) {
+					for (const c of $(this).attr('class').split(/\s+/)) {
+						if (c.startsWith('region')) {
+							$(`.${c}`).each(function() {
+								$(this).removeClass(playerColor).addClass("white ");
+							});
+						}
+					}
+				}
+			});
 		},
 		error: function(data) {
 			console.log(data);
