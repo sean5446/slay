@@ -93,9 +93,10 @@ class Game:
     def get_game_user(game_id, username):
         user = Game.get_user(username)
         user_id = int(user['id'])
+        game = GameModel.query.filter(GameModel.id == game_id).first()
         player = PlayerModel.query.filter(PlayerModel.user_id == user_id).filter(PlayerModel.game_id == game_id).first()
         user['player'] = player_schema.dump(player)
-        return user
+        return game_schema.dumps(game), user
 
     @staticmethod
     def get_games(user_id):

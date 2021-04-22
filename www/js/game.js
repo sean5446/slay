@@ -35,8 +35,8 @@ function unitsAtPosition(top, left) {
 }
 
 function drop(draggable, droppable) {
-	var dropClasses = droppable.attr("class").split(/\s+/);
-	var dragClasses = draggable.attr("class").split(/\s+/);
+	var dropClasses = droppable.attr('class').split(/\s+/);
+	var dragClasses = draggable.attr('class').split(/\s+/);
 	var dragUnit = getUnit(dragClasses)[0];
 	var hexColor = getColor(dropClasses)[0];
 	var hexUnit = getUnit(dropClasses)[0];
@@ -56,7 +56,7 @@ function drop(draggable, droppable) {
 			var totalStrength = 0;
 			for (i = 0; i < units.length; i++) {
 				var e = $(units[i]);
-				var unit = getUnit(e.attr("class").split(/\s+/));
+				var unit = getUnit(e.attr('class').split(/\s+/));
 				totalStrength += UnitEnum[unit];
 				e.remove();
 			}
@@ -87,7 +87,7 @@ function drop(draggable, droppable) {
 }
 
 function setDraggable() {
-	$(".draggable").draggable({
+	$('.draggable').draggable({
 		revert: 'invalid',
 		start: function(event, ui) {
 			dragStartPosition = ui.helper.position();
@@ -108,11 +108,13 @@ initGame = function(displayName, email) {
 	}
 	
 	$.ajax({
-		type: "GET",
-		dataType: "json",
+		type: 'GET',
+		dataType: 'json',
 		url: `${window.location.pathname}/${username}`,
 		success: function(data) {
-			playerColor = PlayerColorsEnum[data.player.color];
+			game = data.game;
+			user = data.user;
+			playerColor = PlayerColorsEnum[user.player.color];
 
 			$(`.${playerColor}`).each(function() {
 				$(this).addClass('droppable');
@@ -120,7 +122,7 @@ initGame = function(displayName, email) {
 
 			setDraggable();
 		
-			$(".droppable").droppable({
+			$('.droppable').droppable({
 				accept: '.draggable',
 				drop: function(event, ui) {
 					draggable = $(ui.draggable[0])
@@ -138,7 +140,7 @@ initGame = function(displayName, email) {
 					for (const c of $(this).attr('class').split(/\s+/)) {
 						if (c.startsWith('region')) {
 							$(`.${c}`).each(function() {
-								$(this).removeClass(playerColor).addClass("white ");
+								$(this).removeClass(playerColor).addClass('white');
 							});
 						}
 					}

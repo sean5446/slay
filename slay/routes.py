@@ -78,8 +78,12 @@ def get_game(game_id):
 
 @app.route('/game/<game_id>/<username>')
 def get_game_user(game_id, username):
-    user = Game.get_game_user(game_id, username)
-    return json.dumps(user), 200, {'ContentType': 'application/json'}
+    game, user = Game.get_game_user(game_id, username)
+    ret = {
+        'game': json.loads(game),
+        'user': user,
+    }
+    return ret, 200, {'ContentType': 'application/json'}
 
 
 @app.route('/game/create', methods=['POST'])
