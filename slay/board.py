@@ -134,9 +134,6 @@ class Board:
         tiles = self.get_player_tiles()[player]
         regions = {}
         for t in tiles:
-            t_color = self.board[t[0]][t[1]][:1]
-            if not t_color == player:
-                continue
             neighbors = self.get_neighbors(t[0], t[1])
             for n in neighbors:
                 n_color = self.board[n[0]][n[1]][:1]
@@ -147,6 +144,12 @@ class Board:
                         regions[t] = [t, n]
                     elif not kn and kt:
                         regions[kt] += [n]
+                    elif kn and kt:
+                        if kn != kt:
+                            print(f'merge?! {t} {n} {kt} {kn}')
+                            for v in regions[kt]:
+                                regions[kn] += [v]
+                            del(regions[kt])
         return regions
 
     def render_to_html(self):
@@ -180,8 +183,10 @@ class Board:
         self.num_cols = len(board.split('\n')[0].split(' ')) - 1
         self.board = []
         num_players = {}
+        board = board.strip()
         for row in board.split('\n'):
-            if len(row) == 0:
+            row = row.strip()
+            if len(row) < 3:
                 continue
             column = []
             for col in row.split(' '):

@@ -4,7 +4,7 @@ import requests
 if len(sys.argv) > 1:
     host = sys.argv[1]
 else:
-    host = 'localhost'
+    host = 'http://localhost'
 
 print(f'host: {host}')
 

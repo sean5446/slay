@@ -36,11 +36,24 @@ class TestBoard(unittest.TestCase):
         print(board.render_to_html())
 
     def test_get_contiguous_player_tiles(self):
+        board_str = """
+        000 000 000 100 000 100 000 000 000
+         000 000 000 100 100 000 000 000 000
+        000 000 000 100 000 100 000 000 000
+         000 000 100 000 000 100 100 000 000
+        000 100 100 000 000 100 000 000 000
+        """
+        board = Board(board_str)
+        tiles = board.get_contiguous_player_tiles(1)
+        assert tiles == {(0, 5): [(0, 5), (1, 4), (0, 3), (1, 3), (2, 3),
+                         (2, 5), (3, 2), (3, 5), (4, 2), (3, 6), (4, 5), (4, 1)]}
+
         board = Board(board_type='horz', num_cols=5, num_rows=5, num_players=2)
         tiles = board.get_contiguous_player_tiles(1)
         assert tiles == {(0, 0): [(0, 0), (0, 1), (0, 2), (0, 3), (0, 4)],
                          (2, 0): [(2, 0), (2, 1), (2, 2), (2, 3), (2, 4)],
                          (4, 0): [(4, 0), (4, 1), (4, 2), (4, 3), (4, 4)]}
+
         board = Board(board_type='vert', num_cols=5, num_rows=5, num_players=2)
         tiles = board.get_contiguous_player_tiles(1)
         assert tiles == {(0, 0): [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0)],
