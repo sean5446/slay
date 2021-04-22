@@ -15,7 +15,6 @@ setup(
         'flask_marshmallow',
         'marshmallow-sqlalchemy',
         'requests',
-        'pyopenssl',
         'gunicorn',
         'psycopg2-binary'
     ],

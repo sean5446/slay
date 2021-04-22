@@ -1,4 +1,5 @@
 
+// these enums must match python enums in board.py
 const UnitEnum = Object.freeze({
 	'grave': 1, 'tree': 2, 'man': 4, 'spearman': 8, 'hut': 9, 'knight': 12, 'castle': 13, 'barron': 16
 });

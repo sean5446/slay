@@ -48,7 +48,7 @@ def create_user():
     # TODO: validate inputs
     ret = Game.create_user(email, username)
     if not isinstance(ret, Exception):
-        return json.dumps(ret), 200, {'ContentType': 'application/json'}
+        return json.dumps({'success': ret}), 200, {'ContentType': 'application/json'}
     else:
         return str(ret), 500
 

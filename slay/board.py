@@ -2,6 +2,7 @@ from random import randint
 
 
 class Board:
+    # these must match javascript enums in game.js
     PLAYER_COLORS = {
         '0': 'transparent', '1': 'red', '2': 'green', '3': 'blue', '4': 'yellow', '5': 'black'
     }
@@ -35,21 +36,25 @@ class Board:
             board += '\n'
         return board
 
-    def get_neighbors(self, row, col):
-        # this only works for a grid where even are shifted left, odd shifted right
-        if row % 2 == 0:
-            all_possible = [
-                (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col)
-            ]
-        else:
-            all_possible = [
-                (row - 1, col), (row - 1, col + 1), (row, col - 1), (row, col + 1), (row + 1, col), (row + 1, col + 1)
-            ]
-        neighbors = []
-        for n in all_possible:
-            if 0 <= n[0] < len(self.board) and 0 <= n[1] < len(self.board[1]):
-                neighbors.append(n)
-        return neighbors
+    def board_from_str(self, board):
+        self.num_rows = len(board.split('\n')) - 1
+        self.num_cols = len(board.split('\n')[0].split(' ')) - 1
+        self.board = []
+        num_players = {}
+        board = board.strip()
+        for row in board.split('\n'):
+            row = row.strip()
+            if len(row) < 3:
+                continue
+            column = []
+            for col in row.split(' '):
+                if len(col) != 3:
+                    continue
+                column.append(col)
+                if col[:1] != '0':  # 0 is not a player
+                    num_players[col[:1]] = ''
+            self.board.append(column)
+        self.num_players = len(num_players.keys())
 
     def fill_board_random(self):
         for row in range(len(self.board)):
@@ -72,6 +77,22 @@ class Board:
             for col in range(len(self.board[row])):
                 color = '1' if col % 2 == 0 else '2'
                 self.board[row][col] = color
+
+    def get_neighbors(self, row, col):
+        # this only works for a grid where even are shifted left, odd shifted right
+        if row % 2 == 0:
+            all_possible = [
+                (row - 1, col - 1), (row - 1, col), (row, col - 1), (row, col + 1), (row + 1, col - 1), (row + 1, col)
+            ]
+        else:
+            all_possible = [
+                (row - 1, col), (row - 1, col + 1), (row, col - 1), (row, col + 1), (row + 1, col), (row + 1, col + 1)
+            ]
+        neighbors = []
+        for n in all_possible:
+            if 0 <= n[0] < len(self.board) and 0 <= n[1] < len(self.board[1]):
+                neighbors.append(n)
+        return neighbors
 
     def get_player_tiles(self):
         player_tiles = {}
@@ -146,7 +167,6 @@ class Board:
                         regions[kt] += [n]
                     elif kn and kt:
                         if kn != kt:
-                            print(f'merge?! {t} {n} {kt} {kn}')
                             for v in regions[kt]:
                                 regions[kn] += [v]
                             del(regions[kt])
@@ -158,8 +178,6 @@ class Board:
             regions[player] = self.get_contiguous_player_tiles(player)
 
         html = ''
-        # insert current men
-        html += ''
         for row in range(len(self.board)):
             html += f'\t<div class="hex-row{"" if row % 2 == 0 else " odd"}">\n'
             for col in range(len(self.board[row])):
@@ -177,23 +195,3 @@ class Board:
                 html += f'\t\t<div id="tile-{tile_id}" class="hex {color} {unit} {region}"></div>\n'
             html += '\t</div>\n'
         return html
-
-    def board_from_str(self, board):
-        self.num_rows = len(board.split('\n')) - 1
-        self.num_cols = len(board.split('\n')[0].split(' ')) - 1
-        self.board = []
-        num_players = {}
-        board = board.strip()
-        for row in board.split('\n'):
-            row = row.strip()
-            if len(row) < 3:
-                continue
-            column = []
-            for col in row.split(' '):
-                if len(col) != 3:
-                    continue
-                column.append(col)
-                if col[:1] != '0':  # 0 is not a player
-                    num_players[col[:1]] = ''
-            self.board.append(column)
-        self.num_players = len(num_players.keys())

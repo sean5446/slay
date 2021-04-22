@@ -27,7 +27,7 @@ class Game:
         try:
             db.session.add(UserModel(email=email, username=username, score=0))
             db.session.commit()
-            return {'success': True}
+            return True
         except Exception as ex:
             return ex
 
@@ -56,7 +56,7 @@ class Game:
             user = UserModel.query.filter_by(username=username).first()
             user.score = score
             db.session.commit()
-            return {'success': True}
+            return True
         except Exception as ex:
             return ex
 
@@ -83,13 +83,6 @@ class Game:
         return game_schema.dump(game_model)
 
     @staticmethod
-    def get_game_board(game_id):
-        game = GameModel.query.filter(GameModel.id == game_id).first()
-        board_id = game.current_board_id()
-        board = Game.get_board(board_id)
-        return board
-
-    @staticmethod
     def get_game_user(game_id, username):
         user = Game.get_user(username)
         user_id = int(user['id'])
@@ -97,11 +90,6 @@ class Game:
         player = PlayerModel.query.filter(PlayerModel.user_id == user_id).filter(PlayerModel.game_id == game_id).first()
         user['player'] = player_schema.dump(player)
         return game_schema.dumps(game), user
-
-    @staticmethod
-    def get_games(user_id):
-        players = PlayerModel.query.filter(PlayerModel.user_id == user_id)
-        return players
 
     @staticmethod
     def get_game_board_html(game_id):
