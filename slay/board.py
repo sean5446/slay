@@ -129,14 +129,15 @@ class Board:
             num_generated += 1
             if std_dev < accept_std_dev:
                 break
+        self.place_huts()
+        return self.board, player_tiles, std_dev, num_generated
 
+    def place_huts(self):
         for player in range(1, self.num_players + 1):
             regions = self.get_contiguous_player_tiles(player)
             for k, v in regions.items():
                 if len(v) > 1:
-                    self.board[k[0]][k[1]] = self.board[k[0]][k[1]][:1] + '09'
-
-        return self.board, player_tiles, std_dev, num_generated
+                    self.board[k[0]][k[1]] = self.board[k[0]][k[1]][:1] + '09'  # place hut
 
     def get_player_turn_order(self):
         player_tiles = self.get_player_tile_count()
