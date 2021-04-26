@@ -15,8 +15,8 @@ class Board:
         self.num_rows = num_rows
         self.num_cols = num_cols
         self.num_players = num_players
-        self.board = []
         self.board_type = board_type
+        self.board = []
         for i in range(num_rows):
             self.board.append([''] * num_cols)
         if type(board_type) is float:
@@ -37,11 +37,11 @@ class Board:
         return board
 
     def board_from_str(self, board):
+        board = board.strip()
         self.num_rows = len(board.split('\n')) - 1
         self.num_cols = len(board.split('\n')[0].split(' ')) - 1
         self.board = []
         num_players = {}
-        board = board.strip()
         for row in board.split('\n'):
             row = row.strip()
             if len(row) < 3:
@@ -61,7 +61,7 @@ class Board:
             for col in range(len(self.board[row])):
                 color = str(randint(0, self.num_players))
                 tree = '00'
-                if color != 0:
+                if color != '0':
                     if randint(0, 3) == 0:
                         tree = '02'
                 self.board[row][col] = f'{color}{tree}'
@@ -129,15 +129,7 @@ class Board:
             num_generated += 1
             if std_dev < accept_std_dev:
                 break
-        self.place_huts()
         return self.board, player_tiles, std_dev, num_generated
-
-    def place_huts(self):
-        for player in range(1, self.num_players + 1):
-            regions = self.get_contiguous_player_tiles(player)
-            for k, v in regions.items():
-                if len(v) > 1:
-                    self.board[k[0]][k[1]] = self.board[k[0]][k[1]][:1] + '09'  # place hut
 
     def get_player_turn_order(self):
         player_tiles = self.get_player_tile_count()
@@ -145,13 +137,23 @@ class Board:
         del order['0']  # 0 is not a player
         return ','.join(order.keys())
 
+    #
+    #  below unused for now
+    #
+    def place_huts(self):
+        for player in range(1, self.num_players + 1):
+            regions = self.get_regions(player)
+            for k, v in regions.items():
+                if len(v) > 1:
+                    self.board[k[0]][k[1]] = self.board[k[0]][k[1]][:1] + '09'  # place hut
+
     def in_dict_of_list(self, item, dict_list):
         for k, v in dict_list.items():
             if item in v:
                 return k
         return None
 
-    def get_contiguous_player_tiles(self, player):
+    def get_regions(self, player):
         player = str(player)
         tiles = self.get_player_tiles()[player]
         regions = {}
@@ -176,7 +178,7 @@ class Board:
     def render_to_html(self):
         regions = {}
         for player in range(1, self.num_players + 1):
-            regions[player] = self.get_contiguous_player_tiles(player)
+            regions[player] = self.get_regions(player)
 
         html = ''
         for row in range(len(self.board)):

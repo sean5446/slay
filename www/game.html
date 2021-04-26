@@ -10,7 +10,9 @@
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 	<script src="../../js/jquery.ui.touch-punch.min.js"></script>
 	<script src="../../js/home.js"></script>
+	<script src="../../js/board.js"></script>
 	<script src="../../js/game.js"></script>
+	
 
 	<link rel="stylesheet" href="../../css/game.css" />
 
@@ -37,14 +39,8 @@
 <body>
 
 <div id="map" class="vertical-map">
-
-	<!-- player units ! -->
-	<div class="hex man draggable unit" style="top:15px; left:106px;"></div>
-	<div class="hex man draggable unit" style="top:15px; left:212px;"></div>
-	<div class="hex spearman draggable unit" style="top:15px; left:318px;"></div>
-
 	<div id="tiles">
-		{{tiles}}
+		<!-- tiles -->
 	</div>
 </div>
 
@@ -59,7 +55,7 @@
 	</div>
 
 	<div id="players">
-		{{players}}
+		<!-- players -->
 	</div>
 
 	<div id="units">

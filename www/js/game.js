@@ -1,41 +1,13 @@
 
-// these enums must match python enums in board.py
-const UnitEnum = Object.freeze({
-	'grave': 1, 'tree': 2, 'man': 4, 'spearman': 8, 'hut': 9, 'knight': 12, 'castle': 13, 'barron': 16
-});
-
-const PlayerColorsEnum = Object.freeze([
-	'transparent', 'red', 'green', 'blue', 'yellow', 'black'
-]);
-
-function getColor(classes) {
-	var color = classes.filter(function(n) {
-		return PlayerColorsEnum.indexOf(n) !== -1;
-	});
-	return color;
-}
-
-function getUnit(classes) {
-	var unit = classes.filter(function(n) {
-		return UnitEnum[n];
-	});
-	return unit;
-}
-
-function getUnitFromStrength(strength) {
-	for (const [key, value] of Object.entries(UnitEnum)) {
-		if (value == strength) return key;
-	}
-}
-
-function unitsAtPosition(top, left) {
+unitsAtPosition = function(top, left) {
 	return $("#map").find('.unit').filter(function() {
 		e = $(this)
 		if (e.offset().top == top && e.offset().left == left) return e;
 	});
 }
 
-function drop(draggable, droppable) {
+
+drop = function(draggable, droppable) {
 	var dropClasses = droppable.attr('class').split(/\s+/);
 	var dragClasses = draggable.attr('class').split(/\s+/);
 	var dragUnit = getUnit(dragClasses)[0];
@@ -96,9 +68,48 @@ function setDraggable() {
 	});
 }
 
+
+function setupDroppable() {
+	$(`.${playerColor}`).each(function() {
+		$(this).addClass('droppable');
+	});
+
+	setDraggable();
+
+	$('.droppable').droppable({
+		accept: '.draggable',
+		drop: function(event, ui) {
+			draggable = $(ui.draggable[0])
+			droppable = $(this)
+			drop(draggable, droppable);
+		}
+	});
+
+	$(document).on('click touchstart', '.hex', function() {
+		$(`[class*=region][class*=white]`).each(function() {
+			$(this).removeClass('white').addClass(playerColor);
+		});
+
+		if ($(this).attr('class').includes(playerColor)) {
+			for (const c of $(this).attr('class').split(/\s+/)) {
+				if (c.startsWith('region')) {
+					$(`.${c}`).each(function() {
+						$(this).removeClass(playerColor).addClass('white');
+					});
+				}
+			}
+		}
+	});
+}
+
+
+
 dragStartPosition = null;
 username = null;
 playerColor = null;
+playerColorId = null;
+board = null;
+game = null;
 
 initGame = function(displayName, email) {
 	username = displayName;
@@ -109,44 +120,30 @@ initGame = function(displayName, email) {
 	}
 	
 	$.ajax({
-		type: 'GET',
+		type: 'POST',
 		dataType: 'json',
-		url: `${window.location.pathname}/${username}`,
+		url: `${window.location.pathname}`,
 		success: function(data) {
-			game = data.game;
-			user = data.user;
-			playerColor = PlayerColorsEnum[user.player.color];
+			console.log(data);
+			game = data;
 
-			$(`.${playerColor}`).each(function() {
-				$(this).addClass('droppable');
-			});
-
-			setDraggable();
-		
-			$('.droppable').droppable({
-				accept: '.draggable',
-				drop: function(event, ui) {
-					draggable = $(ui.draggable[0])
-					droppable = $(this)
-					drop(draggable, droppable);
+			for (const player of data.players) {
+				if (player.user.username == username) {
+					playerColor = PlayerColorsEnum[player.color];
+					playerColorId = player.color;
 				}
-			});
+			}
 
-			$(document).on('click touchstart', '.hex', function() {
-				$(`[class*=region][class*=white]`).each(function() {
-					$(this).removeClass('white').addClass(playerColor);
-				});
+			board = new Board(data.board.board);
+			board.drawBoard('#tiles', playerColorId);
 
-				if ($(this).attr('class').includes(playerColor)) {
-					for (const c of $(this).attr('class').split(/\s+/)) {
-						if (c.startsWith('region')) {
-							$(`.${c}`).each(function() {
-								$(this).removeClass(playerColor).addClass('white');
-							});
-						}
-					}
-				}
-			});
+			for (const player of data.players) {
+				$('#players').append(
+					`<div style="color: ${PlayerColorsEnum[player.color]}">${player.user.username}: 0</div>`
+				);
+			}
+
+			setupDroppable();
 		},
 		error: function(data) {
 			console.log(data);

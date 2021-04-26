@@ -83,37 +83,8 @@ class Game:
         return game_schema.dump(game_model)
 
     @staticmethod
-    def get_game_user(game_id, username):
-        user = Game.get_user(username)
-        user_id = int(user['id'])
-        game = GameModel.query.filter(GameModel.id == game_id).first()
-        player = PlayerModel.query.filter(PlayerModel.user_id == user_id).filter(PlayerModel.game_id == game_id).first()
-        user['player'] = player_schema.dump(player)
-        return game_schema.dumps(game), user
-
-    @staticmethod
-    def get_game_board_html(game_id):
-        game = GameModel.query.filter(GameModel.id == game_id).first()
-        if not game:
-            return None, None
-        board_html = Board(game.board.board).render_to_html()
-        players_html = Game.game_to_html(game)
-        return board_html, players_html
-
-    @staticmethod
-    def get_board_html(board_id):
-        board = BoardModel.query.filter(BoardModel.id == board_id).first()
-        if not board:
+    def get_game(game_id):
+        game_model = GameModel.query.filter(GameModel.id == game_id).first()
+        if not game_model:
             return None
-        return Board(board.board).render_to_html()
-
-    @staticmethod
-    def game_to_html(game):
-        players_html = ''
-        board = Board(game.board.board)
-        counts = board.get_player_tile_count()
-        for player in game.players:
-            user = player.user
-            players_html += f'<div style="color: {Board.PLAYER_COLORS[str(player.color)]};">' + \
-                            f'{user.username}: {counts[str(player.color)]}</div>\n'
-        return players_html
+        return game_schema.dump(game_model)

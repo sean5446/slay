@@ -69,21 +69,16 @@ def get_all_users():
 
 
 @app.route('/game/<game_id>')
+def get_game_html(game_id):
+    return render_template('game.html', title='Slay Game')
+
+
+@app.route('/game/<game_id>', methods=['POST'])
 def get_game(game_id):
-    board_html, players_html = Game.get_game_board_html(game_id)
-    if not board_html:
+    game = Game.get_game(game_id)
+    if not game:
         abort(404)
-    return render_template('game.html', title='Slay Game', tiles=Markup(board_html), players=Markup(players_html))
-
-
-@app.route('/game/<game_id>/<username>')
-def get_game_user(game_id, username):
-    game, user = Game.get_game_user(game_id, username)
-    ret = {
-        'game': json.loads(game),
-        'user': user,
-    }
-    return ret, 200, {'ContentType': 'application/json'}
+    return json.dumps(game), 200, {'ContentType': 'application/json'}
 
 
 @app.route('/game/create', methods=['POST'])

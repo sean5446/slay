@@ -50,7 +50,7 @@ class PlayerModel(db.Model):
 
 class PlayerSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'color', 'user_id', 'game_id', 'bank', 'last_turn_time')
+        fields = ('id', 'color', 'user_id', 'game_id', 'bank', 'last_turn_time', 'user')
     user = ma.Nested(UserSchema)
 
 
@@ -71,9 +71,9 @@ class GameModel(db.Model):
 
 class GameSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'name', 'current_board_id', 'turn_colors', 'current_turn')
-        board = ma.Nested(BoardSchema)
+        fields = ('id', 'name', 'current_board_id', 'turn_colors', 'current_turn', 'players', 'board')
     players = ma.Nested(PlayerSchema, many=True)
+    board = ma.Nested(BoardSchema)
 
 
 class GameHistoryModel(db.Model):
