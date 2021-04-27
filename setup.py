@@ -16,6 +16,6 @@ setup(
         'requests',
         'gunicorn',
         'psycopg2-binary',
-        'firebase-auth',
+        'firebase-admin',
     ],
 )
