@@ -13,6 +13,7 @@ setup(
         'Flask-Limiter',
         'flask_SQLAlchemy',
         'flask_marshmallow',
+        'marshmallow-sqlalchemy',
         'requests',
         'gunicorn',
         'psycopg2-binary',
