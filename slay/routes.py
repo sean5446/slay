@@ -7,6 +7,8 @@ from flask import current_app as app
 
 from .game import Game
 
+from firebase_admin import auth
+
 
 firebase = None
 if os.environ.get('FIREBASE'):
@@ -14,6 +16,13 @@ if os.environ.get('FIREBASE'):
 else:
     with open('firebase.json', 'r') as auth_file:
         firebase = auth_file.read()
+
+
+def authenticate(req):
+    try:
+        return auth.verify_id_token(req.get('token'))
+    except Exception:
+        abort(401)
 
 
 @app.route('/firebase')

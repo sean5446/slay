@@ -63,6 +63,8 @@ class Game:
     @staticmethod
     def create_game(name, users):
         shuffle(users)
+        users.remove("Sean")  # TODO remove debug code
+        users.insert(0, "Sean")  # TODO remove debug code
         board_rand = Game.get_random_board(num_players=len(users))
         turn_colors = board_rand.get_player_turn_order()
         board_model = Game.create_board(str(board_rand))  # adds and commits

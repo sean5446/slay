@@ -85,7 +85,7 @@ class Board {
 	in_dict_of_list(item, dict_list) {
 		for (const [k, v] of Object.entries(dict_list)) {
 			for (const i of v) {
-				if (JSON.stringify(i) === JSON.stringify(item)) return k;
+				if (i[0] == item[0] && i[1] == item[1]) return k;
 			}
 		}
 		return null;
@@ -123,21 +123,21 @@ class Board {
 	}
 
 	placeHuts() {
+		var regions = {};
 		for (var player = 1; player < this.num_players+1; player++) {
-			var regions = this.getRegions(player);
-			for (const [k, v] of Object.entries(regions)) {
+			regions[player] = this.getRegions(player);
+			for (const [k, v] of Object.entries(regions[player])) {
 				if (v.length > 1) {
 					var i = k.split(',');
 					this.board[i[0]][i[1]] = this.board[i[0]][i[1]].charAt(0) + '09' // hut
 				}
 			}
 		}
+		return regions;
 	}
 
   drawBoard(parent, playerColorId) {
-		// regions
-
-		this.placeHuts(parent);
+		var regions = this.placeHuts(parent);
 
 		for (let row = 0; row < this.board.length; row++) {
 			var odd = (row % 2 == 0) ? '' : ' odd';
@@ -148,7 +148,15 @@ class Board {
 				var color = PlayerColorsEnum[player];
 				var unit = UnitEnum[unit_id];
 				var tileId = col + '-' + row;
-				$(`<div id="tile-${tileId}" class="hex ${color} ${unit}"></div>`).appendTo(rowElem)
+				var region = '';
+				if (player == playerColorId) {
+					var k = this.in_dict_of_list([row, col], regions[playerColorId]);
+					if (k != null) {
+						var i = k.split(',');
+						region = `region-${i[0]}-${i[1]}`;
+					}
+				}
+				$(`<div id="tile-${tileId}" class="hex ${color} ${unit} ${region}"></div>`).appendTo(rowElem)
 			}
 		}
   }

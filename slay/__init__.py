@@ -5,7 +5,9 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-# cd www && python3 -m http.server
+
+import firebase_admin
+from firebase_admin import credentials
 
 from flask_marshmallow import Marshmallow
 
@@ -29,6 +31,10 @@ app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
+
+cred = credentials.Certificate("firebase-admin.json")
+firebase_admin.initialize_app(cred)
+
 Reminder.run()
 
 with app.app_context():

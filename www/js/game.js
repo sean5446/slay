@@ -1,11 +1,68 @@
 
+dragStartPosition = null;
+username = null;
+playerColor = null;
+playerColorId = null;
+board = null;
+game = null;
+
+initGame = function(displayName, email) {
+	username = displayName;
+
+	if (window.innerWidth > 1000) {
+		$('#map').removeClass('vertical-map').addClass('horizontal-map');
+		$('#panel').removeClass('vertical-panel').addClass('horizontal-panel');
+	}
+	
+	$.ajax({
+		type: 'POST',
+		dataType: 'json',
+		url: `${window.location.pathname}`,
+		success: function(data) {
+			console.log(data);
+			game = data;
+
+			for (const player of data.players) {
+				if (player.user.username == username) {
+					playerColor = PlayerColorsEnum[player.color];
+					playerColorId = player.color;
+				}
+			}
+
+			board = new Board(data.board.board);
+			board.drawBoard('#tiles', playerColorId);
+
+			for (const player of data.players) {
+				$('#players').append(
+					`<div style="color: ${PlayerColorsEnum[player.color]}">${player.user.username}: 0</div>`
+				);
+			}
+
+			setupDroppable();
+		},
+		error: function(data) {
+			console.log(data);
+		}
+	});
+
+	$('#buttonReset').click(function() {
+		//window.location.reload(true)
+		location.reload();
+	});
+
+	$('#buttonEndTurn').click(function() {
+		if (confirm('Are you sure you want to end the turn?')) {
+			alert('Turn ended!');
+		}
+	});
+}
+
 unitsAtPosition = function(top, left) {
 	return $("#map").find('.unit').filter(function() {
 		e = $(this)
 		if (e.offset().top == top && e.offset().left == left) return e;
 	});
 }
-
 
 drop = function(draggable, droppable) {
 	var dropClasses = droppable.attr('class').split(/\s+/);
@@ -104,60 +161,3 @@ function setupDroppable() {
 
 
 
-dragStartPosition = null;
-username = null;
-playerColor = null;
-playerColorId = null;
-board = null;
-game = null;
-
-initGame = function(displayName, email) {
-	username = displayName;
-
-	if (window.innerWidth > 1000) {
-		$('#map').removeClass('vertical-map').addClass('horizontal-map');
-		$('#panel').removeClass('vertical-panel').addClass('horizontal-panel');
-	}
-	
-	$.ajax({
-		type: 'POST',
-		dataType: 'json',
-		url: `${window.location.pathname}`,
-		success: function(data) {
-			console.log(data);
-			game = data;
-
-			for (const player of data.players) {
-				if (player.user.username == username) {
-					playerColor = PlayerColorsEnum[player.color];
-					playerColorId = player.color;
-				}
-			}
-
-			board = new Board(data.board.board);
-			board.drawBoard('#tiles', playerColorId);
-
-			for (const player of data.players) {
-				$('#players').append(
-					`<div style="color: ${PlayerColorsEnum[player.color]}">${player.user.username}: 0</div>`
-				);
-			}
-
-			setupDroppable();
-		},
-		error: function(data) {
-			console.log(data);
-		}
-	});
-
-	$('#buttonReset').click(function() {
-		//window.location.reload(true)
-		location.reload();
-	});
-
-	$('#buttonEndTurn').click(function() {
-		if (confirm('Are you sure you want to end the turn?')) {
-			alert('Turn ended!');
-		}
-	});
-}

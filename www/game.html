@@ -6,28 +6,44 @@
 	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
 	<meta content="utf-8">
 
+	<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" />
+	<link type="text/css" rel="stylesheet" href="../../css/game.css" />
+
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 	<script src="../../js/jquery.ui.touch-punch.min.js"></script>
-	<script src="../../js/home.js"></script>
+
 	<script src="../../js/board.js"></script>
 	<script src="../../js/game.js"></script>
-	
-
-	<link rel="stylesheet" href="../../css/game.css" />
 
 	<script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-app.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-auth.js"></script>
 
 	<script type="text/javascript">
+		function firebaseInit(data) {
+			firebase.initializeApp(data);
+			firebase.auth().onAuthStateChanged(function(user) {
+				if (user) {
+					// user is signed in
+					user.getIdToken().then(function(accessToken) {
+						initGame(user.displayName, user.email);
+					});
+				} else {
+					// user is signed out
+					window.location.replace('/');
+				}
+			}, function(error) {
+				console.log(error);
+			});
+		}
+
 		$(document).ready(function() {
 			$.ajax({
 				type: "GET",
 				dataType: "json",
 				url: `/firebase`,
 				success: function(data) {
-					firebase.initializeApp(data);
-					initApp(initGame);  // firebase auth
+					firebaseInit(data);
 				},
 				error: function(data) {
 					console.log(data)

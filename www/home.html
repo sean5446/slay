@@ -8,21 +8,51 @@
 
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
+	<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" />
+	<link type="text/css" rel="stylesheet" href="https://jqwidgets.com/public/jqwidgets/styles/jqx.base.css" />
+	<link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.8.0/firebase-ui-auth.css" />
+	<link type="text/css" rel="stylesheet" href="../css/home.css" />
+
 	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 	<script src="https://jqwidgets.com/public/jqwidgets/jqx-all.js"></script>
 	<script src="js/home.js"></script>
-
-	<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" />
-	<link type="text/css" rel="stylesheet" href="https://jqwidgets.com/public/jqwidgets/styles/jqx.base.css" />
-	<link type="text/css" rel="stylesheet" href="../css/home.css" />
-	<link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/4.8.0/firebase-ui-auth.css" />
 
 	<script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-app.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/ui/4.8.0/firebase-ui-auth.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-auth.js"></script>
 
 	<script type="text/javascript">
+		function firebaseInit(data) {
+			firebase.initializeApp(data);
+			firebase.auth().onAuthStateChanged(function(user) {
+				if (user) {
+					// user is signed in
+					user.getIdToken().then(function(accessToken) {
+						initMainMenu(user.displayName, user.email);
+					});
+				} else {
+					// user is signed out
+					var uiConfig = {
+						signInSuccessUrl: '/home.html',
+						signInOptions: [
+							firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+							firebase.auth.EmailAuthProvider.PROVIDER_ID,
+						],
+						tosUrl: '<your-tos-url>',
+						privacyPolicyUrl: function() {
+							window.location.assign('<your-privacy-policy-url>');
+						}
+					};
+
+					var ui = new firebaseui.auth.AuthUI(firebase.auth());
+					ui.start('#firebaseui-auth-container', uiConfig);
+				}
+			}, function(error) {
+				console.log(error);
+			});
+		}
+
 		$(document).ready(function() {
 			$('#main-menu').hide();
 			$.ajax({
@@ -30,11 +60,10 @@
 				dataType: "json",
 				url: `/firebase`,
 				success: function(data) {
-					firebase.initializeApp(data);
-					initApp(initMainMenu);  // firebase auth
+					firebaseInit(data);
 				},
 				error: function(data) {
-					window.location.replace('/')
+					console.log(data);
 				}
 			});
 		});

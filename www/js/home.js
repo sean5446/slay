@@ -1,3 +1,4 @@
+
 initMainMenu = function(displayName, email) {
 	$('#firebaseui-auth-container').hide();
 	$('#main-menu').show();
@@ -8,35 +9,6 @@ initMainMenu = function(displayName, email) {
 	getUserList(displayName, email);
 	getGameList(displayName);
 }
-
-function initApp(callback) {
-	firebase.auth().onAuthStateChanged(function(user) {
-		if (user) {
-			// User is signed in
-			user.getIdToken().then(function(accessToken) {
-				callback(user.displayName, user.email);
-			});
-		} else {
-			// User is signed out
-			var uiConfig = {
-				signInSuccessUrl: '/home.html',
-				signInOptions: [
-					firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-					firebase.auth.FacebookAuthProvider.PROVIDER_ID,
-					firebase.auth.EmailAuthProvider.PROVIDER_ID,
-				],
-				tosUrl: '<your-tos-url>',
-				privacyPolicyUrl: function() {
-					window.location.assign('<your-privacy-policy-url>');
-				}
-			};
-			var ui = new firebaseui.auth.AuthUI(firebase.auth());
-			ui.start('#firebaseui-auth-container', uiConfig);
-		}
-	}, function(error) {
-		console.log(error);
-	});
-};
 
 function getUserList(displayName, email) {
 	$.ajax({
