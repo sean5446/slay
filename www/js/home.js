@@ -1,5 +1,5 @@
 
-initMainMenu = function(displayName, email) {
+function initMainMenu(displayName, email) {
 	$('#firebaseui-auth-container').hide();
 	$('#main-menu').show();
 	$('#sign-in-status').html(`Logged in: ${displayName}`);

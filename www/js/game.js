@@ -4,9 +4,9 @@ username = null;
 playerColor = null;
 playerColorId = null;
 board = null;
-game = null;
+regions = null;
 
-initGame = function(displayName, email) {
+function initGame(displayName, email) {
 	username = displayName;
 
 	if (window.innerWidth > 1000) {
@@ -19,9 +19,6 @@ initGame = function(displayName, email) {
 		dataType: 'json',
 		url: `${window.location.pathname}`,
 		success: function(data) {
-			console.log(data);
-			game = data;
-
 			for (const player of data.players) {
 				if (player.user.username == username) {
 					playerColor = PlayerColorsEnum[player.color];
@@ -30,11 +27,15 @@ initGame = function(displayName, email) {
 			}
 
 			board = new Board(data.board.board);
-			board.drawBoard('#tiles', playerColorId);
+			regions = board.drawBoard('#tiles', playerColorId);
 
 			for (const player of data.players) {
+				var total = 0;
+				for (const [k, v] of Object.entries(regions[player.color])) {
+					total += v.length;
+				}
 				$('#players').append(
-					`<div style="color: ${PlayerColorsEnum[player.color]}">${player.user.username}: 0</div>`
+					`<div style="color: ${PlayerColorsEnum[player.color]}">${player.user.username}: ${total}</div>`
 				);
 			}
 
@@ -57,14 +58,34 @@ initGame = function(displayName, email) {
 	});
 }
 
-unitsAtPosition = function(top, left) {
+function unitsAtPosition(top, left) {
 	return $("#map").find('.unit').filter(function() {
 		e = $(this)
 		if (e.offset().top == top && e.offset().left == left) return e;
 	});
 }
 
-drop = function(draggable, droppable) {
+function getColor(classes) {
+	var color = classes.filter(function(n) {
+		return PlayerColorsEnum.indexOf(n) !== -1;
+	});
+	return color;
+}
+
+function getUnit(classes) {
+	var unit = classes.filter(function(n) {
+		return UnitEnum[n];
+	});
+	return unit;
+}
+
+function getUnitFromStrength(strength) {
+	for (const [key, value] of Object.entries(UnitEnum)) {
+		if (value == strength) return key;
+	}
+}
+
+function drop(draggable, droppable) {
 	var dropClasses = droppable.attr('class').split(/\s+/);
 	var dragClasses = draggable.attr('class').split(/\s+/);
 	var dragUnit = getUnit(dragClasses)[0];
@@ -152,6 +173,15 @@ function setupDroppable() {
 					$(`.${c}`).each(function() {
 						$(this).removeClass(playerColor).addClass('white');
 					});
+					var row = c.split('-')[1];
+					var col = c.split('-')[2];
+					region = regions[playerColorId][ [row,col] ];
+					// TODO remove trees from income, find wages
+					$('#savings').html(`Savings: 10`);
+					$('#income').html(`Income: ${region.length}`);
+					$('#wages').html(`Wages: 0`);
+					$('#balance').html(`Balance: 0`);
+					$('#money').html(`Money: 0`);
 				}
 			}
 		}

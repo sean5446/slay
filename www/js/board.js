@@ -159,26 +159,18 @@ class Board {
 				$(`<div id="tile-${tileId}" class="hex ${color} ${unit} ${region}"></div>`).appendTo(rowElem)
 			}
 		}
+		return regions;
   }
 
-  getColor(classes) {
-		var color = classes.filter(function(n) {
-			return PlayerColorsEnum.indexOf(n) !== -1;
-		});
-		return color;
-	}
-
-	getUnit(classes) {
-		var unit = classes.filter(function(n) {
-			return UnitEnum[n];
-		});
-		return unit;
-	}
-
-	getUnitFromStrength(strength) {
-		for (const [key, value] of Object.entries(UnitEnum)) {
-			if (value == strength) return key;
+	toString() {
+		var str = '';
+		for (let row = 0; row < this.board.length; row++) {
+			for (let col = 0; col < this.board[0].length; col++) {
+				str += this.board[row][col] + ' ';
+			}
+			str += '\n';
 		}
+		return str;
 	}
 
 }
