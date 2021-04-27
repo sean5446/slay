@@ -38,6 +38,7 @@ class PlayerModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     color = db.Column(db.Integer)
     bank = db.Column(db.Integer)
+    regions = db.Column(db.String(128))
     game_id = db.Column(db.Integer, db.ForeignKey('games.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     last_turn_time = db.Column(db.Integer)
@@ -50,7 +51,7 @@ class PlayerModel(db.Model):
 
 class PlayerSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'color', 'user_id', 'game_id', 'bank', 'last_turn_time', 'user')
+        fields = ('id', 'color', 'user_id', 'bank', 'regions', 'game_id', 'last_turn_time', 'user')
     user = ma.Nested(UserSchema)
 
 

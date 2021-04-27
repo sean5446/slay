@@ -1,6 +1,5 @@
 
 import json
-import os
 
 from flask import send_from_directory, request, render_template, abort, Markup
 from flask import current_app as app
@@ -8,14 +7,7 @@ from flask import current_app as app
 from .game import Game
 
 from firebase_admin import auth
-
-
-firebase = None
-if os.environ.get('FIREBASE'):
-    firebase = os.environ.get('FIREBASE')
-else:
-    with open('firebase.json', 'r') as auth_file:
-        firebase = auth_file.read()
+from . import firebase_auth
 
 
 def authenticate(req):
@@ -27,7 +19,7 @@ def authenticate(req):
 
 @app.route('/firebase')
 def get_firebase():
-    return firebase
+    return firebase_auth
 
 
 @app.route('/<path:path>')

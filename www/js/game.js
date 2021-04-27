@@ -125,7 +125,6 @@ function setDraggable() {
 	});
 }
 
-
 function setupDroppable() {
 	$(`.${playerColor}`).each(function() {
 		$(this).addClass('droppable');
@@ -158,6 +157,4 @@ function setupDroppable() {
 		}
 	});
 }
-
-
 

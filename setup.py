@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='slay',
     version='1.0.0',
-    url='https://github.com/sean5446/slay.git',
+    url='https://github.com/sean5446/',
     author='Author',
     author_email='author@gmail.com',
     description='Description of my package',

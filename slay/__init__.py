@@ -1,5 +1,6 @@
 
 import os
+import json
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -32,7 +33,22 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
-cred = credentials.Certificate("firebase-admin.json")
+firebase_auth = None
+if os.environ.get('FIREBASE_AUTH'):
+    firebase_auth = os.environ.get('FIREBASE_AUTH')
+else:
+    with open('firebase_auth.json', 'r') as auth_file:
+        firebase_auth = auth_file.read()
+
+
+firebase_creds = None
+if os.environ.get('FIREBASE_ADMIN'):
+    firebase_creds = json.loads(os.environ.get('FIREBASE_ADMIN'))
+else:
+    with open('firebase_admin.json', 'r') as auth_file:
+        firebase_creds = json.loads(auth_file.read())
+
+cred = credentials.Certificate(firebase_creds)
 firebase_admin.initialize_app(cred)
 
 Reminder.run()
