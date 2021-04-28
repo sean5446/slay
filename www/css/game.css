@@ -12,6 +12,7 @@ body {
 	margin: 15px 0;
 	border-left: solid 1px #333333;
 	border-right: solid 1px #333333;
+	/*background-image: url(../img/ground.png);*/
 }
 
 .hex:before,
@@ -26,6 +27,7 @@ body {
 	transform: scaleY(0.5774) rotate(-45deg);
 	background-color: inherit;
 	left: 14.2304px;
+	/*background-image: url(../img/ground.png);*/
 }
 
 .hex:before {
@@ -49,85 +51,85 @@ body {
 	margin-left: 53px;
 }
 
-.white {
+.color-white {
 	background-color: rgb(255, 255, 255);
 }
 
-.hex.red {
+.hex.color-red {
 	background-color: rgb(151, 4, 11);
 }
 
-.hex.green {
+.hex.color-green {
 	background-color: rgb(58, 117, 36);
 }
 
 
-.hex.blue {
+.hex.color-blue {
 	background-color: rgb(25, 89, 201);
 }
 
-.hex.yellow {
+.hex.color-yellow {
 	background-color: rgb(240, 193, 67);
 }
 
-.hex.black {
+.hex.color-black {
 	background-color: rgb(10, 20, 30);
 }
 
-.hex.transparent {
+.hex.color-transparent {
 	opacity: 0;
 }
 
-.hex.hut {
+.hex.unit-hut {
 	background-image: url("../img/hut.png");
 	background-position: 50% 50%;
 	background-size: 50px;
 	background-repeat: no-repeat;
 }
 
-.hex.castle {
+.hex.unit-castle {
 	background-image: url("../img/castle.png");
 	background-position: 50% 50%;
 	background-size: 40px;
 	background-repeat: no-repeat;
 }
 
-.hex.tree {
+.hex.unit-tree {
 	background-image: url("../img/tree.png");
 	background-position: 50% 50%;
 	background-size: 50px;
 	background-repeat: no-repeat;
 }
 
-.hex.grave {
+.hex.unit-grave {
 	background-image: url("../img/grave.png");
 	background-position: 50% 50%;
 	background-size: 50px;
 	background-repeat: no-repeat;
 }
 
-.hex.man {
+.hex.unit-man {
 	background-image: url("../img/man.png");
 	background-position: 50% 50%;
 	background-size: 45px;
 	background-repeat: no-repeat;
 }
 
-.hex.spearman {
+.hex.unit-spearman {
 	background-image: url("../img/spearman.png");
 	background-position: 50% 50%;
 	background-size: 40px;
 	background-repeat: no-repeat;
 }
 
-.hex.knight {
+.hex.unit-knight {
 	background-image: url("../img/knight.png");
 	background-position: 50% 50%;
 	background-size: 40px;
 	background-repeat: no-repeat;
 }
 
-.hex.barron {
+.hex.unit-barron {
 	background-image: url("../img/barron.png");
 	background-position: 50% 50%;
 	background-size: 60px;
@@ -188,20 +190,23 @@ body {
 
 #economy {
 	float: left;
-	padding: 30px;
+	padding-right: 15%;
+	padding-bottom: 90px;
 }
 
 #players {
 	float: left;
-	padding: 30px;
+	padding-right: 15%;
+	padding-bottom: 20px;
 }
 
 #units {
 	float: left;
-	padding: 30px;
+	padding-right: 15%;
+	padding-bottom: 20px;
 }
 
 #buttons {
 	float: left;
-	padding: 30px;
+	padding-right: 15%;
 }

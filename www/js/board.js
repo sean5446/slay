@@ -17,7 +17,7 @@ class Board {
 	num_cols = 0;
 	num_players = 0;
 
-  constructor(strBoard) {
+	constructor(strBoard) {
 		strBoard.replace(/^\s+|\s+$/g, '');
 		this.num_rows = strBoard.split('\n').length - 1;
 		this.num_cols = strBoard.split('\n')[0].split(' ').length - 1;
@@ -38,7 +38,7 @@ class Board {
 			this.board.push(column);
 		}
 		this.num_players = Object.keys(num_players).length;
-  }
+	}
 
 	getNeighbors(row, col) {
 		var allPossible = null;
@@ -156,7 +156,7 @@ class Board {
 						region = `region-${i[0]}-${i[1]}`;
 					}
 				}
-				$(`<div id="tile-${tileId}" class="hex ${color} ${unit} ${region}"></div>`).appendTo(rowElem)
+				$(`<div id="tile-${tileId}" class="hex color-${color} unit-${unit} ${region}"></div>`).appendTo(rowElem)
 			}
 		}
 		return regions;
