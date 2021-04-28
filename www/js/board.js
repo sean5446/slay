@@ -136,7 +136,7 @@ class Board {
 		return regions;
 	}
 
-  drawBoard(parent, playerColorId) {
+	drawBoard(parent, playerColorId) {
 		var regions = this.placeHuts(parent);
 
 		for (let row = 0; row < this.board.length; row++) {
@@ -160,7 +160,7 @@ class Board {
 			}
 		}
 		return regions;
-  }
+	}
 
 	toString() {
 		var str = '';

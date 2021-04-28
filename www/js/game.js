@@ -23,8 +23,6 @@ function initGame(displayName, email) {
 
 			setupHighlightRegion(playerColor, regions);
 			setupPlayerStats(data, regions);
-			setupDraggable(regions);
-			setupDroppable(playerColor, regions);
 			setupButtons();
 		},
 		error: function(data) {
@@ -35,9 +33,11 @@ function initGame(displayName, email) {
 
 function setupHighlightRegion(playerColor, regions) {
 	$(document).on('click touchstart', '.hex', function() {
+		setupDroppable(playerColor, regions);
+
 		$(`[class*=region][class*=white]`).each(function() {
 			$(this).removeClass('color-white').addClass(`color-${playerColor}`);
-			$('#unit').html('');
+			//$('#unit').html('');
 		});
 
 		if ($(this).attr('class').includes(`color-${playerColor}`)) {
@@ -57,7 +57,6 @@ function setupHighlightRegion(playerColor, regions) {
 					$('#money').html(`Money: 0`);
 					$('#unit').html('<div class="hex unit-man draggable unit"></div>');
 					setupDraggable(regions);
-					setupDroppable(playerColor, regions);
 				}
 			}
 		}
