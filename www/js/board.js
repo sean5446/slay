@@ -2,12 +2,9 @@
 // these enums must match python enums in board.py
 UnitEnum = Object.freeze({
 	'00': '', '01': 'grave', '02': 'tree', '04': 'man', '08': 'spearman',
-	'09': 'hut', '12': 'knight', '13': 'castle', '16': 'barron'
-	//'grave': 1, 'tree': 2, 'man': 4, 'spearman': 8, 'hut': 9, 'knight': 12, 'castle': 13, 'barron': 16
+	'09': 'hut', '12': 'knight', '13': 'castle', '16': 'baron'
 });
-
 PlayerColorsEnum = Object.freeze([
-	//'0': 'transparent', '1': 'red', '2': 'green', '3': 'blue', '4': 'yellow', '5': 'black'
 	'transparent', 'red', 'green', 'blue', 'yellow', 'black'
 ]);
 

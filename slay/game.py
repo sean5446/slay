@@ -1,4 +1,5 @@
 from random import shuffle
+import json
 
 from .board import Board
 from .models import *
@@ -77,8 +78,10 @@ class Game:
         i = 0
         for username in users:
             user_id = Game.get_user(username)['id']
-            player = PlayerModel(user_id=user_id, game_id=game_model.id, color=turn_colors.split(',')[i],
-                                 bank=0, last_turn_time=0)
+            color = turn_colors.split(',')[i]
+            regions = board_rand.get_regions(color)
+            player = PlayerModel(user_id=user_id, game_id=game_model.id, color=color,
+                                 regions=json.dumps(regions), last_turn_time=0)
             db.session.add(player)
             i += 1
         db.session.commit()

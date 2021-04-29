@@ -8,7 +8,7 @@ class Board:
     }
     UNIT_VALUES = {
         '00': '', '01': 'grave', '02': 'tree', '04': 'man', '08': 'spearman',
-        '09': 'hut', '12': 'knight', '13': 'castle', '16': 'barron'
+        '09': 'hut', '12': 'knight', '13': 'castle', '16': 'baron'
     }
 
     def __init__(self, board_type, num_rows=0, num_cols=0, num_players=0):
@@ -137,16 +137,6 @@ class Board:
         del order['0']  # 0 is not a player
         return ','.join(order.keys())
 
-    #
-    #  below unused for now
-    #
-    def place_huts(self):
-        for player in range(1, self.num_players + 1):
-            regions = self.get_regions(player)
-            for k, v in regions.items():
-                if len(v) > 1:
-                    self.board[k[0]][k[1]] = self.board[k[0]][k[1]][:1] + '09'  # place hut
-
     def in_dict_of_list(self, item, dict_list):
         for k, v in dict_list.items():
             if item in v:
@@ -174,6 +164,16 @@ class Board:
                                 regions[kn] += [v]
                             del(regions[kt])
         return regions
+
+    #
+    #  below unused for now
+    #
+    def place_huts(self):
+        for player in range(1, self.num_players + 1):
+            regions = self.get_regions(player)
+            for k, v in regions.items():
+                if len(v) > 1:
+                    self.board[k[0]][k[1]] = self.board[k[0]][k[1]][:1] + '09'  # place hut
 
     def render_to_html(self):
         regions = {}

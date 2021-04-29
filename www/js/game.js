@@ -99,10 +99,10 @@ function setupPlayerStats(data, regions) {
 	}
 }
 
-function unitsAtPosition(top, left) {
+function unitsAtPosition(item) {
 	return $("#map").find('.unit').filter(function() {
 		e = $(this)
-		if (e.offset().top == top && e.offset().left == left) return e;
+		if (e.offset().top == item.offset().top && e.offset().left == item.offset().left) return e;
 	});
 }
 
@@ -118,24 +118,33 @@ function getUnitStrength(unit) {
 	}
 }
 
+function resetDraggable() {
+	draggable.detach();
+	$('#unit').append(draggable);
+	draggable.css({top: dragStartPosition.top, left: dragStartPosition.left});
+}
+
 function drop(draggable, droppable) {
+	// position unit
 	draggable.detach();
 	$('#map').append(draggable);
+	pos_top = Math.round(droppable.position().top + (droppable.height() / 2) - (draggable.height() / 2));
+	pos_left = Math.round(droppable.position().left + (droppable.width() / 2) - (draggable.width() / 2));
+	draggable.css({position: 'absolute', top: pos_top, left: pos_left});
+
 	var dragUnit = getClass(draggable, 'unit');
-	var hexUnit = getClass(droppable, 'unit');
+	var hexUnit = getClass($(unitsAtPosition(draggable)[0]), 'unit'); // not sure why this has to be draggable
 	var hexColor = getClass(droppable, 'color');
 	var dragUnitStrength = getUnitStrength(dragUnit);
 	var hexUnitStrength = getUnitStrength(hexUnit);
 
-	if (playerColor == hexColor || hexColor == 'white') {
+	if (playerColor == hexColor || hexColor == 'white' && hexUnit) {
 		console.log('on friendly territory');
-		// position unit
-		pos_top = Math.round(droppable.position().top + (droppable.height() / 2) - (draggable.height() / 2))
-		pos_left = Math.round(droppable.position().left + (droppable.width() / 2) - (draggable.width() / 2))
-		draggable.css({position: 'absolute', top: pos_top, left: pos_left});
+
+		if (hexUnit == 'baron') resetDraggable();
 
 		// looking to level up
-		units = unitsAtPosition(draggable.offset().top, draggable.offset().left);
+		units = unitsAtPosition(draggable);
 		if (units.length > 1) {
 			var totalStrength = 0;
 			for (i = 0; i < units.length; i++) {
@@ -150,10 +159,6 @@ function drop(draggable, droppable) {
 			setupDraggable();
 			elementUnit.draggable();
 		}
-		// just place the unit
-		else {
-			draggable.css({top: pos_top, left: pos_left});
-		}
 	}
 	else {
 		console.log('on enemy territory');
@@ -165,7 +170,7 @@ function drop(draggable, droppable) {
 		}
 		// can't battle - reset position
 		else {
-			draggable.css({top: dragStartPosition.top, left: dragStartPosition.left});
+			resetDraggable();
 		}
 	}
 }
