@@ -24,6 +24,7 @@ limiter = Limiter(
     default_limits=[]  # "200 per day", "50 per hour"]
 )
 
+# TODO does stuff in this file need __file__ based path?
 db_file = os.path.join(os.getcwd(), 'slay.db')
 db_uri = os.environ.get('DATABASE_URL', f'sqlite:///{db_file}')
 db_uri = db_uri.replace('postgres://', 'postgresql://')
@@ -39,7 +40,6 @@ if os.environ.get('FIREBASE_AUTH'):
 else:
     with open('firebase_auth.json', 'r') as auth_file:
         firebase_auth = auth_file.read()
-
 
 firebase_creds = None
 if os.environ.get('FIREBASE_ADMIN'):

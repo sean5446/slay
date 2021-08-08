@@ -4,9 +4,9 @@ setup(
     name='slay',
     version='1.0.0',
     url='https://github.com/sean5446/',
-    author='Author',
+    author='sean5446',
     author_email='author@gmail.com',
-    description='Description of my package',
+    description='A game server',
     packages=find_packages(),
     install_requires=[
         'Flask',

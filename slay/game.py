@@ -68,7 +68,7 @@ class Game:
         users.insert(0, "Sean")  # TODO remove debug code
         board_rand = Game.get_random_board(num_players=len(users))
         turn_colors = board_rand.get_player_turn_order()
-        board_model = Game.create_board(str(board_rand))  # adds and commits
+        board_model = Game.create_board(str(board_rand))  # creates and commits to db
         game_model = GameModel(name=name, current_board_id=board_model.id,
                                turn_colors=turn_colors, current_turn=turn_colors[0])
         history_model = GameHistoryModel(game_id=game_model.id, board_id=board_model.id)
@@ -93,3 +93,11 @@ class Game:
         if not game_model:
             return None
         return game_schema.dump(game_model)
+
+    @staticmethod
+    def validate_move(self, moves, user, board):
+        # had enough money to place unit
+        # moving within region or next to region
+        # unit is strong enough to move to location
+        # unit is not upgrading baron
+        pass

@@ -1,8 +1,9 @@
+
 from random import randint
 
 
 class Board:
-    # these must match javascript enums in game.js
+    # these enums must match javascript enums in game.js
     PLAYER_COLORS = {
         '0': 'transparent', '1': 'red', '2': 'green', '3': 'blue', '4': 'yellow', '5': 'black'
     }
@@ -165,9 +166,6 @@ class Board:
                             del(regions[kt])
         return regions
 
-    #
-    #  below unused for now
-    #
     def place_huts(self):
         for player in range(1, self.num_players + 1):
             regions = self.get_regions(player)
@@ -191,10 +189,10 @@ class Board:
                     for k, v in player_regions.items():
                         if len(v) > 1 and (row, col) in v:
                             region = f'region{k[0]}-{k[1]}'
-                color = Board.PLAYER_COLORS[player]
                 unit_id = self.board[row][col][1:3]
-                unit = Board.UNIT_VALUES[unit_id]
-                tile_id = f'{row}-{col}'
-                html += f'\t\t<div id="tile-{tile_id}" class="hex {color} {unit} {region}"></div>\n'
+                unit = f'unit-{Board.UNIT_VALUES[unit_id]}'
+                color = f'color-{Board.PLAYER_COLORS[player]}'
+                tile_id = f'tile-{row}-{col}'
+                html += f'\t\t<div id="{tile_id}" class="hex {color} {unit} {region}"></div>\n'
             html += '\t</div>\n'
         return html
