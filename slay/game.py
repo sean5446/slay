@@ -64,8 +64,8 @@ class Game:
     @staticmethod
     def create_game(name, users):
         shuffle(users)
-        users.remove("Sean")  # TODO remove debug code
-        users.insert(0, "Sean")  # TODO remove debug code
+        # users.remove("Sean")  # TODO remove debug code
+        # users.insert(0, "Sean")  # TODO remove debug code
         board_rand = Game.get_random_board(num_players=len(users))
         turn_colors = board_rand.get_player_turn_order()
         board_model = Game.create_board(str(board_rand))  # creates and commits to db
@@ -95,7 +95,7 @@ class Game:
         return game_schema.dump(game_model)
 
     @staticmethod
-    def validate_move(self, moves, user, board):
+    def validate_move(board, moves, user):
         # had enough money to place unit
         # moving within region or next to region
         # unit is strong enough to move to location

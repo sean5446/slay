@@ -26,8 +26,8 @@ limiter = Limiter(
 
 # TODO does stuff in this file need __file__ based path?
 db_file = os.path.join(os.getcwd(), 'slay.db')
-db_uri = os.environ.get('DATABASE_URL', f'sqlite:///{db_file}')
-db_uri = db_uri.replace('postgres://', 'postgresql://')
+db_uri = os.environ.get('DATABASE_URI', f'sqlite:///{db_file}')
+db_uri = db_uri.replace('postgres://', 'postgresql://')  # heroku doesn't append 'ql' suffix
 
 app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

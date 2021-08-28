@@ -10,7 +10,7 @@ function initGame(displayName, email) {
 	$.ajax({
 		type: 'POST',
 		dataType: 'json',
-		url: `${window.location.pathname}`,
+		url: `${window.location.pathname}`,  // /game/<id>
 		success: function(data) {
 			for (const player of data.players) {
 				if (player.user.username == displayName) {

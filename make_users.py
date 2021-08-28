@@ -11,10 +11,10 @@ else:
 print(f'host: {host}')
 
 users = [
-    {'username': 'Computer1', 'email': 'computer1@gmail.com'},
-    {'username': 'Computer2', 'email': 'computer2@gmail.com'},
-    {'username': 'Computer3', 'email': 'computer3@gmail.com'},
-    {'username': 'Computer4', 'email': 'computer4@gmail.com'},
+    {'username': 'Computer 1', 'email': 'computer1@gmail.com'},
+    {'username': 'Computer 2', 'email': 'computer2@gmail.com'},
+    {'username': 'Computer 3', 'email': 'computer3@gmail.com'},
+    {'username': 'Computer 4', 'email': 'computer4@gmail.com'},
 ]
 
 for user in users:

@@ -9,7 +9,7 @@ class BoardModel(db.Model):
     board = db.Column(db.String(999))
 
     def __repr__(self):
-        return f'board: {self.id}'
+        return f'board={self.id}'
 
 
 class BoardSchema(ma.Schema):
@@ -25,7 +25,7 @@ class UserModel(db.Model):
     score = db.Column(db.Integer)
 
     def __repr__(self):
-        return f'id: {self.id}, name: {self.username}, score: {self.score}'
+        return f'user={self.id}, {self.username=}, {self.score=}'
 
 
 class UserSchema(ma.Schema):
@@ -37,15 +37,15 @@ class PlayerModel(db.Model):
     __tablename__ = "players"
     id = db.Column(db.Integer, primary_key=True)
     color = db.Column(db.Integer)
-    regions = db.Column(db.String(128))
+    regions = db.Column(db.String(999))
     game_id = db.Column(db.Integer, db.ForeignKey('games.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     last_turn_time = db.Column(db.Integer)
     user = db.relationship("UserModel", backref="users")
 
     def __repr__(self):
-        return f'player: {self.id}, color: {self.color}, game_id: {self.game_id}, ' + \
-               f'user_id: {self.user_id}, last_turn_time: {self.last_turn_time}'
+        return f'player={self.id}, {self.color=}, {self.game_id=}, ' + \
+               f'{self.user_id=}, {self.last_turn_time=}'
 
 
 class PlayerSchema(ma.Schema):
@@ -65,8 +65,8 @@ class GameModel(db.Model):
     players = db.relationship('PlayerModel', backref='games')
 
     def __repr__(self):
-        return f'game: {self.id}, name: {self.name}, current_turn: {self.current_turn}, ' + \
-               f'current_board_id: {self.current_board_id}, turn_colors: {self.turn_colors}'
+        return f'game={self.id}, {self.name=}, {self.current_turn=}, ' + \
+               f'{self.current_board_id=}, {self.turn_colors=}'
 
 
 class GameSchema(ma.Schema):
@@ -82,6 +82,9 @@ class GameHistoryModel(db.Model):
     game_id = db.Column(db.Integer, db.ForeignKey('games.id'))
     board_id = db.Column(db.Integer, db.ForeignKey('boards.id'))
     board = ma.Nested(BoardSchema)
+
+    def __repr__(self):
+        return f'history={self.id}, {self.game_id=}, {self.board_id=}' 
 
 
 class GameHistorySchema(ma.Schema):

@@ -10,6 +10,14 @@ class TestGame(unittest.TestCase):
     def setUpClass(cls):
         Game.create_user(email='sean@sean.com', username='Sean')
 
+    @classmethod
+    def tearDownClass(cls):
+        user = db.session.query(UserModel).filter(UserModel.username == 'Sean')
+        user.delete()
+        game = db.session.query(GameModel).filter(GameModel.name == 'SeanGame')
+        game.delete()
+        db.session.commit()
+
     def test_get_user(self):
         user = Game.get_user('Sean')
         assert user is not None
@@ -19,13 +27,8 @@ class TestGame(unittest.TestCase):
         assert game is not None
         assert board is not None
 
-    @classmethod
-    def tearDownClass(cls):
-        user = db.session.query(UserModel).filter(UserModel.username == 'Sean')
-        user.delete()
-        game = db.session.query(GameModel).filter(GameModel.name == 'SeanGame')
-        game.delete()
-        db.session.commit()
+    def validate_move(self):
+        pass
 
 
 if __name__ == '__main__':

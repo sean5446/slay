@@ -99,7 +99,7 @@ def create_game():
 
 
 @app.route('/game/<game_id>/validate', methods=['POST'])
-def validate_moves(game_id):
+def validate_move(game_id):
     req = request.get_json()
     username = req.username
     moves = req.moves
@@ -107,6 +107,6 @@ def validate_moves(game_id):
     user = Game.get_user(username)
     if not game or not user:
         abort(404)
-    Game.validate_moves(moves, user, game.board)
+    Game.validate_move(game.board, moves, user)
     resp = {'request': req, 'game': game}
     return ok(resp)

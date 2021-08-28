@@ -7,6 +7,6 @@
 **/*.db
 **/__pycache__
 **/*egg-info
+
 firebase_auth.json
 firebase_admin.json
-

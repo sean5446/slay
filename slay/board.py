@@ -156,9 +156,9 @@ class Board:
                     kn = self.in_dict_of_list(n, regions)
                     kt = self.in_dict_of_list(t, regions)
                     if not kn and not kt:
-                        regions[t] = [t, n]
+                        regions[str(t)] = [t, n]    # keys need to be strings to jsonify
                     elif not kn and kt:
-                        regions[kt] += [n]
+                        regions[str(kt)] += [n]
                     elif kn and kt:
                         if kn != kt:
                             for v in regions[kt]:

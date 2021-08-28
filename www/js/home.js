@@ -16,7 +16,7 @@ function getUserList(displayName, email) {
 		dataType: "json",
 		url: "/user",
 		success: function(data) {
-			var users = data;
+			const users = data;
 			var source = [];
 			var found = false;
 			for (var i = 0; i < users.length; i++) {
@@ -60,7 +60,7 @@ function getGameList(user) {
 		dataType: "json",
 		url: `/user/${user}`,
 		success: function(data) {
-			var games = data.games;
+			const games = data.games;
 			var source = [];
 			for (const [key, value] of Object.entries(games)) {
 				var entry = `${key}: ${value}`
@@ -81,11 +81,15 @@ function getGameList(user) {
 	$("#listbox-games").jqxListBox({ width: $(window).width()/2-10, source: source, checkboxes: true, height: 300 });
 }
 
+function reverse(s) {
+    return s.split("").reverse().join("");
+}
+
 function createGame(displayName) {
-	var items = $("#listbox-users").jqxListBox('getCheckedItems');
+	const items = $("#listbox-users").jqxListBox('getCheckedItems');
 	var checkedItems = [displayName];
 	$.each(items, function(index) {
-		var user = this.label.match(/^(.+) /)[0].trim();
+		const user = reverse(reverse(this.label).match(/^\)\d+\( (.+)$/)[1]).trim(); // remove score
 		checkedItems.push(user);
 	});
 
@@ -106,7 +110,7 @@ function createGame(displayName) {
 		contentType: 'application/json',
 		data: JSON.stringify({ 'name': name, 'users': checkedItems } ),
 		success: function(data) {
-			board = JSON.parse(data);
+			const board = JSON.parse(data);
 			window.location.assign('/game/' + board.id);
 		},
 		error: function(data) {
@@ -126,16 +130,16 @@ function setCookie(name,value,days) {
 }
 
 function getCookie(name) {
-	var nameEQ = name + "=";
-	var ca = document.cookie.split(';');
-	for(var i=0;i < ca.length;i++) {
+	const nameEQ = name + "=";
+	const ca = document.cookie.split(';');
+	for(var i=0; i < ca.length; i++) {
 		var c = ca[i];
 		while (c.charAt(0)==' ') c = c.substring(1,c.length);
-		if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+		if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
 	}
 	return null;
 }
 
 function removeCookie(name) {
-	document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+	document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 }
