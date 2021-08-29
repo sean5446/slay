@@ -4,12 +4,12 @@ from . import ma
 
 
 class BoardModel(db.Model):
-    __tablename__ = "boards"
+    __tablename__ = 'boards'
     id = db.Column(db.Integer, primary_key=True)
     board = db.Column(db.String(999))
 
     def __repr__(self):
-        return f'board={self.id}'
+        return f'board={self.id}, board_size={len(self.board)}'
 
 
 class BoardSchema(ma.Schema):
@@ -18,14 +18,15 @@ class BoardSchema(ma.Schema):
 
 
 class UserModel(db.Model):
-    __tablename__ = "users"
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(99), unique=True)
     email = db.Column(db.String(99), unique=True)
+    computer = db.Column(db.Integer)
     score = db.Column(db.Integer)
 
     def __repr__(self):
-        return f'user={self.id}, {self.username=}, {self.score=}'
+        return f'user={self.id}, {self.username=}, {self.computer=}, {self.score=}'
 
 
 class UserSchema(ma.Schema):
@@ -34,14 +35,13 @@ class UserSchema(ma.Schema):
 
 
 class PlayerModel(db.Model):
-    __tablename__ = "players"
+    __tablename__ = 'players'
     id = db.Column(db.Integer, primary_key=True)
     color = db.Column(db.Integer)
-    regions = db.Column(db.String(999))
     game_id = db.Column(db.Integer, db.ForeignKey('games.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     last_turn_time = db.Column(db.Integer)
-    user = db.relationship("UserModel", backref="users")
+    user = db.relationship('UserModel', backref='users')
 
     def __repr__(self):
         return f'player={self.id}, {self.color=}, {self.game_id=}, ' + \
@@ -50,34 +50,34 @@ class PlayerModel(db.Model):
 
 class PlayerSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'color', 'user_id', 'regions', 'game_id', 'last_turn_time', 'user')
+        fields = ('id', 'color', 'user_id', 'game_id', 'last_turn_time', 'user')
     user = ma.Nested(UserSchema)
 
 
 class GameModel(db.Model):
-    __tablename__ = "games"
+    __tablename__ = 'games'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(16), unique=True)
     current_board_id = db.Column(db.Integer, db.ForeignKey('boards.id'))
     turn_colors = db.Column(db.String(24))
-    current_turn = db.Column(db.Integer)
+    current_turn_color = db.Column(db.Integer)
     board = db.relationship('BoardModel', backref='games')
     players = db.relationship('PlayerModel', backref='games')
 
     def __repr__(self):
-        return f'game={self.id}, {self.name=}, {self.current_turn=}, ' + \
+        return f'game={self.id}, {self.name=}, {self.current_turn_color=}, ' + \
                f'{self.current_board_id=}, {self.turn_colors=}'
 
 
 class GameSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'name', 'current_board_id', 'turn_colors', 'current_turn', 'players', 'board')
+        fields = ('id', 'name', 'current_board_id', 'turn_colors', 'current_turn_color', 'players', 'board')
     players = ma.Nested(PlayerSchema, many=True)
     board = ma.Nested(BoardSchema)
 
 
 class GameHistoryModel(db.Model):
-    __tablename__ = "history"
+    __tablename__ = 'history'
     id = db.Column(db.Integer, primary_key=True)
     game_id = db.Column(db.Integer, db.ForeignKey('games.id'))
     board_id = db.Column(db.Integer, db.ForeignKey('boards.id'))

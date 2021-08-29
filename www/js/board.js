@@ -21,11 +21,11 @@ class Board {
 		this.board = [];
 		var num_players = {};
 
-		for (var row of strBoard.split('\n')) {
+		for (let row of strBoard.split('\n')) {
 			row = row.trim();
 			if (row.length < 3) continue;
 			var column = []
-			for (var col of row.split(' ')) {
+			for (const col of row.split(' ')) {
 				if (col.length != 3) continue;
 				column.push(col);
 				if (col.charAt(0) != '0') {
@@ -46,7 +46,7 @@ class Board {
 			allPossible = [ [row-1, col], [row-1, col+1], [row, col-1], [row, col+1], [row+1, col], [row+1, col+1] ];
 		}
 		var neighbors = [];
-		for (var n of allPossible) {
+		for (const n of allPossible) {
 			if (0 <= n[0] && n[0] < this.board.length && 0 <= n[1] && n[1] < this.board[0].length) {
 				neighbors.push(n);
 			}
@@ -56,9 +56,9 @@ class Board {
 
 	getPlayerTiles() {
 		var playerTiles = {};
-		for (var row = 0; row < this.board.length; row++) {
-			for (var col = 0; col < this.board[0].length; col++) {
-				var player = this.board[row][col].charAt(0);
+		for (let row = 0; row < this.board.length; row++) {
+			for (let col = 0; col < this.board[0].length; col++) {
+				const player = this.board[row][col].charAt(0);
 				if (!playerTiles.hasOwnProperty(player)) {
 					playerTiles[player] = [[row, col]];
 				}
@@ -72,7 +72,7 @@ class Board {
 
 	getPlayerTileCount() {
 		var playerCounts = {};
-		var playerTiles = this.getPlayerTiles();
+		const playerTiles = this.getPlayerTiles();
 		for (const [k, v] of Object.entries(playerTiles)) {
 			playerCounts[k] = v.length;
 		}
@@ -90,11 +90,11 @@ class Board {
 
 	getRegions(player) {
 		var player = player.toString();
-		var tiles = this.getPlayerTiles()[player];
+		const tiles = this.getPlayerTiles()[player];
 		var regions = {};
-		for (var t of tiles) {
+		for (const t of tiles) {
 			var neighbors = this.getNeighbors(t[0], t[1]);
-			for (var n of neighbors) {
+			for (const n of neighbors) {
 				var n_color = this.board[n[0]][n[1]].charAt(0);
 				if (n_color == player) {
 					var kn = this.in_dict_of_list(n, regions);
@@ -121,7 +121,7 @@ class Board {
 
 	placeHuts() {
 		var regions = {};
-		for (var player = 1; player < this.num_players+1; player++) {
+		for (let player = 1; player < this.num_players+1; player++) {
 			regions[player] = this.getRegions(player);
 			for (const [k, v] of Object.entries(regions[player])) {
 				if (v.length > 1) {
@@ -133,18 +133,18 @@ class Board {
 		return regions;
 	}
 
-	drawBoard(parent, playerColorId) {
-		var regions = this.placeHuts(parent);
+	drawBoard(parent) {
+		const regions = this.placeHuts(parent);
 
 		for (let row = 0; row < this.board.length; row++) {
-			var odd = (row % 2 == 0) ? '' : ' odd';
-			var rowElem = $(`\t<div class="hex-row${odd}"></div>\n`).appendTo(parent);
+			const odd = (row % 2 == 0) ? '' : ' odd';
+			const rowElem = $(`\t<div class="hex-row${odd}"></div>\n`).appendTo(parent);
 			for (let col = 0; col < this.board[0].length; col++) {
-				var player = this.board[row][col].charAt(0);
-				var unit_id = this.board[row][col].slice(-2);
-				var color = PlayerColorsEnum[player];
-				var unit = UnitEnum[unit_id];
-				var tileId = col + '-' + row;
+				const player = this.board[row][col].charAt(0);
+				const unit_id = this.board[row][col].slice(-2);
+				const color = PlayerColorsEnum[player];
+				const unit = UnitEnum[unit_id];
+				const tileId = col + '-' + row;
 				var region = '';
 				if (player == playerColorId) {
 					var k = this.in_dict_of_list([row, col], regions[playerColorId]);

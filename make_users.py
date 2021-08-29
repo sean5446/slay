@@ -2,19 +2,20 @@
 
 import sys
 import requests
+from uuid import uuid4
 
 if len(sys.argv) > 1:
     host = sys.argv[1]
 else:
-    host = 'http://localhost'
+    host = 'http://localhost:8080'
 
 print(f'host: {host}')
 
 users = [
-    {'username': 'Computer 1', 'email': 'computer1@gmail.com'},
-    {'username': 'Computer 2', 'email': 'computer2@gmail.com'},
-    {'username': 'Computer 3', 'email': 'computer3@gmail.com'},
-    {'username': 'Computer 4', 'email': 'computer4@gmail.com'},
+    {'username': 'Computer 1', 'email': 'computer1@gmail.com', 'computer': 1},
+    {'username': 'Computer 2', 'email': 'computer2@gmail.com', 'computer': 1},
+    {'username': 'Computer 3', 'email': 'computer3@gmail.com', 'computer': 1},
+    {'username': 'Computer 4', 'email': 'computer4@gmail.com', 'computer': 1},
 ]
 
 for user in users:
@@ -26,9 +27,9 @@ for user in users:
     print(req.status_code)
     print(req.json())
 
-req = requests.get(f'{host}/user/adfgsasdfs')
-print(req.status_code)
+req = requests.get(f'{host}/user/{uuid4().hex}')
+assert req.status_code == 404
 
 req = requests.get(f'{host}/user')
-print(req.status_code)
+assert req.status_code == 200
 print(req.json())

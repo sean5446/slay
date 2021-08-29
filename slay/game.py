@@ -24,9 +24,11 @@ class Game:
         return new_board
 
     @staticmethod
-    def create_user(email, username):
+    def create_user(email, username, computer):
         try:
-            db.session.add(UserModel(email=email, username=username, score=0))
+            if not computer:
+                computer = 0
+            db.session.add(UserModel(email=email, username=username, score=0, computer=computer))
             db.session.commit()
             return True
         except Exception as ex:
@@ -64,26 +66,22 @@ class Game:
     @staticmethod
     def create_game(name, users):
         shuffle(users)
-        # users.remove("Sean")  # TODO remove debug code
-        # users.insert(0, "Sean")  # TODO remove debug code
+        users.remove("Sean Magu")  # TODO remove debug code
+        users.insert(0, "Sean Magu")  # TODO remove debug code
         board_rand = Game.get_random_board(num_players=len(users))
         turn_colors = board_rand.get_player_turn_order()
         board_model = Game.create_board(str(board_rand))  # creates and commits to db
         game_model = GameModel(name=name, current_board_id=board_model.id,
-                               turn_colors=turn_colors, current_turn=turn_colors[0])
+                               turn_colors=turn_colors, current_turn_color=turn_colors[0])
         history_model = GameHistoryModel(game_id=game_model.id, board_id=board_model.id)
         db.session.add(history_model)
         db.session.add(game_model)
-        db.session.commit()
         i = 0
         for username in users:
             user_id = Game.get_user(username)['id']
-            color = turn_colors.split(',')[i]
-            regions = board_rand.get_regions(color)
-            player = PlayerModel(user_id=user_id, game_id=game_model.id, color=color,
-                                 regions=json.dumps(regions), last_turn_time=0)
+            color = turn_colors.split(',')[i]; i += 1
+            player = PlayerModel(user_id=user_id, game_id=game_model.id, color=color, last_turn_time=0)
             db.session.add(player)
-            i += 1
         db.session.commit()
         return game_schema.dump(game_model)
 
@@ -92,12 +90,30 @@ class Game:
         game_model = GameModel.query.filter(GameModel.id == game_id).first()
         if not game_model:
             return None
-        return game_schema.dump(game_model)
+        regions = {}
+        board = Board(game_model.board.board)
+        for color in game_model.turn_colors.split(','):
+            player_regions = board.get_regions(color)
+            regions[color] = {}
+            for k, v in player_regions.items():
+                regions[color][k] = {}
+                regions[color][k]['tiles'] = v
+                regions[color][k]['savings'] = len(v) * 4  # TODO subtract trees :'(
+                regions[color][k]['wages'] = 0  # TODO calc wages
+        game = game_schema.dump(game_model)
+        game['regions'] = regions
+        return game
 
     @staticmethod
     def validate_move(board, moves, user):
+        # is player turn?
+
+        # move is not upgrading baron
+
         # had enough money to place unit
-        # moving within region or next to region
+
+        # move within region or next to region
+
         # unit is strong enough to move to location
-        # unit is not upgrading baron
+        
         pass

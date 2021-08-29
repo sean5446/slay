@@ -51,8 +51,9 @@ def create_user():
     req = request.get_json()
     email = req.get('email')
     username = req.get('username')
+    computer = req.get('computer')
     # TODO: validate inputs
-    ret = Game.create_user(email, username)
+    ret = Game.create_user(email, username, computer)
     if not isinstance(ret, Exception):
         return ok({'success': ret})
     else:
