@@ -146,6 +146,7 @@ class Board:
             num_generated += 1
             if std_dev < accept_std_dev:
                 break
+        self.place_huts()
         return self.board, player_tiles, std_dev, num_generated
 
     def get_player_turn_order(self):
@@ -188,9 +189,11 @@ class Board:
             color = player.color
             player_regions = self.get_regions(color)
             regions[color] = {}
+            regions[color]['total'] = 0
             for k, v in player_regions.items():
                 regions[color][k] = {}
                 regions[color][k]['tiles'] = v
+                regions[color]['total'] += len(v)
                 income, wages = self.get_income_and_wages(v)    
                 savings = json.loads(player.savings)
                 regions[color][k]['savings'] = savings[k]
@@ -207,7 +210,7 @@ class Board:
             if tile_unit != 2:  # not a tree
                 income += 1
             if tile_unit > 2 and tile_unit != 9 and tile_unit != 13:  # a unit but not a hut or castle
-                wages += tile_unit
+                wages += tile_unit  # this isn't quite right
         return income, wages
 
 
@@ -216,7 +219,10 @@ class Board:
             regions = self.get_regions(player)
             for k, v in regions.items():
                 if len(v) > 1:
-                    self.board[k[0]][k[1]] = self.board[k[0]][k[1]][:1] + '09'  # place hut
+                    nums = k[1:-1]
+                    row = int(nums.split(',')[0].strip())
+                    col = int(nums.split(',')[1].strip())
+                    self.board[row][col] = self.board[row][col][:1] + '09'  # place hut
 
     def render_to_html(self):
         regions = {}

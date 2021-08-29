@@ -1,7 +1,6 @@
 
 dragStartPosition = null;
-playerColor = null;
-playerColorId = null;
+
 
 function initGame(displayName, email) {
 	if (window.innerWidth > 1000) {
@@ -25,11 +24,11 @@ function initGame(displayName, email) {
 			}
 
 			// setup UI elements
-			board.drawBoard('#tiles');
+			board.drawBoard(data, playerColorId, '#tiles');
 			setupPlayerStats(data);
 			if (data.current_turn_color == playerColorId) {
 				setupButtons();
-				setupHighlightRegion(regions);
+				setupHighlightRegion(regions, playerColorId);
 			}
 		},
 		error: function(data) {
@@ -38,7 +37,7 @@ function initGame(displayName, email) {
 	});
 }
 
-function setupHighlightRegion(regions) {
+function setupHighlightRegion(regions, playerColorId) {
 	$(document).on('click touchstart', '.hex', function() {
 		setupDroppable(playerColor);
 
@@ -56,7 +55,6 @@ function setupHighlightRegion(regions) {
 					var row = c.split('-')[1];
 					var col = c.split('-')[2];
 					region = regions[playerColorId][`(${row}, ${col})`]
-					// TODO remove trees from income, find wages
 					$('#savings').html(`Savings: ${region['savings']}`);
 					$('#income').html(`Income: ${region['income']}`);
 					$('#wages').html(`Wages: ${region['wages']}`);
@@ -89,17 +87,14 @@ function setupDroppable(playerColor) {
 		drop: function(event, ui) {
 			draggable = $(ui.draggable[0])
 			droppable = $(this)
-			drop(draggable, droppable);
+			drop(draggable, droppable, playerColor);
 		}
 	});
 }
 
 function setupPlayerStats(data) {
 	for (const player of data.players) {
-		var total = 0;
-		for (const [k, v] of Object.entries(data.regions[player.color])) {
-			total += v['tiles'].length;
-		}
+		var total = data.regions[player.color]['total'];
 		$('#players').append(
 			`<div style="color: ${PlayerColorsEnum[player.color]}">${player.user.username}: ${total}</div>`
 		);
@@ -131,7 +126,7 @@ function resetDraggable() {
 	draggable.css({top: dragStartPosition.top, left: dragStartPosition.left});
 }
 
-function drop(draggable, droppable) {
+function drop(draggable, droppable, playerColor) {
 	// position unit
 	draggable.detach();
 	$('#map').append(draggable);

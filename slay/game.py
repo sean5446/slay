@@ -17,13 +17,6 @@ class Game:
         return Board(std_dev, num_rows, num_cols, num_players)
 
     @staticmethod
-    def create_board(board):
-        new_board = BoardModel(board=board)
-        db.session.add(new_board)
-        db.session.commit()
-        return new_board
-
-    @staticmethod
     def create_user(email, username, computer):
         try:
             if not computer:
@@ -70,7 +63,9 @@ class Game:
         users.insert(0, "Sean Magu")  # TODO remove debug code
         board_rand = Game.get_random_board(num_players=len(users))
         turn_colors = board_rand.get_player_turn_order()
-        board_model = Game.create_board(str(board_rand))  # creates and commits to db
+        board_model = BoardModel(board=str(board_rand))
+        db.session.add(board_model)
+        db.session.commit()  # do I need to commit to get IDs?
         game_model = GameModel(name=name, current_board_id=board_model.id,
                                turn_colors=turn_colors, current_turn_color=turn_colors[0])
         history_model = GameHistoryModel(game_id=game_model.id, board_id=board_model.id)

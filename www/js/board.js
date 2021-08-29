@@ -1,12 +1,26 @@
 
 // these enums must match python enums in board.py
 UnitEnum = Object.freeze({
-	'00': '', '01': 'grave', '02': 'tree', '04': 'man', '08': 'spearman',
-	'09': 'hut', '12': 'knight', '13': 'castle', '16': 'baron'
+	'00': '',
+	'01': 'grave',
+	'02': 'tree',
+	'04': 'man',
+	'08': 'spearman',
+	'09': 'hut',
+	'12': 'knight',
+	'13': 'castle',
+	'16': 'baron'
 });
+
 PlayerColorsEnum = Object.freeze([
-	'transparent', 'red', 'green', 'blue', 'yellow', 'black'
+	'transparent',
+	'red',
+	'green',
+	'blue',
+	'yellow',
+	'black'
 ]);
+
 
 class Board {
 	board = [];
@@ -70,72 +84,8 @@ class Board {
 		return playerTiles;
 	}
 
-	getPlayerTileCount() {
-		var playerCounts = {};
-		const playerTiles = this.getPlayerTiles();
-		for (const [k, v] of Object.entries(playerTiles)) {
-			playerCounts[k] = v.length;
-		}
-		return playerCounts;
-	}
-
-	in_dict_of_list(item, dict_list) {
-		for (const [k, v] of Object.entries(dict_list)) {
-			for (const i of v) {
-				if (i[0] == item[0] && i[1] == item[1]) return k;
-			}
-		}
-		return null;
-	}
-
-	getRegions(player) {
-		var player = player.toString();
-		const tiles = this.getPlayerTiles()[player];
-		var regions = {};
-		for (const t of tiles) {
-			var neighbors = this.getNeighbors(t[0], t[1]);
-			for (const n of neighbors) {
-				var n_color = this.board[n[0]][n[1]].charAt(0);
-				if (n_color == player) {
-					var kn = this.in_dict_of_list(n, regions);
-					var kt = this.in_dict_of_list(t, regions);
-					if (kn == null && kt == null) {
-						regions[t] = [t, n]
-					}
-					else if (kn == null && kt != null) {
-						regions[kt].push(n);
-					}
-					else if (kn != null && kt != null) {
-						if (kn != kt) {
-							for (const v of regions[kt]) {
-								regions[kn].push(v);
-							}
-							delete regions[kt];
-						}
-					}
-				}
-			}
-		}
-		return regions;
-	}
-
-	placeHuts() {
-		var regions = {};
-		for (let player = 1; player < this.num_players+1; player++) {
-			regions[player] = this.getRegions(player);
-			for (const [k, v] of Object.entries(regions[player])) {
-				if (v.length > 1) {
-					var i = k.split(',');
-					this.board[i[0]][i[1]] = this.board[i[0]][i[1]].charAt(0) + '09' // hut
-				}
-			}
-		}
-		return regions;
-	}
-
-	drawBoard(parent) {
-		const regions = this.placeHuts(parent);
-
+	drawBoard(data, playerColorId, parent) {
+		// draw the board units and colors
 		for (let row = 0; row < this.board.length; row++) {
 			const odd = (row % 2 == 0) ? '' : ' odd';
 			const rowElem = $(`\t<div class="hex-row${odd}"></div>\n`).appendTo(parent);
@@ -143,31 +93,36 @@ class Board {
 				const player = this.board[row][col].charAt(0);
 				const unit_id = this.board[row][col].slice(-2);
 				const color = PlayerColorsEnum[player];
-				const unit = UnitEnum[unit_id];
-				const tileId = col + '-' + row;
-				var region = '';
-				if (player == playerColorId) {
-					var k = this.in_dict_of_list([row, col], regions[playerColorId]);
-					if (k != null) {
-						var i = k.split(',');
-						region = `region-${i[0]}-${i[1]}`;
-					}
-				}
-				$(`<div id="tile-${tileId}" class="hex color-${color} unit-${unit} ${region}"></div>`).appendTo(rowElem)
+				const unit = (UnitEnum[unit_id] != '') ? `unit-${UnitEnum[unit_id]}` : '';
+				$(`<div id="tile-${row}-${col}" class="hex color-${color} ${unit}"></div>`).appendTo(rowElem)
 			}
 		}
-		return regions;
+		
+		// make highlight-able regions for player
+		const player_regions = data.regions[playerColorId];
+		for (const [k, v] of Object.entries(player_regions)) {
+			if (k == 'total') continue;
+			const sliz = k.slice(1, -1).split(', ');
+			const row = sliz[0];
+			const col = sliz[1];
+			const tiles = player_regions[k]['tiles'];
+			for (const t of tiles) {
+				$(`#tile-${t[0]}-${t[1]}`).addClass(`region-${row}-${col}`);
+			}
+		}
 	}
 
 	toString() {
-		var str = '';
+		var board_str = '';
+		var count = 0;
 		for (let row = 0; row < this.board.length; row++) {
+			board_str += ((count % 2 == 0) ? '' : '  '); count++;
 			for (let col = 0; col < this.board[0].length; col++) {
-				str += this.board[row][col] + ' ';
+				board_str += this.board[row][col] + ' ';
 			}
-			str += '\n';
+			board_str += '\n';
 		}
-		return str;
+		return board_str;
 	}
 
 }
