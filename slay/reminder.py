@@ -1,16 +1,18 @@
+
+import os
+import time
+import _thread
 import smtplib
 import ssl
-import os
 
 # https://myaccount.google.com/lesssecureapps
 
-import _thread
-import time
+_REMINDER_DELAY_MIN = 10 * 60
 
 
 class Reminder:
     @staticmethod
-    def run(delay=5 * 60):
+    def run(delay=_REMINDER_DELAY_MIN):
         _thread.start_new_thread(Reminder.remind_players, ("reminder thread", delay,))
 
     @staticmethod

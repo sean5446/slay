@@ -1,15 +1,28 @@
 
+import json
 from random import randint
 
 
 class Board:
-    # these enums must match javascript enums in game.js
+    # these enums must match javascript enums in game.js - using strings to format directly to css
     PLAYER_COLORS = {
-        '0': 'transparent', '1': 'red', '2': 'green', '3': 'blue', '4': 'yellow', '5': 'black'
+        '0': 'transparent',
+        '1': 'red',
+        '2': 'green',
+        '3': 'blue',
+        '4': 'yellow',
+        '5': 'black'
     }
     UNIT_VALUES = {
-        '00': '', '01': 'grave', '02': 'tree', '04': 'man', '08': 'spearman',
-        '09': 'hut', '12': 'knight', '13': 'castle', '16': 'baron'
+        '00': '',
+        '01': 'grave',
+        '02': 'tree',
+        '04': 'man',
+        '08': 'spearman',
+        '09': 'hut',
+        '12': 'knight',
+        '13': 'castle',
+        '16': 'baron'
     }
 
     def __init__(self, board_type, num_rows=0, num_cols=0, num_players=0):
@@ -31,7 +44,10 @@ class Board:
 
     def __repr__(self):
         board = ''
+        count = 0
         for row in range(len(self.board)):
+            board += '' if count % 2 == 0 else '  '
+            count += 1
             for col in range(len(self.board[row])):
                 board += f'{self.board[row][col]} '
             board += '\n'
@@ -161,10 +177,39 @@ class Board:
                         regions[str(kt)] += [n]
                     elif kn and kt:
                         if kn != kt:
-                            for v in regions[kt]:
-                                regions[kn] += [v]
-                            del(regions[kt])
+                            for v in regions[str(kt)]:
+                                regions[str(kn)] += [v]
+                            del(regions[str(kt)])
         return regions
+
+    def get_regions_stats(self, players):
+        regions = {}
+        for player in players:
+            color = player.color
+            player_regions = self.get_regions(color)
+            regions[color] = {}
+            for k, v in player_regions.items():
+                regions[color][k] = {}
+                regions[color][k]['tiles'] = v
+                income, wages = self.get_income_and_wages(v)    
+                savings = json.loads(player.savings)
+                regions[color][k]['savings'] = savings[k]
+                regions[color][k]['income'] = income
+                regions[color][k]['wages'] = wages
+                regions[color][k]['balance'] = savings[k] + income - wages
+        return regions
+
+    def get_income_and_wages(self, tiles):
+        income = 0
+        wages = 0
+        for t in tiles:
+            tile_unit = int(self.board[t[0]][t[1]][1:])
+            if tile_unit != 2:  # not a tree
+                income += 1
+            if tile_unit > 2 and tile_unit != 9 and tile_unit != 13:  # a unit but not a hut or castle
+                wages += tile_unit
+        return income, wages
+
 
     def place_huts(self):
         for player in range(1, self.num_players + 1):

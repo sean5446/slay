@@ -62,7 +62,7 @@ def create_user():
 
 @app.route('/user/<username>')
 def get_user(username):
-    user = Game.get_user(username)  # TODO does this work with spaces?
+    user = Game.get_user(username)
     if user and not isinstance(user, Exception):
         return ok(user)
     else:

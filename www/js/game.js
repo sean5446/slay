@@ -58,10 +58,9 @@ function setupHighlightRegion(regions) {
 					region = regions[playerColorId][`(${row}, ${col})`]
 					// TODO remove trees from income, find wages
 					$('#savings').html(`Savings: ${region['savings']}`);
-					$('#income').html(`Income: ${region['tiles'].length}`);
+					$('#income').html(`Income: ${region['income']}`);
 					$('#wages').html(`Wages: ${region['wages']}`);
-					const balance = region['savings'] + region['tiles'].length - region['wages'];
-					$('#balance').html(`Balance: ${balance}`);
+					$('#balance').html(`Balance: ${region['balance']}`);
 					$('#money').html(`Money: 0`);
 					$('#unit').html('<div class="hex unit-man draggable unit"></div>');
 					setupDraggable(regions);

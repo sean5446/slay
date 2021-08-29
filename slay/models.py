@@ -38,19 +38,20 @@ class PlayerModel(db.Model):
     __tablename__ = 'players'
     id = db.Column(db.Integer, primary_key=True)
     color = db.Column(db.Integer)
+    savings = db.Column(db.String(99))
     game_id = db.Column(db.Integer, db.ForeignKey('games.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     last_turn_time = db.Column(db.Integer)
     user = db.relationship('UserModel', backref='users')
 
     def __repr__(self):
-        return f'player={self.id}, {self.color=}, {self.game_id=}, ' + \
+        return f'player={self.id}, {self.color=}, {self.savings=} {self.game_id=}, ' + \
                f'{self.user_id=}, {self.last_turn_time=}'
 
 
 class PlayerSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'color', 'user_id', 'game_id', 'last_turn_time', 'user')
+        fields = ('id', 'color', 'savings', 'user_id', 'game_id', 'last_turn_time', 'user')
     user = ma.Nested(UserSchema)
 
 

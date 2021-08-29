@@ -76,11 +76,17 @@ class Game:
         history_model = GameHistoryModel(game_id=game_model.id, board_id=board_model.id)
         db.session.add(history_model)
         db.session.add(game_model)
+        db.session.commit()
         i = 0
         for username in users:
             user_id = Game.get_user(username)['id']
             color = turn_colors.split(',')[i]; i += 1
-            player = PlayerModel(user_id=user_id, game_id=game_model.id, color=color, last_turn_time=0)
+            regions = board_rand.get_regions(color)
+            savings = {}
+            for k, v in regions.items():
+                savings[k] = board_rand.get_income_and_wages(v)[0] * 4
+            savings = json.dumps(savings)
+            player = PlayerModel(user_id=user_id, color=color, savings=savings, game_id=game_model.id, last_turn_time=0)
             db.session.add(player)
         db.session.commit()
         return game_schema.dump(game_model)
@@ -90,16 +96,9 @@ class Game:
         game_model = GameModel.query.filter(GameModel.id == game_id).first()
         if not game_model:
             return None
-        regions = {}
         board = Board(game_model.board.board)
-        for color in game_model.turn_colors.split(','):
-            player_regions = board.get_regions(color)
-            regions[color] = {}
-            for k, v in player_regions.items():
-                regions[color][k] = {}
-                regions[color][k]['tiles'] = v
-                regions[color][k]['savings'] = len(v) * 4  # TODO subtract trees :'(
-                regions[color][k]['wages'] = 0  # TODO calc wages
+        players = game_model.players
+        regions = board.get_regions_stats(players)
         game = game_schema.dump(game_model)
         game['regions'] = regions
         return game
