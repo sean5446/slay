@@ -14,7 +14,6 @@ function initGame(displayName, email) {
 		url: `${window.location.pathname}`,  // /game/<id>
 		success: function(data) {
 			// get important data from response
-			const regions = data.regions;
 			const board = new Board(data.board.board);
 			for (const player of data.players) {
 				if (player.user.username == displayName) {
@@ -28,7 +27,7 @@ function initGame(displayName, email) {
 			setupPlayerStats(data);
 			if (data.current_turn_color == playerColorId) {
 				setupButtons();
-				setupHighlightRegion(regions, playerColorId);
+				setupHighlightRegion(data.regions, playerColorId);
 			}
 		},
 		error: function(data) {
@@ -52,8 +51,9 @@ function setupHighlightRegion(regions, playerColorId) {
 					$(`.${c}`).each(function() {
 						$(this).removeClass(`color-${playerColor}`).addClass('color-white');
 					});
-					var row = c.split('-')[1];
-					var col = c.split('-')[2];
+					const s = c.split('-');
+					const row = s[1];
+					const col = s[2];
 					region = regions[playerColorId][`(${row}, ${col})`]
 					$('#savings').html(`Savings: ${region['savings']}`);
 					$('#income').html(`Income: ${region['income']}`);
@@ -61,14 +61,14 @@ function setupHighlightRegion(regions, playerColorId) {
 					$('#balance').html(`Balance: ${region['balance']}`);
 					$('#money').html(`Money: 0`);
 					$('#unit').html('<div class="hex unit-man draggable unit"></div>');
-					setupDraggable(regions);
+					setupDraggable();
 				}
 			}
 		}
 	});
 }
 
-function setupDraggable(regions) {
+function setupDraggable() {
 	$('.draggable').draggable({
 		revert: 'invalid',
 		start: function(event, ui) {
@@ -85,8 +85,8 @@ function setupDroppable(playerColor) {
 	$('.droppable').droppable({
 		accept: '.draggable',
 		drop: function(event, ui) {
-			draggable = $(ui.draggable[0])
-			droppable = $(this)
+			const draggable = $(ui.draggable[0]);
+			const droppable = $(this);
 			drop(draggable, droppable, playerColor);
 		}
 	});
@@ -94,22 +94,15 @@ function setupDroppable(playerColor) {
 
 function setupPlayerStats(data) {
 	for (const player of data.players) {
-		var total = data.regions[player.color]['total'];
+		const total = data.regions[player.color]['total'];
 		$('#players').append(
 			`<div style="color: ${PlayerColorsEnum[player.color]}">${player.user.username}: ${total}</div>`
 		);
 	}
 }
 
-function unitsAtPosition(item) {
-	return $("#map").find('.unit').filter(function() {
-		var e = $(this);
-		if (e.offset().top == item.offset().top && e.offset().left == item.offset().left) return e;
-	});
-}
-
 function getClass(item, prop) {
-	for (cls of item.attr('class').split(/\s+/)) {
+	for (const cls of item.attr('class').split(/\s+/)) {
 		if (cls.startsWith(`${prop}-`)) return cls.split('-')[1];
 	}
 }
@@ -120,7 +113,7 @@ function getUnitStrength(unit) {
 	}
 }
 
-function resetDraggable() {
+function resetDraggable(draggable) {
 	draggable.detach();
 	$('#unit').append(draggable);
 	draggable.css({top: dragStartPosition.top, left: dragStartPosition.left});
@@ -130,49 +123,49 @@ function drop(draggable, droppable, playerColor) {
 	// position unit
 	draggable.detach();
 	$('#map').append(draggable);
-	pos_top = Math.round(droppable.position().top + (droppable.height() / 2) - (draggable.height() / 2));
-	pos_left = Math.round(droppable.position().left + (droppable.width() / 2) - (draggable.width() / 2));
-	draggable.css({position: 'absolute', top: pos_top, left: pos_left});
+	const posTop = Math.round(droppable.position().top + (droppable.height() / 2) - (draggable.height() / 2));
+	const posLeft = Math.round(droppable.position().left + (droppable.width() / 2) - (draggable.width() / 2));
+	draggable.css({position: 'absolute', top: posTop, left: posLeft});
 
-	const dragUnit = getClass(draggable, 'unit');
-	const hexUnit = getClass($(unitsAtPosition(draggable)[0]), 'unit'); // not sure why this has to be draggable
-	const hexColor = getClass(droppable, 'color');
+	var dragUnit = getClass(draggable, 'unit');
+	const dropUnit = getClass(droppable, 'unit');
+	const dropColor = getClass(droppable, 'color');
 	const dragUnitStrength = getUnitStrength(dragUnit);
-	const hexUnitStrength = getUnitStrength(hexUnit);
+	const dropUnitStrength = getUnitStrength(dropUnit);
 
-	if (playerColor == hexColor || hexColor == 'white' && hexUnit) {
+	if (playerColor == dropColor || dropColor == 'white') {
 		console.log('on friendly territory');
 
-		if (hexUnit == 'baron') resetDraggable();
+		if (dropUnit == 'baron' || dropUnit == 'hut' || dropUnit == 'castle') {
+			resetDraggable(draggable);
+			return;
+		}
+		if (dropUnit == 'tree') {
+			droppable.removeClass(`unit-tree`);
+		}
 
 		// looking to level up
-		var units = unitsAtPosition(draggable);
-		if (units.length > 1) {
-			var totalStrength = 0;
-			for (i = 0; i < units.length; i++) {
-				const unit = getClass($(units[i]), 'unit');
-				totalStrength += getUnitStrength(unit);
-				$(units[i]).remove();
-			}
+		if (dropUnitStrength > 2) {
+			var totalStrength = dragUnitStrength + dropUnitStrength;
 			if (totalStrength < 10) totalStrength = '0' + totalStrength.toString();
-			const upgradedUnit = UnitEnum[totalStrength];
-			const elementUnit = $(`<div class="hex unit-${upgradedUnit} draggable unit" style="top: ${pos_top}px; left: ${pos_left}px;"></div>`);
-			$('#map').append(elementUnit);
-			setupDraggable();
-			elementUnit.draggable();
+			dragUnit = UnitEnum[totalStrength];
+			droppable.removeClass(`unit-${dropUnit}`);
 		}
+
+		draggable.remove();
+		droppable.addClass(`unit-${dragUnit}`);
 	}
 	else {
 		console.log('on enemy territory');
 		// win battle
-		if (dragUnitStrength > hexUnitStrength) {
+		if (dragUnitStrength > dragUnitStrength) {
 			draggable.remove();
-			droppable.removeClass([hexColor, hexUnit]);
-			droppable.addClass([`color-${playerColor}`, dragUnit]);
+			droppable.removeClass([`color-${playerColor}`, `unit-${dragUnit}`]);
+			droppable.addClass([`color-${playerColor}`, `unit-${dragUnit}`]);
 		}
 		// can't battle - reset position
 		else {
-			resetDraggable();
+			resetDraggable(draggable);
 		}
 	}
 }
