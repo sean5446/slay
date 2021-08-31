@@ -15,7 +15,7 @@ function initGame(displayName, email) {
 			for (const player of data.players) {
 				if (player.user.username == displayName) {
 					const board = new Board(data.board.board);
-					const playerColor = PlayerColorsEnum[player.color];
+					const playerColor = PlayerColors[player.color];
 					const playerColorId = player.color;
 
 					// setup UI elements
@@ -46,12 +46,12 @@ function setupHighlightRegion(regions, board, playerColorId, playerColor) {
 		if ($(this).attr('class').includes(`color-${playerColor}`)) {
 			const currentRegion = 'region-' + getClass($(this), 'region').join('-');
 			setupDroppable(board, playerColor, currentRegion);
-			var c = getClass($(this), 'region');
+			const c = getClass($(this), 'region');
 			if (c !== undefined) {
 				$(`.region-${c[0]}-${c[1]}`).each(function() {
 					$(this).removeClass(`color-${playerColor}`).addClass('color-white');
 				});
-				region = regions[playerColorId][`(${c[0]}, ${c[1]})`];
+				const region = regions[playerColorId][`(${c[0]}, ${c[1]})`];
 				updateRegionStats(region['savings'], region['income'], region['wages'], region['balance']);
 				$('#unit').html('<div class="hex unit-man draggable unit"></div>');
 				setupDraggable();
@@ -106,7 +106,7 @@ function setupPlayerStats(data) {
 	for (const player of data.players) {
 		const total = data.regions[player.color]['total'];
 		$('#players').append(
-			`<div style="color: ${PlayerColorsEnum[player.color]}">${player.user.username}: ${total}</div>`
+			`<div style="color: ${PlayerColors[player.color]}">${player.user.username}: ${total}</div>`
 		);
 	}
 }
@@ -119,7 +119,7 @@ function getClass(item, prop) {
 
 function getUnitStrength(unit) {
 	if (unit === undefined) return 0;
-	for (const [k, v] of Object.entries(UnitEnum)) {
+	for (const [k, v] of Object.entries(UnitValue)) {
 		if (v == unit) return parseInt(k);
 	}
 }
@@ -161,7 +161,7 @@ function drop(draggable, droppable, board, playerColor, currentRegion) {
 		if (dropUnitStrength > 2) {
 			var totalStrength = dragUnitStrength + dropUnitStrength;
 			if (totalStrength < 10) totalStrength = '0' + totalStrength.toString();
-			dragUnit = UnitEnum[totalStrength];
+			dragUnit = UnitValue[totalStrength];
 			droppable.removeClass(`unit-${dropUnit}`);
 		}
 

@@ -4,7 +4,7 @@ from random import randint
 
 
 class Board:
-    # these enums must match javascript enums in game.js - using strings to format directly to css
+    # these enums must match Javascript objects in game.js - using strings to format directly to css
     PLAYER_COLORS = {
         '0': 'transparent',
         '1': 'red',
@@ -23,6 +23,12 @@ class Board:
         '12': 'knight',
         '13': 'castle',
         '16': 'baron'
+    }
+    UNIT_COST = {
+        'man': 2,
+        'spearman': 6,
+        'knight': 18,
+        'baron': 54
     }
 
     def __init__(self, board_type, num_rows=0, num_cols=0, num_players=0):
@@ -194,7 +200,7 @@ class Board:
                 regions[color][k] = {}
                 regions[color][k]['tiles'] = v
                 regions[color]['total'] += len(v)
-                income, wages = self.get_income_and_wages(v)    
+                income, wages = self.get_income_and_wages(v)
                 savings = json.loads(player.savings)
                 regions[color][k]['savings'] = savings[k]
                 regions[color][k]['income'] = income
@@ -210,9 +216,9 @@ class Board:
             if tile_unit != 2:  # not a tree
                 income += 1
             if tile_unit > 2 and tile_unit != 9 and tile_unit != 13:  # a unit but not a hut or castle
-                wages += tile_unit  # this isn't quite right
+                unit_name = self.UNIT_VALUES[tile_unit]
+                wages += self.UNIT_COST[unit_name]
         return income, wages
-
 
     def place_huts(self):
         for player in range(1, self.num_players + 1):
@@ -241,8 +247,8 @@ class Board:
                         if len(v) > 1 and (row, col) in v:
                             region = f'region{k[0]}-{k[1]}'
                 unit_id = self.board[row][col][1:3]
-                unit = f'unit-{Board.UNIT_VALUES[unit_id]}'
-                color = f'color-{Board.PLAYER_COLORS[player]}'
+                unit = f'unit-{self.UNIT_VALUES[unit_id]}'
+                color = f'color-{self.PLAYER_COLORS[player]}'
                 tile_id = f'tile-{row}-{col}'
                 html += f'\t\t<div id="{tile_id}" class="hex {color} {unit} {region}"></div>\n'
             html += '\t</div>\n'

@@ -54,29 +54,35 @@ body {
 	margin-left: 53px;
 }
 
+/* colors based on MSWord color pallet and then adding 40% (184, 178, 156) from water.png bg */
 .color-white {
-	background-color: rgb(255, 255, 255);
+	/* background-color: rgb(255, 255, 255); */
+	background-color: rgb(227, 224, 215);
 }
 
 .hex.color-red {
-	background-color: rgb(151, 4, 11);
+	/* background-color: rgb(151, 4, 11); */
+	background-color: rgb(164, 74, 69);
 }
 
 .hex.color-green {
-	background-color: rgb(58, 117, 36);
+	/* background-color: rgb(58, 117, 36); */
+	background-color: rgb(108, 141, 8);
 }
 
-
 .hex.color-blue {
-	background-color: rgb(25, 89, 201);
+	/* background-color: rgb(25, 89, 201); */
+	background-color: rgb(89, 125, 188);
 }
 
 .hex.color-yellow {
-	background-color: rgb(240, 193, 67);
+	/* background-color: rgb(240, 193, 67); */
+	background-color: rgb(218, 187, 103);
 }
 
 .hex.color-black {
-	background-color: rgb(10, 20, 30);
+	/* background-color: rgb(10, 20, 30); */
+	background-color: rgb(80, 83, 80);
 }
 
 .hex.color-transparent,

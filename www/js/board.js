@@ -1,6 +1,6 @@
 
-// these enums must match python enums in board.py
-UnitEnum = Object.freeze({
+// UnitValue, PlayerColors, UnitCost must match Python objects in board.py
+UnitValue = Object.freeze({
 	'00': '',
 	'01': 'grave',
 	'02': 'tree',
@@ -11,8 +11,7 @@ UnitEnum = Object.freeze({
 	'13': 'castle',
 	'16': 'baron'
 });
-
-PlayerColorsEnum = Object.freeze([
+PlayerColors = Object.freeze([
 	'transparent',
 	'red',
 	'green',
@@ -20,27 +19,33 @@ PlayerColorsEnum = Object.freeze([
 	'yellow',
 	'black'
 ]);
+UnitCost = Object.freeze({
+	'man': 2,
+	'spearman': 6,
+	'knight': 18,
+	'baron': 54
+});
 
-SeaObjectEnum = Object.freeze([
+SeaObject = Object.freeze([
+	'ship',
 	'narwhal',
 	'walrus',
-	'ship',
 	'kraken'
 ]);
 
 
 class Board {
 	board = [];
-	num_rows = 0;
-	num_cols = 0;
-	num_players = 0;
+	numRows = 0;
+	numCols = 0;
+	numPlayers = 0;
 
 	constructor(strBoard) {
 		strBoard.replace(/^\s+|\s+$/g, '');
-		this.num_rows = strBoard.split('\n').length - 1;
-		this.num_cols = strBoard.split('\n')[0].split(' ').length - 1;
+		this.numRows = strBoard.split('\n').length - 1;
+		this.numCols = strBoard.split('\n')[0].split(' ').length - 1;
 		this.board = [];
-		var num_players = {};
+		var numPlayers = {};
 
 		for (let row of strBoard.split('\n')) {
 			row = row.trim();
@@ -50,12 +55,12 @@ class Board {
 				if (col.length != 3) continue;
 				column.push(col);
 				if (col.charAt(0) != '0') {
-					num_players[col.charAt(0)] = '';
+					numPlayers[col.charAt(0)] = '';
 				}
 			}
 			this.board.push(column);
 		}
-		this.num_players = Object.keys(num_players).length;
+		this.numPlayers = Object.keys(numPlayers).length;
 	}
 
 	getNeighbors(row, col) {
@@ -85,23 +90,23 @@ class Board {
 			const rowElem = $(`\t<div class="hex-row${odd}"></div>\n`).appendTo(parent);
 			for (let col = 0; col < this.board[0].length; col++) {
 				const player = this.board[row][col].charAt(0);
-				const unit_id = this.board[row][col].slice(-2);
-				const color = PlayerColorsEnum[player];
-				const unit = (UnitEnum[unit_id] != '') ? `unit-${UnitEnum[unit_id]}` : '';
+				const unitId = this.board[row][col].slice(-2);
+				const color = PlayerColors[player];
+				const unit = (UnitValue[unitId] != '') ? `unit-${UnitValue[unitId]}` : '';
 				var seaObj = '';
 				if (player == 0 && (Math.floor(Math.random() * 11) % 7 == 0)) {
-					seaObj = SeaObjectEnum[ Math.floor(Math.random() * SeaObjectEnum.length) ];
+					seaObj = SeaObject[ Math.floor(Math.random() * SeaObject.length) ];
 				}
 				$(`<div id="tile-${row}-${col}" class="hex color-${color} ${unit} ${seaObj}"></div>`).appendTo(rowElem)
 			}
 		}
 		
 		// make highlight-able regions for player
-		const player_regions = data.regions[playerColorId];
-		for (const [k, v] of Object.entries(player_regions)) {
+		const playerRegions = data.regions[playerColorId];
+		for (const [k, v] of Object.entries(playerRegions)) {
 			if (k == 'total') continue;
 			const p = k.slice(1, -1).split(', ');
-			const tiles = player_regions[k]['tiles'];
+			const tiles = playerRegions[k]['tiles'];
 			for (const t of tiles) {
 				$(`#tile-${t[0]}-${t[1]}`).addClass(`region-${p[0]}-${p[1]}`);
 			}
@@ -109,16 +114,16 @@ class Board {
 	}
 
 	toString() {
-		var board_str = '';
+		var boardStr = '';
 		var count = 0;
 		for (let row = 0; row < this.board.length; row++) {
-			board_str += ((count % 2 == 0) ? '' : '  '); count++;
+			boardStr += ((count % 2 == 0) ? '' : '  '); count++;
 			for (let col = 0; col < this.board[0].length; col++) {
-				board_str += this.board[row][col] + ' ';
+				boardStr += this.board[row][col] + ' ';
 			}
-			board_str += '\n';
+			boardStr += '\n';
 		}
-		return board_str;
+		return boardStr;
 	}
 
 }
