@@ -21,6 +21,13 @@ PlayerColorsEnum = Object.freeze([
 	'black'
 ]);
 
+SeaObjectEnum = Object.freeze([
+	'narwhal',
+	'walrus',
+	'ship',
+	'kraken'
+]);
+
 
 class Board {
 	board = [];
@@ -81,7 +88,11 @@ class Board {
 				const unit_id = this.board[row][col].slice(-2);
 				const color = PlayerColorsEnum[player];
 				const unit = (UnitEnum[unit_id] != '') ? `unit-${UnitEnum[unit_id]}` : '';
-				$(`<div id="tile-${row}-${col}" class="hex color-${color} ${unit}"></div>`).appendTo(rowElem)
+				var seaObj = '';
+				if (player == 0 && (Math.floor(Math.random() * 11) % 7 == 0)) {
+					seaObj = SeaObjectEnum[ Math.floor(Math.random() * SeaObjectEnum.length) ];
+				}
+				$(`<div id="tile-${row}-${col}" class="hex color-${color} ${unit} ${seaObj}"></div>`).appendTo(rowElem)
 			}
 		}
 		

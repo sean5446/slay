@@ -9,10 +9,13 @@ body {
 	position: relative;
 	width: 104px;
 	height: 60.04px;
-	margin: 15px 0;
+	margin: 15.01px 0;
 	border-left: solid 1px #333333;
 	border-right: solid 1px #333333;
-	/*background-image: url(../img/ground.png);*/
+
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	/* background-image: url(../img/ground.png); */
 }
 
 .hex:before,
@@ -27,7 +30,7 @@ body {
 	transform: scaleY(0.5774) rotate(-45deg);
 	background-color: inherit;
 	left: 14.2304px;
-	/*background-image: url(../img/ground.png);*/
+	/* background-image: url(../img/ground.png); */
 }
 
 .hex:before {
@@ -76,64 +79,70 @@ body {
 	background-color: rgb(10, 20, 30);
 }
 
-.hex.color-transparent {
-	opacity: 0;
+.hex.color-transparent,
+.hex.color-transparent:before,
+.hex.color-transparent:after {
+	border: 0px;
 }
 
 .hex.unit-hut {
 	background-image: url("../img/hut.png");
-	background-position: 50% 50%;
 	background-size: 50px;
-	background-repeat: no-repeat;
 }
 
 .hex.unit-castle {
 	background-image: url("../img/castle.png");
-	background-position: 50% 50%;
 	background-size: 40px;
-	background-repeat: no-repeat;
 }
 
 .hex.unit-tree {
 	background-image: url("../img/tree.png");
-	background-position: 50% 50%;
 	background-size: 50px;
-	background-repeat: no-repeat;
 }
 
 .hex.unit-grave {
 	background-image: url("../img/grave.png");
-	background-position: 50% 50%;
 	background-size: 50px;
-	background-repeat: no-repeat;
 }
 
 .hex.unit-man {
 	background-image: url("../img/man.png");
-	background-position: 50% 50%;
 	background-size: 45px;
-	background-repeat: no-repeat;
 }
 
 .hex.unit-spearman {
 	background-image: url("../img/spearman.png");
-	background-position: 50% 50%;
 	background-size: 40px;
-	background-repeat: no-repeat;
 }
 
 .hex.unit-knight {
 	background-image: url("../img/knight.png");
-	background-position: 50% 50%;
 	background-size: 40px;
-	background-repeat: no-repeat;
 }
 
 .hex.unit-baron {
 	background-image: url("../img/baron.png");
-	background-position: 50% 50%;
 	background-size: 60px;
-	background-repeat: no-repeat;
+}
+
+.hex.narwhal {
+	background-image: url("../img/narwhal.png");
+	background-size: 60px;
+}
+
+.hex.walrus {
+	background-image: url("../img/walrus.png");
+	background-size: 90px;
+}
+
+.hex.kraken {
+	background-image: url("../img/kraken.png");
+	background-size: 80px;
+}
+
+.hex.ship {
+	background-image: url("../img/ship.png");
+	background-size: 60px;
 }
 
 .draggable {
