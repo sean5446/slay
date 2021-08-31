@@ -12,23 +12,21 @@ function initGame(displayName, email) {
 		dataType: 'json',
 		url: `${window.location.pathname}`,  // /game/<id>
 		success: function(data) {
-			const board = new Board(data.board.board);
-			var playerColor = null;
-			var playerColorId = null;
-
 			for (const player of data.players) {
 				if (player.user.username == displayName) {
-					playerColor = PlayerColorsEnum[player.color];
-					playerColorId = player.color;
-				}
-			}
+					const board = new Board(data.board.board);
+					const playerColor = PlayerColorsEnum[player.color];
+					const playerColorId = player.color;
 
-			// setup UI elements
-			board.drawBoard(data, playerColorId, '#tiles');
-			setupPlayerStats(data);
-			if (data.current_turn_color == playerColorId) {
-				setupButtons();
-				setupHighlightRegion(data.regions, board, playerColorId, playerColor);
+					// setup UI elements
+					board.drawBoard(data, playerColorId, '#tiles');
+					setupPlayerStats(data);
+					if (data.current_turn_color == playerColorId) {
+						setupButtons();
+						setupHighlightRegion(data.regions, board, playerColorId, playerColor);
+					}
+					return;
+				}
 			}
 		},
 		error: function(data) {
@@ -39,8 +37,6 @@ function initGame(displayName, email) {
 
 function setupHighlightRegion(regions, board, playerColorId, playerColor) {
 	$(document).on('click touchstart', '.hex', function() {
-		setupDroppable(this, board, playerColor);
-
 		// remove all white hex
 		$('[class*=region][class*=white]').each(function() {
 			$(this).removeClass('color-white').addClass(`color-${playerColor}`);
@@ -48,17 +44,17 @@ function setupHighlightRegion(regions, board, playerColorId, playerColor) {
 
 		// add white hex to selected region
 		if ($(this).attr('class').includes(`color-${playerColor}`)) {
-			for (const c of $(this).attr('class').split(/\s+/)) {
-				if (c.startsWith('region')) {
-					$(`.${c}`).each(function() {
-						$(this).removeClass(`color-${playerColor}`).addClass('color-white');
-					});
-					const p = c.split('-');
-					region = regions[playerColorId][`(${p[1]}, ${p[2]})`];
-					updateRegionStats(region['savings'], region['income'], region['wages'], region['balance']);
-					$('#unit').html('<div class="hex unit-man draggable unit"></div>');
-					setupDraggable();
-				}
+			const currentRegion = 'region-' + getClass($(this), 'region').join('-');
+			setupDroppable(board, playerColor, currentRegion);
+			var c = getClass($(this), 'region');
+			if (c !== undefined) {
+				$(`.region-${c[0]}-${c[1]}`).each(function() {
+					$(this).removeClass(`color-${playerColor}`).addClass('color-white');
+				});
+				region = regions[playerColorId][`(${c[0]}, ${c[1]})`];
+				updateRegionStats(region['savings'], region['income'], region['wages'], region['balance']);
+				$('#unit').html('<div class="hex unit-man draggable unit"></div>');
+				setupDraggable();
 			}
 		}
 		else if ($(this).attr('class').match(/color-*/)) {
@@ -85,27 +81,23 @@ function setupDraggable() {
 	});
 }
 
-function setupDroppable(elem, board, playerColor) {
-	for (const c of $(elem).attr('class').split(/\s+/)) {
-		if (c.startsWith('region')) {
-			const p = c.split('-');
-			$(`.region-${p[1]}-${p[2]}`).each(function() {
-				$(this).addClass('droppable');
-				const e = this.id.split('-');
-				const borderTiles = board.getNeighbors(e[1], e[2]);
-				for (const b of borderTiles) {
-					$(`#tile-${b[0]}-${b[1]}`).addClass('droppable');
-				}
-			});
+function setupDroppable(board, playerColor, currentRegion) {
+	const p = currentRegion.split('-');
+	$(`.region-${p[1]}-${p[2]}`).each(function() {
+		$(this).addClass('droppable');
+		const e = this.id.split('-');
+		const borderTiles = board.getNeighbors(e[1], e[2]);
+		for (const b of borderTiles) {
+			$(`#tile-${b[0]}-${b[1]}`).addClass('droppable');
 		}
-	}
+	});
 
 	$('.droppable').droppable({
 		accept: '.draggable',
 		drop: function(event, ui) {
 			const draggable = $(ui.draggable[0]);
 			const droppable = $(this);
-			drop(draggable, droppable, playerColor);
+			drop(draggable, droppable, board, playerColor, currentRegion);
 		}
 	});
 }
@@ -121,7 +113,7 @@ function setupPlayerStats(data) {
 
 function getClass(item, prop) {
 	for (const cls of item.attr('class').split(/\s+/)) {
-		if (cls.startsWith(`${prop}-`)) return cls.split('-');
+		if (cls.startsWith(`${prop}-`)) return cls.split('-').slice(1);
 	}
 }
 
@@ -138,7 +130,7 @@ function resetDraggable(draggable) {
 	draggable.css({top: dragStartPosition.top, left: dragStartPosition.left});
 }
 
-function drop(draggable, droppable, playerColor) {
+function drop(draggable, droppable, board, playerColor, currentRegion) {
 	// position unit
 	draggable.detach();
 	$('#map').append(draggable);
@@ -146,9 +138,9 @@ function drop(draggable, droppable, playerColor) {
 	const posLeft = Math.round(droppable.position().left + (droppable.width() / 2) - (draggable.width() / 2));
 	draggable.css({position: 'absolute', top: posTop, left: posLeft});
 
-	var dragUnit = getClass(draggable, 'unit')[1];
-	const dropUnit = getClass(droppable, 'unit') === undefined ? '' : getClass(droppable, 'unit')[1];
-	const dropColor = getClass(droppable, 'color')[1];
+	var dragUnit = getClass(draggable, 'unit');
+	const dropUnit = getClass(droppable, 'unit');
+	const dropColor = getClass(droppable, 'color');
 	const dragUnitStrength = getUnitStrength(dragUnit);
 	const dropUnitStrength = getUnitStrength(dropUnit);
 
@@ -181,11 +173,11 @@ function drop(draggable, droppable, playerColor) {
 		// win battle
 		if (dragUnitStrength > dropUnitStrength) {
 			draggable.remove();
-			droppable.removeClass([`color-${dropColor}`, `unit-${dragUnit}`]);
-			const region = getClass($('[class*=region][class*=white]'), 'region').join('-');
-			droppable.addClass([`color-white`, `unit-${dragUnit}`, region]);
+			droppable.removeClass([`color-${dropColor}`, `unit-${dropUnit}`]);
+			droppable.addClass([`color-${playerColor}`, `unit-${dragUnit}`, currentRegion]);
+			setupDroppable(board, playerColor, currentRegion);
 		}
-		// can't battle - reset position
+		// can't win battle - reset position
 		else {
 			resetDraggable(draggable);
 		}
