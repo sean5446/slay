@@ -1,6 +1,5 @@
 
-dragStartPosition = null;
-
+var dragStartPosition = null;
 
 function initGame(displayName, email) {
 	if (window.innerWidth > 1000) {
@@ -13,8 +12,10 @@ function initGame(displayName, email) {
 		dataType: 'json',
 		url: `${window.location.pathname}`,  // /game/<id>
 		success: function(data) {
-			// get important data from response
 			const board = new Board(data.board.board);
+			var playerColor = null;
+			var playerColorId = null;
+
 			for (const player of data.players) {
 				if (player.user.username == displayName) {
 					playerColor = PlayerColorsEnum[player.color];
@@ -27,7 +28,7 @@ function initGame(displayName, email) {
 			setupPlayerStats(data);
 			if (data.current_turn_color == playerColorId) {
 				setupButtons();
-				setupHighlightRegion(data.regions, playerColorId);
+				setupHighlightRegion(data.regions, board, playerColorId, playerColor);
 			}
 		},
 		error: function(data) {
@@ -36,36 +37,43 @@ function initGame(displayName, email) {
 	});
 }
 
-function setupHighlightRegion(regions, playerColorId) {
+function setupHighlightRegion(regions, board, playerColorId, playerColor) {
 	$(document).on('click touchstart', '.hex', function() {
-		setupDroppable(playerColor);
+		setupDroppable(this, board, playerColor);
 
-		$(`[class*=region][class*=white]`).each(function() {
+		// remove all white hex
+		$('[class*=region][class*=white]').each(function() {
 			$(this).removeClass('color-white').addClass(`color-${playerColor}`);
-			//$('#unit').html('');
 		});
 
+		// add white hex to selected region
 		if ($(this).attr('class').includes(`color-${playerColor}`)) {
 			for (const c of $(this).attr('class').split(/\s+/)) {
 				if (c.startsWith('region')) {
 					$(`.${c}`).each(function() {
 						$(this).removeClass(`color-${playerColor}`).addClass('color-white');
 					});
-					const s = c.split('-');
-					const row = s[1];
-					const col = s[2];
-					region = regions[playerColorId][`(${row}, ${col})`]
-					$('#savings').html(`Savings: ${region['savings']}`);
-					$('#income').html(`Income: ${region['income']}`);
-					$('#wages').html(`Wages: ${region['wages']}`);
-					$('#balance').html(`Balance: ${region['balance']}`);
-					$('#money').html(`Money: 0`);
+					const p = c.split('-');
+					region = regions[playerColorId][`(${p[1]}, ${p[2]})`];
+					updateRegionStats(region['savings'], region['income'], region['wages'], region['balance']);
 					$('#unit').html('<div class="hex unit-man draggable unit"></div>');
 					setupDraggable();
 				}
 			}
 		}
+		else if ($(this).attr('class').match(/color-*/)) {
+			updateRegionStats('', '', '', '');
+			$('#unit').html('<div></div>');
+		}
 	});
+}
+
+function updateRegionStats(savings, income, wages, balance) {
+	$('#savings').html(`Savings: ${savings}`);
+	$('#income').html(`Income: ${income}`);
+	$('#wages').html(`Wages: ${wages}`);
+	$('#balance').html(`Balance: ${balance}`);
+	$('#money').html(`Money: `);
 }
 
 function setupDraggable() {
@@ -77,10 +85,20 @@ function setupDraggable() {
 	});
 }
 
-function setupDroppable(playerColor) {
-	$(`.color-${playerColor}`).each(function() {
-		$(this).addClass('droppable');
-	});
+function setupDroppable(elem, board, playerColor) {
+	for (const c of $(elem).attr('class').split(/\s+/)) {
+		if (c.startsWith('region')) {
+			const p = c.split('-');
+			$(`.region-${p[1]}-${p[2]}`).each(function() {
+				$(this).addClass('droppable');
+				const e = this.id.split('-');
+				const borderTiles = board.getNeighbors(e[1], e[2]);
+				for (const b of borderTiles) {
+					$(`#tile-${b[0]}-${b[1]}`).addClass('droppable');
+				}
+			});
+		}
+	}
 
 	$('.droppable').droppable({
 		accept: '.draggable',
@@ -103,13 +121,14 @@ function setupPlayerStats(data) {
 
 function getClass(item, prop) {
 	for (const cls of item.attr('class').split(/\s+/)) {
-		if (cls.startsWith(`${prop}-`)) return cls.split('-')[1];
+		if (cls.startsWith(`${prop}-`)) return cls.split('-');
 	}
 }
 
 function getUnitStrength(unit) {
-	for (const [key, value] of Object.entries(UnitEnum)) {
-		if (value == unit) return parseInt(key);
+	if (unit === undefined) return 0;
+	for (const [k, v] of Object.entries(UnitEnum)) {
+		if (v == unit) return parseInt(k);
 	}
 }
 
@@ -127,11 +146,13 @@ function drop(draggable, droppable, playerColor) {
 	const posLeft = Math.round(droppable.position().left + (droppable.width() / 2) - (draggable.width() / 2));
 	draggable.css({position: 'absolute', top: posTop, left: posLeft});
 
-	var dragUnit = getClass(draggable, 'unit');
-	const dropUnit = getClass(droppable, 'unit');
-	const dropColor = getClass(droppable, 'color');
+	var dragUnit = getClass(draggable, 'unit')[1];
+	const dropUnit = getClass(droppable, 'unit') === undefined ? '' : getClass(droppable, 'unit')[1];
+	const dropColor = getClass(droppable, 'color')[1];
 	const dragUnitStrength = getUnitStrength(dragUnit);
 	const dropUnitStrength = getUnitStrength(dropUnit);
+
+	console.log(dragUnit, dropUnit, playerColor, dropColor, dragUnitStrength, dropUnitStrength);
 
 	if (playerColor == dropColor || dropColor == 'white') {
 		console.log('on friendly territory');
@@ -158,16 +179,19 @@ function drop(draggable, droppable, playerColor) {
 	else {
 		console.log('on enemy territory');
 		// win battle
-		if (dragUnitStrength > dragUnitStrength) {
+		if (dragUnitStrength > dropUnitStrength) {
 			draggable.remove();
-			droppable.removeClass([`color-${playerColor}`, `unit-${dragUnit}`]);
-			droppable.addClass([`color-${playerColor}`, `unit-${dragUnit}`]);
+			droppable.removeClass([`color-${dropColor}`, `unit-${dragUnit}`]);
+			const region = getClass($('[class*=region][class*=white]'), 'region').join('-');
+			droppable.addClass([`color-white`, `unit-${dragUnit}`, region]);
 		}
 		// can't battle - reset position
 		else {
 			resetDraggable(draggable);
 		}
 	}
+
+	// calculate cost of drop
 }
 
 function setupButtons() {

@@ -52,6 +52,8 @@ class Board {
 	}
 
 	getNeighbors(row, col) {
+		var row = parseInt(row);
+		var col = parseInt(col);
 		var allPossible = null;
 		if (row % 2 == 0) {
 			allPossible = [ [row-1, col-1], [row-1, col], [row, col-1], [row, col+1], [row+1, col-1], [row+1, col] ];
@@ -62,26 +64,11 @@ class Board {
 		var neighbors = [];
 		for (const n of allPossible) {
 			if (0 <= n[0] && n[0] < this.board.length && 0 <= n[1] && n[1] < this.board[0].length) {
-				neighbors.push(n);
+				// if not transparent
+				if (this.board[n[0]][n[1]].charAt(0) != '0') neighbors.push(n);
 			}
 		}
 		return neighbors;
-	}
-
-	getPlayerTiles() {
-		var playerTiles = {};
-		for (let row = 0; row < this.board.length; row++) {
-			for (let col = 0; col < this.board[0].length; col++) {
-				const player = this.board[row][col].charAt(0);
-				if (!playerTiles.hasOwnProperty(player)) {
-					playerTiles[player] = [[row, col]];
-				}
-				else {
-					playerTiles[player].push([row, col]);
-				}
-			}
-		}
-		return playerTiles;
 	}
 
 	drawBoard(data, playerColorId, parent) {
@@ -102,12 +89,10 @@ class Board {
 		const player_regions = data.regions[playerColorId];
 		for (const [k, v] of Object.entries(player_regions)) {
 			if (k == 'total') continue;
-			const sliz = k.slice(1, -1).split(', ');
-			const row = sliz[0];
-			const col = sliz[1];
+			const p = k.slice(1, -1).split(', ');
 			const tiles = player_regions[k]['tiles'];
 			for (const t of tiles) {
-				$(`#tile-${t[0]}-${t[1]}`).addClass(`region-${row}-${col}`);
+				$(`#tile-${t[0]}-${t[1]}`).addClass(`region-${p[0]}-${p[1]}`);
 			}
 		}
 	}
