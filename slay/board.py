@@ -14,7 +14,7 @@ class Board:
         '5': 'black'
     }
     UNIT_VALUES = {
-        '00': '',
+        '00': 'none',
         '01': 'grave',
         '02': 'tree',
         '04': 'man',
@@ -24,7 +24,7 @@ class Board:
         '13': 'castle',
         '16': 'baron'
     }
-    UNIT_COST = {
+    UNIT_COSTS = {
         'man': 2,
         'spearman': 6,
         'knight': 18,
@@ -189,6 +189,29 @@ class Board:
                             del(regions[str(kt)])
         return regions
 
+    def place_huts(self):
+        for player in range(1, self.num_players + 1):
+            regions = self.get_regions(player)
+            for k, v in regions.items():
+                if len(v) > 1:
+                    nums = k[1:-1]
+                    row = int(nums.split(',')[0].strip())
+                    col = int(nums.split(',')[1].strip())
+                    self.board[row][col] = self.board[row][col][:1] + '09'  # place hut
+
+    def get_income_and_wages(self, tiles):
+        income = 0
+        wages = 0
+        for t in tiles:
+            tile_unit = int(self.board[t[0]][t[1]][1:])
+            if tile_unit != 2:  # not a tree
+                income += 1
+            if tile_unit > 2 and tile_unit != 9 and tile_unit != 13:  # a unit but not a hut or castle
+                unit_name = self.UNIT_VALUES[tile_unit]
+                wages += self.UNIT_COSTS[unit_name]
+        return income, wages
+
+    # currently unused
     def get_regions_stats(self, players):
         regions = {}
         for player in players:
@@ -208,28 +231,7 @@ class Board:
                 regions[color][k]['balance'] = savings[k] + income - wages
         return regions
 
-    def get_income_and_wages(self, tiles):
-        income = 0
-        wages = 0
-        for t in tiles:
-            tile_unit = int(self.board[t[0]][t[1]][1:])
-            if tile_unit != 2:  # not a tree
-                income += 1
-            if tile_unit > 2 and tile_unit != 9 and tile_unit != 13:  # a unit but not a hut or castle
-                unit_name = self.UNIT_VALUES[tile_unit]
-                wages += self.UNIT_COST[unit_name]
-        return income, wages
-
-    def place_huts(self):
-        for player in range(1, self.num_players + 1):
-            regions = self.get_regions(player)
-            for k, v in regions.items():
-                if len(v) > 1:
-                    nums = k[1:-1]
-                    row = int(nums.split(',')[0].strip())
-                    col = int(nums.split(',')[1].strip())
-                    self.board[row][col] = self.board[row][col][:1] + '09'  # place hut
-
+    # currently unused
     def render_to_html(self):
         regions = {}
         for player in range(1, self.num_players + 1):

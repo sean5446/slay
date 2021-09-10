@@ -75,7 +75,8 @@ class Game:
         i = 0
         for username in users:
             user_id = Game.get_user(username)['id']
-            color = turn_colors.split(',')[i]; i += 1
+            color = turn_colors.split(',')[i]
+            i += 1
             regions = board_rand.get_regions(color)
             savings = {}
             for k, v in regions.items():
@@ -91,12 +92,12 @@ class Game:
         game_model = GameModel.query.filter(GameModel.id == game_id).first()
         if not game_model:
             return None
-        board = Board(game_model.board.board)
-        players = game_model.players
-        regions = board.get_regions_stats(players)
-        game = game_schema.dump(game_model)
-        game['regions'] = regions
-        return game
+        # board = Board(game_model.board.board)
+        # players = game_model.players
+        # regions = board.get_regions_stats(players)
+        # game = game_schema.dump(game_model)
+        # game['regions'] = regions
+        return game_schema.dump(game_model)
 
     @staticmethod
     def validate_move(board, moves, user):
@@ -109,5 +110,5 @@ class Game:
         # move within region or next to region
 
         # unit is strong enough to move to location
-        
+
         pass

@@ -45,7 +45,7 @@ class TestBoard(unittest.TestCase):
         """
         board = Board(board_str)
         tiles = board.get_regions(1)
-        assert tiles == {'(0, 5)': [(0, 5), (1, 4), (0, 3), (1, 3), (2, 3), (2, 5), 
+        assert tiles == {'(0, 5)': [(0, 5), (1, 4), (0, 3), (1, 3), (2, 3), (2, 5),
                                     (3, 2), (3, 5), (4, 2), (3, 6), (4, 5), (4, 1)]}
 
         board = Board(board_type='horz', num_cols=5, num_rows=5, num_players=2)

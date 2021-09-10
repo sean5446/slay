@@ -12,25 +12,24 @@ body {
 	margin: 15.01px 0;
 	border-left: solid 1px #333333;
 	border-right: solid 1px #333333;
-
 	background-position: 50% 50%;
 	background-repeat: no-repeat;
-	/* background-image: url(../img/ground.png); */
+	background-image: url("../img/ground.png");
 }
 
 .hex:before,
 .hex:after {
 	content: "";
-	position: absolute;
 	z-index: -1;
+	position: absolute;
 	width: 73.54px;
 	height: 73.54px;
+	left: 14.2304px;
 	-webkit-transform: scaleY(0.5774) rotate(-45deg);
 	-ms-transform: scaleY(0.5774) rotate(-45deg);
 	transform: scaleY(0.5774) rotate(-45deg);
 	background-color: inherit;
-	left: 14.2304px;
-	/* background-image: url(../img/ground.png); */
+	background-image: url("../img/ground.png");
 }
 
 .hex:before {
@@ -43,6 +42,7 @@ body {
 	bottom: -36.7696px;
 	border-bottom: solid 1.4142px #333333;
 	border-left: solid 1.4142px #333333;
+	/* box-shadow: 0 0 45px rgb(99, 99, 99); */
 }
 
 .hex-row {
@@ -60,93 +60,86 @@ body {
 	background-color: rgb(227, 224, 215);
 }
 
-.hex.color-red {
+.color-red {
 	/* background-color: rgb(151, 4, 11); */
 	background-color: rgb(164, 74, 69);
 }
 
-.hex.color-green {
+.color-green {
 	/* background-color: rgb(58, 117, 36); */
 	background-color: rgb(108, 141, 8);
 }
 
-.hex.color-blue {
+.color-blue {
 	/* background-color: rgb(25, 89, 201); */
 	background-color: rgb(89, 125, 188);
 }
 
-.hex.color-yellow {
+.color-yellow {
 	/* background-color: rgb(240, 193, 67); */
 	background-color: rgb(218, 187, 103);
 }
 
-.hex.color-black {
+.color-black {
 	/* background-color: rgb(10, 20, 30); */
 	background-color: rgb(80, 83, 80);
 }
 
-.hex.color-transparent,
-.hex.color-transparent:before,
-.hex.color-transparent:after {
+.color-transparent,
+.color-transparent:before,
+.color-transparent:after {
 	border: 0px;
+	background-image: none;
 }
 
-.hex.unit-hut {
-	background-image: url("../img/hut.png");
-	background-size: 50px;
+.unit-hut {
+	background-image: url("../img/ground.png"), url("../img/hut.png");
 }
 
-.hex.unit-castle {
+.unit-tree {
+	background-image: url("../img/ground.png"), url("../img/tree.png");
+}
+
+.unit-grave {
+	background-image: url("../img/ground.png"), url("../img/grave.png");
+}
+
+.unit-castle {
 	background-image: url("../img/castle.png");
-	background-size: 40px;
 }
 
-.hex.unit-tree {
-	background-image: url("../img/tree.png");
-	background-size: 50px;
-}
-
-.hex.unit-grave {
-	background-image: url("../img/grave.png");
-	background-size: 50px;
-}
-
-.hex.unit-man {
+.unit-man {
 	background-image: url("../img/man.png");
-	background-size: 45px;
 }
 
-.hex.unit-spearman {
+.unit-spearman {
 	background-image: url("../img/spearman.png");
-	background-size: 40px;
 }
 
-.hex.unit-knight {
+.unit-knight {
 	background-image: url("../img/knight.png");
-	background-size: 40px;
 }
 
-.hex.unit-baron {
+.unit-baron {
 	background-image: url("../img/baron.png");
-	background-size: 60px;
 }
 
-.hex.narwhal {
+.narwhal {
 	background-image: url("../img/narwhal.png");
 	background-size: 60px;
 }
 
-.hex.walrus {
+.walrus {
 	background-image: url("../img/walrus.png");
 	background-size: 90px;
 }
 
-.hex.kraken {
+.kraken {
 	background-image: url("../img/kraken.png");
 	background-size: 80px;
 }
 
-.hex.ship {
+.ship {
 	background-image: url("../img/ship.png");
 	background-size: 60px;
 }
@@ -154,16 +147,9 @@ body {
 .draggable {
 	position: absolute;
 	z-index: 9;
-}
-
-.unit {
-	border-style: hidden;
-}
-.unit::after {
-	border-style: hidden;
-}
-.unit::before {
-	border-style: hidden;
+	background-repeat: no-repeat;
+	height: 50px;
+	width: 50px;
 }
 
 .vertical-map {

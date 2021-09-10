@@ -1,7 +1,7 @@
 
-// UnitValue, PlayerColors, UnitCost must match Python objects in board.py
-UnitValue = Object.freeze({
-	'00': '',
+// UnitValues, PlayerColors, UnitCosts must match Python objects in board.py
+UnitValues = Object.freeze({
+	'00': 'none',
 	'01': 'grave',
 	'02': 'tree',
 	'04': 'man',
@@ -19,19 +19,12 @@ PlayerColors = Object.freeze([
 	'yellow',
 	'black'
 ]);
-UnitCost = Object.freeze({
+UnitCosts = Object.freeze({
 	'man': 2,
 	'spearman': 6,
 	'knight': 18,
 	'baron': 54
 });
-
-SeaObject = Object.freeze([
-	'ship',
-	'narwhal',
-	'walrus',
-	'kraken'
-]);
 
 
 class Board {
@@ -83,7 +76,8 @@ class Board {
 		return neighbors;
 	}
 
-	drawBoard(data, playerColorId, parent) {
+	drawBoard(playerColorId, parent) {
+		var seaObjects = [ 'ship', 'narwhal', 'walrus', 'kraken' ];
 		// draw the board units and colors
 		for (let row = 0; row < this.board.length; row++) {
 			const odd = (row % 2 == 0) ? '' : ' odd';
@@ -91,26 +85,87 @@ class Board {
 			for (let col = 0; col < this.board[0].length; col++) {
 				const player = this.board[row][col].charAt(0);
 				const unitId = this.board[row][col].slice(-2);
-				const color = PlayerColors[player];
-				const unit = (UnitValue[unitId] != '') ? `unit-${UnitValue[unitId]}` : '';
+				const color = `color-${PlayerColors[player]}`;
+				const unit = (UnitValues[unitId] != 'none') ? `unit-${UnitValues[unitId]}` : '';
 				var seaObj = '';
-				if (player == 0 && (Math.floor(Math.random() * 11) % 7 == 0)) {
-					seaObj = SeaObject[ Math.floor(Math.random() * SeaObject.length) ];
-				}
-				$(`<div id="tile-${row}-${col}" class="hex color-${color} ${unit} ${seaObj}"></div>`).appendTo(rowElem)
+				var randomChance = (Math.floor(Math.random() * 11) % 7 == 0);  // 10% chance
+				if (player == 0 && randomChance) seaObj = this.popRandom(seaObjects);
+				$(`<div id="tile-${row}-${col}" class="hex ${color} ${unit} ${seaObj}"></div>`).appendTo(rowElem);
 			}
 		}
-		
 		// make highlight-able regions for player
-		const playerRegions = data.regions[playerColorId];
+		const playerRegions = this.getRegions(playerColorId);
 		for (const [k, v] of Object.entries(playerRegions)) {
 			if (k == 'total') continue;
-			const p = k.slice(1, -1).split(', ');
-			const tiles = playerRegions[k]['tiles'];
-			for (const t of tiles) {
+			const p = k.split(',');
+			for (const t of v) {
 				$(`#tile-${t[0]}-${t[1]}`).addClass(`region-${p[0]}-${p[1]}`);
 			}
 		}
+	}
+
+	popRandom(array) {
+		return array.splice(Math.floor(Math.random() * array.length), 1);
+	}
+
+	getPlayersTiles() {
+		var playerTiles = {};
+		for (let row = 0; row < this.board.length; row++) {
+			for (let col = 0; col < this.board[0].length; col++) {
+				const player = this.board[row][col].charAt(0);
+				if (!playerTiles.hasOwnProperty(player)) {
+					playerTiles[player] = [[row, col]];
+				}
+				else {
+					playerTiles[player].push([row, col]);
+				}
+			}
+		}
+		return playerTiles;
+	}
+
+	in_dict_of_list(item, dict_list) {
+		for (const [k, v] of Object.entries(dict_list)) {
+			for (const i of v) {
+				if (i[0] == item[0] && i[1] == item[1]) return k;
+			}
+		}
+		return null;
+	}
+
+	getRegions(player) {
+		var player = player.toString();
+		var regions = {};
+		const tiles = this.getPlayersTiles()[player];
+		for (const t of tiles) {
+			const neighbors = this.getNeighbors(t[0], t[1]);
+			for (const n of neighbors) {
+				var n_color = this.board[n[0]][n[1]].charAt(0);
+				if (n_color == player) {
+					var kn = this.in_dict_of_list(n, regions);
+					var kt = this.in_dict_of_list(t, regions);
+					if (kn == null && kt == null) {
+						regions[t] = [t, n]
+					}
+					else if (kn == null && kt != null) {
+						regions[kt].push(n);
+					}
+					else if (kn != null && kt != null) {
+						if (kn != kt) {
+							for (const v of regions[kt]) {
+								regions[kn].push(v);
+							}
+							delete regions[kt];
+						}
+					}
+				}
+			}
+		}
+		return regions;
+	}
+
+	updatePosition(row, col, playerColorId, unit) {
+		this.board[row][col] = `${playerColorId + '' + unit}`;  // lazy cast to string
 	}
 
 	toString() {
