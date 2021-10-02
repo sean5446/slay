@@ -10,8 +10,8 @@ body {
 	width: 104px;
 	height: 60.04px;
 	margin: 15.01px 0;
-	border-left: solid 1px #333333;
-	border-right: solid 1px #333333;
+	border-left: solid 1px #444444;
+	border-right: solid 1px #444444;
 	background-position: 50% 50%;
 	background-repeat: no-repeat;
 	background-image: url("../img/ground.png");
@@ -42,7 +42,7 @@ body {
 	bottom: -36.7696px;
 	border-bottom: solid 1.4142px #333333;
 	border-left: solid 1.4142px #333333;
-	/* box-shadow: 0 0 45px rgb(99, 99, 99); */
+	box-shadow: 0 15px 30px rgb(197, 192, 177);
 }
 
 .hex-row {
@@ -50,46 +50,41 @@ body {
 }
 
 .hex-row.odd {
-	margin-top: 50px;
 	margin-left: 53px;
 }
 
 /* colors based on MSWord color pallet and then adding 40% (184, 178, 156) from water.png bg */
 .color-white {
-	/* background-color: rgb(255, 255, 255); */
 	background-color: rgb(227, 224, 215);
 }
 
 .color-red {
-	/* background-color: rgb(151, 4, 11); */
 	background-color: rgb(164, 74, 69);
 }
 
 .color-green {
-	/* background-color: rgb(58, 117, 36); */
 	background-color: rgb(108, 141, 8);
 }
 
 .color-blue {
-	/* background-color: rgb(25, 89, 201); */
 	background-color: rgb(89, 125, 188);
 }
 
 .color-yellow {
-	/* background-color: rgb(240, 193, 67); */
 	background-color: rgb(218, 187, 103);
 }
 
 .color-black {
-	/* background-color: rgb(10, 20, 30); */
 	background-color: rgb(80, 83, 80);
 }
 
 .color-transparent,
 .color-transparent:before,
 .color-transparent:after {
-	border: 0px;
+	border: none;
 	background-image: none;
+	box-shadow: none;
+	margin: 1px 1px 1px 1px;
 }
 
 .unit-hut {
@@ -136,7 +131,7 @@ body {
 
 .kraken {
 	background-image: url("../img/kraken.png");
-	background-size: 80px;
+	background-size: 70px;
 }
 
 .ship {
@@ -148,8 +143,8 @@ body {
 	position: absolute;
 	z-index: 9;
 	background-repeat: no-repeat;
-	height: 50px;
-	width: 50px;
+	height: 65px;
+	width: 65px;
 }
 
 .vertical-map {

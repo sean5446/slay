@@ -37,6 +37,11 @@ function initGame(displayName, email) {
 function setupClickTouch(board, playerColorId, playerColor) {
 	// mousedown touchstart are alternatives
 	$(document).on('click touch', '.hex', function() {
+		// remove all white hex (unselect)
+		$('[class*=region][class*=white]').each(function() {
+			$(this).removeClass('color-white').addClass(`color-${playerColor}`);
+		});
+
 		// selected friendly tile
 		if ($(this).attr('class').includes(`color-${playerColor}`)) {
 			const regions = recolorRegions(board, playerColorId);
@@ -61,10 +66,6 @@ function setupClickTouch(board, playerColorId, playerColor) {
 		}
 		// selected enemy tile
 		else if ($(this).attr('class').match(/color-*/)) {
-			// remove all white hex (unselect)
-			$('[class*=region][class*=white]').each(function() {
-				$(this).removeClass('color-white').addClass(`color-${playerColor}`);
-			});
 			updateRegionStats('', '', '', '');
 			$('#unit').html('<div></div>');
 		}
@@ -166,7 +167,7 @@ function drop(draggable, droppable, board, playerColorId, playerColor, currentRe
 	const dropColor = getClass(droppable, 'color');
 	const dropPos = $(droppable).attr('id').split('-');
 
-	console.log(dragUnit, dropUnit, playerColor, dropColor, dragUnitStrength, dropUnitStrength);
+	console.log(dropPos, dragUnit, dropUnit, playerColor, dropColor, dragUnitStrength, dropUnitStrength);
 
 	// friendly region
 	if (playerColor == dropColor || dropColor == 'white') {
@@ -186,17 +187,24 @@ function drop(draggable, droppable, board, playerColorId, playerColor, currentRe
 			droppable.removeClass(`unit-${dropUnit}`);
 		}
 		draggable.remove();
-		droppable.css('background-image', `url("../img/ground.png"), url("../img/${dragUnit}.png")`);
-		droppable.addClass([currentRegion]);
+		// droppable.css('background-image', `url("../img/ground.png"), url("../img/${dragUnit}.png")`);
+		droppable.addClass([currentRegion], `unit-${dragUnit}`);
 		board.updatePosition(dropPos[1], dropPos[2], playerColorId, dragUnitStrength);
 	}
 	else {
-		// win enemy tile
+		// enemy tile
+		for (const n of board.getNeighbors(dropPos[1], dropPos[2])) {
+			// if dropColor == getClass 'color' n[0] n[1] 
+			// const nUnit = getClass($(`#tile-${n[0]}-${n[1]}`), 'unit');
+			// for (const u of nUnit) {
+			// 	if (dragUnitStrength < getUnitStrength(nUnit)) resetDraggable(draggable);
+			// }
+		}
 		if (dragUnitStrength > dropUnitStrength) {
 			draggable.remove();
 			droppable.removeClass([`color-${dropColor}`, `unit-${dropUnit}`]);
-			droppable.css('background-image', `url("../img/ground.png"), url("../img/${dragUnit}.png")`);
-			droppable.addClass(['color-white', currentRegion]);
+			// droppable.css('background-image', `url("../img/ground.png"), url("../img/${dragUnit}.png")`);
+			droppable.addClass(['color-white', currentRegion, `unit-${dragUnit}`]);
 			if (dragUnitStrength < 10) dragUnitStrength = '0' + dragUnitStrength.toString();
 			board.updatePosition(dropPos[1], dropPos[2], playerColorId, dragUnitStrength);
 		}
@@ -205,9 +213,6 @@ function drop(draggable, droppable, board, playerColorId, playerColor, currentRe
 			resetDraggable(draggable);
 		}
 	}
-
-
-	// TODO: calculate cost of drop
 }
 
 function setupButtons() {

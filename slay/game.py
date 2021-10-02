@@ -59,8 +59,9 @@ class Game:
     @staticmethod
     def create_game(name, users):
         shuffle(users)
-        users.remove("Sean Magu")  # TODO remove debug code
-        users.insert(0, "Sean Magu")  # TODO remove debug code
+        if "Sean Magu" in users:
+            users.remove("Sean Magu")  # TODO remove debug code
+            users.insert(0, "Sean Magu")  # TODO remove debug code
         board_rand = Game.get_random_board(num_players=len(users))
         turn_colors = board_rand.get_player_turn_order()
         board_model = BoardModel(board=str(board_rand))

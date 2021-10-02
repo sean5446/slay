@@ -28,7 +28,12 @@ def get_firebase():
 
 @app.route('/<path:path>')
 def serve_files(path):
-    return send_from_directory('../www/', path)
+    mime_type = 'text/plain'
+    if path.endswith('.js'):
+        mime_type = 'text/javascript'
+    elif path.endswith('.css'):
+        mime_type = 'text/css'
+    return send_from_directory('../www/', path, mimetype=mime_type)
 
 
 @app.route('/')
