@@ -64,7 +64,7 @@ class Board {
 				const unit = (Units[unitId] != 'none') ? `unit-${Units[unitId]}` : '';
 				var seaObj = '';
 				var randomChance = (Math.floor(Math.random() * 11) % 7 == 0);  // 10% chance
-				if (player == 0 && randomChance) seaObj = this.popRandom(seaObjects);
+				if (player === Object.keys(PlayerColors)[0] && randomChance) seaObj = this.popRandom(seaObjects);
 				$(`<div id="tile-${row}-${col}" class="hex ${color} ${unit} ${seaObj}"></div>`).appendTo(rowElem);
 			}
 		}

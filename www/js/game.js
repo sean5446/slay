@@ -142,6 +142,7 @@ function showPlayerStats(data) {
 		for (let i = 0; i < data['players'].length; i++) {
 			if (data['players'][i].color === playerColorId) {
 				name = data['players'][i].user.username;
+				break;
 			}
 		}
 		$('#players').append(
