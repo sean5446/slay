@@ -1,15 +1,18 @@
 
 import json
+import os
 
 from flask import send_from_directory, request, render_template, abort, Markup
 from flask import current_app as app
 
 from .game import Game
+from .board import Board
 
 from firebase_admin import auth
 from . import firebase_auth
 
 
+# unused
 def authenticate(req):
     try:
         return auth.verify_id_token(req.get('token'))
@@ -21,18 +24,20 @@ def ok(resp):
     return json.dumps(resp), 200, {'ContentType': 'application/json'}
 
 
-@app.route('/firebase')
-def get_firebase():
-    return firebase_auth
+_CONTENT_TYPE = {
+    '.js': 'text/javascript',
+    '.css': 'text/css',
+    '.png': 'image/png',
+    '.ico': 'image/x-icon',
+    '.html': 'text/html',
+}
 
 
 @app.route('/<path:path>')
 def serve_files(path):
-    mime_type = 'text/plain'
-    if path.endswith('.js'):
-        mime_type = 'text/javascript'
-    elif path.endswith('.css'):
-        mime_type = 'text/css'
+    mime_type = _CONTENT_TYPE.get(os.path.splitext(path)[1], 'text/plain')
+    if mime_type == 'text/plain':
+        return 405
     return send_from_directory('../www/', path, mimetype=mime_type)
 
 
@@ -41,7 +46,12 @@ def serve_index():
     return send_from_directory('../www/', 'home.html')
 
 
-# unused?
+@app.route('/firebase')
+def get_firebase():
+    return firebase_auth
+
+
+# unused
 @app.route('/board/<board_id>')
 def get_board(board_id):
     board = Game.get_board_html(board_id)
@@ -82,6 +92,7 @@ def get_all_users():
 
 @app.route('/game/<game_id>')
 def get_game_html(game_id):
+    # TODO: do we need game_id ?
     return render_template('game.html', title='Slay Game')
 
 
@@ -104,6 +115,21 @@ def create_game():
         return 500
 
 
+@app.route('/regions', methods=['POST'])
+def get_regions_stats():
+    data = request.get_json()
+    regions = Board(data['board']).get_regions_stats()
+    return ok(regions)
+
+
+@app.route('/game/<game_id>/savings', methods=['POST'])
+def get_savings(game_id):
+    game = Game.get_game(game_id)
+    Game.get_savings(game.board)
+    return 500  # TODO not implemented
+
+
+# current unused
 @app.route('/game/<game_id>/validate', methods=['POST'])
 def validate_move(game_id):
     req = request.get_json()

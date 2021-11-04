@@ -3,14 +3,14 @@
 
 ## Overview
 - Can run on Heroku, see `./Procfile`
-- Uses firebase for login and authorization
-- Uses sqlite data base `./slay.db` or env var `DATABASE_URI` (as URI)
+- Uses Firebase for login and authorization
+- Uses sqlite database `./slay.db` or env var `DATABASE_URI` (as URI)
 
 
 ## Starting
-1. Create a Python virual environment
+1. Use a Python virual environment `python -m venv <venv-name>`, then activate venv
 
-2. `pip install -r requirements.txt`
+2. Install required packages `pip install -r requirements.txt`
 
 3. Get Firebase credentials 
 
@@ -18,7 +18,7 @@
 
     - `./firebase_admin.json` or env var `FIREBASE_ADMIN` (as JSON) is for backend
 
-4. `python3 ./run.py`
+4. Run the app `python3 ./run.py`
 
 
 ## Code
@@ -27,3 +27,8 @@
 - Tests are in `./test`
 - Helper script `./make_users.py` makes a few test users
 - Reminder is a placeholder to send reminder emails when players haven't made a move
+
+
+## Tests
+From source root: `python3 -m unittest discover test`
+Where `test` is the folder with the tests

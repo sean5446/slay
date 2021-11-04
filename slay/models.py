@@ -6,7 +6,7 @@ from . import ma
 class BoardModel(db.Model):
     __tablename__ = 'boards'
     id = db.Column(db.Integer, primary_key=True)
-    board = db.Column(db.String(999))
+    board = db.Column(db.String(1024))
 
     def __repr__(self):
         return f'board={self.id}, board_size={len(self.board)}'
@@ -20,8 +20,8 @@ class BoardSchema(ma.Schema):
 class UserModel(db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(99), unique=True)
-    email = db.Column(db.String(99), unique=True)
+    username = db.Column(db.String(96), unique=True)
+    email = db.Column(db.String(96), unique=True)
     computer = db.Column(db.Integer)
     score = db.Column(db.Integer)
 
@@ -38,7 +38,7 @@ class PlayerModel(db.Model):
     __tablename__ = 'players'
     id = db.Column(db.Integer, primary_key=True)
     color = db.Column(db.Integer)
-    savings = db.Column(db.String(99))
+    savings = db.Column(db.String(256))
     game_id = db.Column(db.Integer, db.ForeignKey('games.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     last_turn_time = db.Column(db.Integer)
@@ -58,9 +58,9 @@ class PlayerSchema(ma.Schema):
 class GameModel(db.Model):
     __tablename__ = 'games'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(16), unique=True)
+    name = db.Column(db.String(64), unique=True)
     current_board_id = db.Column(db.Integer, db.ForeignKey('boards.id'))
-    turn_colors = db.Column(db.String(24))
+    turn_colors = db.Column(db.String(256))
     current_turn_color = db.Column(db.Integer)
     board = db.relationship('BoardModel', backref='games')
     players = db.relationship('PlayerModel', backref='games')

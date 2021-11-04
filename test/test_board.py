@@ -8,6 +8,10 @@ class TestBoard(unittest.TestCase):
 
     def test_get_neighbors(self):
         board = Board(board_type=5.0, num_rows=4, num_cols=4, num_players=1)
+        assert board.num_cols == 4
+        assert board.num_rows == 4
+        assert board.num_players == 1
+        assert len(board.get_player_turn_order()) == 1
         assert board.get_neighbors(0, 0) == [(0, 1), (1, 0)]
         assert board.get_neighbors(1, 0) == [(0, 0), (0, 1), (1, 1), (2, 0), (2, 1)]
         assert board.get_neighbors(3, 0) == [(2, 0), (2, 1), (3, 1)]
@@ -25,37 +29,47 @@ class TestBoard(unittest.TestCase):
         print(f"std dev: {std_dev}")
         print(f"num gen: {num_generated}")
         assert std_dev <= 1.2
-        assert len(board.get_player_tile_count().keys()) == 6  # 6 with trees
+        assert len(board.get_player_turn_order()) == 5
+        assert board.num_cols == 9
+        assert board.num_rows == 5
+        assert board.num_players == 5
 
     def test_get_player_turn_order(self):
         board = Board(board_type=1.2, num_cols=5, num_rows=5, num_players=5)
-        board.get_player_turn_order()
+        assert len(board.get_player_turn_order()) == 5
 
-    def test_render_to_html(self):
-        board = Board(board_type=1.2, num_cols=5, num_rows=5, num_players=5)
-        board.render_to_html()
+    def test_from_arrays(self):
+        board = Board([ ["TMT", "RMT"], ["TMT", "RMT"] ])
+        assert board.num_cols == 2
+        assert board.num_rows == 2
+        assert board.num_players == 1
 
     def test_get_regions(self):
         board_str = """
-        000 000 000 100 000 100 000 000 000
-          000 000 000 100 100 000 000 000 000
-        000 000 000 100 000 100 000 000 000
-          000 000 100 000 000 100 100 000 000
-        000 100 100 000 000 100 000 000 000
+            TMT TMT TMT RMT TMT RMT TMT TMT TMT 
+            TMT TMT TMT RMT RMT TMT TMT TMT TMT 
+            TMT TMT TMT RMT TMT RMT TMT TMT TMT 
+            TMT TMT RMT TMT TMT RMT RMT TMT TMT 
+            TMT RMT RMT TMT TMT RMT TMT TMT TMT 
         """
         board = Board(board_str)
-        tiles = board.get_regions(1)
+        assert len(board.get_player_turn_order()) == 1
+        assert board.num_cols == 9
+        assert board.num_rows == 5
+        assert board.num_players == 1
+
+        tiles = board.get_regions('R')
         assert tiles == {'(0, 5)': [(0, 5), (1, 4), (0, 3), (1, 3), (2, 3), (2, 5),
                                     (3, 2), (3, 5), (4, 2), (3, 6), (4, 5), (4, 1)]}
 
         board = Board(board_type='horz', num_cols=5, num_rows=5, num_players=2)
-        tiles = board.get_regions(1)
+        tiles = board.get_regions('R')
         assert tiles == {'(0, 0)': [(0, 0), (0, 1), (0, 2), (0, 3), (0, 4)],
                          '(2, 0)': [(2, 0), (2, 1), (2, 2), (2, 3), (2, 4)],
                          '(4, 0)': [(4, 0), (4, 1), (4, 2), (4, 3), (4, 4)]}
 
         board = Board(board_type='vert', num_cols=5, num_rows=5, num_players=2)
-        tiles = board.get_regions(1)
+        tiles = board.get_regions('R')
         assert tiles == {'(0, 0)': [(0, 0), (1, 0), (2, 0), (3, 0), (4, 0)],
                          '(0, 2)': [(0, 2), (1, 2), (2, 2), (3, 2), (4, 2)],
                          '(0, 4)': [(0, 4), (1, 4), (2, 4), (3, 4), (4, 4)]}

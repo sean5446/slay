@@ -4,67 +4,63 @@ from random import randint
 
 
 class Board:
-    # these enums must match Javascript objects in game.js - using strings to format directly to css
+    # these enums correspond to Javascript objects in game.js - using strings to format directly to css
     PLAYER_COLORS = {
-        '0': 'transparent',
-        '1': 'red',
-        '2': 'green',
-        '3': 'blue',
-        '4': 'yellow',
-        '5': 'black'
+        0: 'T',  # transparent
+        1: 'R',  # red
+        2: 'G',  # green
+        3: 'B',  # blue
+        4: 'Y',  # yellow
+        5: 'C'   # coal
     }
     UNIT_VALUES = {
-        '00': 'none',
-        '01': 'grave',
-        '02': 'tree',
-        '04': 'man',
-        '08': 'spearman',
-        '09': 'hut',
-        '12': 'knight',
-        '13': 'castle',
-        '16': 'baron'
+        'MT': 0,  # empty
+        'GR': 1,  # grave
+        'TR': 2,  # tree
+        'MA': 4,  # man
+        'SP': 8,  # spearman
+        'HU': 9,  # hut
+        'KN': 12, # knight
+        'CA': 13,  # castle
+        'BA': 16,  # baron
     }
     UNIT_COSTS = {
-        'man': 2,
-        'spearman': 6,
-        'knight': 18,
-        'baron': 54
+        'MA': 2,  # man
+        'SP': 6,  # spearman
+        'KN': 18, # knight
+        'BA': 54,  # baron
+        'CA': 12,  # castle
     }
 
     def __init__(self, board_type, num_rows=0, num_cols=0, num_players=0):
-        self.num_rows = num_rows
-        self.num_cols = num_cols
-        self.num_players = num_players
-        self.board_type = board_type
         self.board = []
+        self.num_players = num_players
         for i in range(num_rows):
             self.board.append([''] * num_cols)
         if type(board_type) is float:
             self.fair_random_board(board_type)
+        elif type(board_type) is list:
+            self.board = board_type
         elif board_type == 'vert':
             self.simple_board_vert()
         elif board_type == 'horz':
             self.simple_board_horz()
         else:
             self.board_from_str(board_type)
+        self.num_players = len(self.get_player_tiles().keys())
+        self.num_rows = len(self.board)
+        self.num_cols = len(self.board[0])
 
     def __repr__(self):
         board = ''
-        count = 0
         for row in range(len(self.board)):
-            board += '' if count % 2 == 0 else '  '
-            count += 1
+            board += '' if row % 2 == 0 else '  '
             for col in range(len(self.board[row])):
                 board += f'{self.board[row][col]} '
             board += '\n'
         return board
 
     def board_from_str(self, board):
-        board = board.strip()
-        self.num_rows = len(board.split('\n')) - 1
-        self.num_cols = len(board.split('\n')[0].split(' ')) - 1
-        self.board = []
-        num_players = {}
         for row in board.split('\n'):
             row = row.strip()
             if len(row) < 3:
@@ -72,33 +68,30 @@ class Board:
             column = []
             for col in row.split(' '):
                 if len(col) != 3:
-                    continue
+                    raise Exception('col data had less than 3 chars')
                 column.append(col)
-                if col[:1] != '0':  # 0 is not a player
-                    num_players[col[:1]] = ''
             self.board.append(column)
-        self.num_players = len(num_players.keys())
 
     def fill_board_random(self):
         for row in range(len(self.board)):
             for col in range(len(self.board[row])):
-                color = str(randint(0, self.num_players))
-                tree = '00'
-                if color != '0':
+                color = self.PLAYER_COLORS.get(randint(0, self.num_players))
+                tree = 'MT'
+                if color != self.PLAYER_COLORS[0]:
                     if randint(0, 3) == 0:
-                        tree = '02'
+                        tree = 'TR'
                 self.board[row][col] = f'{color}{tree}'
 
     def simple_board_horz(self):
         for row in range(len(self.board)):
             for col in range(len(self.board[row])):
-                color = '1' if row % 2 == 0 else '2'
+                color = 'R' if row % 2 == 0 else 'B'
                 self.board[row][col] = color
 
     def simple_board_vert(self):
         for row in range(len(self.board)):
             for col in range(len(self.board[row])):
-                color = '1' if col % 2 == 0 else '2'
+                color = 'R' if col % 2 == 0 else 'B'
                 self.board[row][col] = color
 
     def get_neighbors(self, row, col):
@@ -121,11 +114,14 @@ class Board:
         player_tiles = {}
         for row in range(len(self.board)):
             for col in range(len(self.board[0])):
-                value = str(self.board[row][col])[:1]
-                if not player_tiles.get(value):
-                    player_tiles[value] = [(row, col)]
+                color = self.board[row][col][:1]
+                if color == self.PLAYER_COLORS[0]:
+                    continue
+                if not player_tiles.get(color):
+                    player_tiles[color] = [(row, col)]
                 else:
-                    player_tiles[value] += [(row, col)]
+                    player_tiles[color] += [(row, col)]
+        player_tiles.pop(self.PLAYER_COLORS[0], None)
         return player_tiles
 
     def get_player_tile_count(self):
@@ -158,8 +154,7 @@ class Board:
     def get_player_turn_order(self):
         player_tiles = self.get_player_tile_count()
         order = {k: v for k, v in sorted(player_tiles.items(), key=lambda item: item[1])}
-        del order['0']  # 0 is not a player
-        return ','.join(order.keys())
+        return list(order.keys())
 
     def in_dict_of_list(self, item, dict_list):
         for k, v in dict_list.items():
@@ -168,7 +163,7 @@ class Board:
         return None
 
     def get_regions(self, player):
-        player = str(player)
+        player = player
         tiles = self.get_player_tiles()[player]
         regions = {}
         for t in tiles:
@@ -191,67 +186,34 @@ class Board:
 
     def place_huts(self):
         for player in range(1, self.num_players + 1):
-            regions = self.get_regions(player)
+            regions = self.get_regions(self.PLAYER_COLORS.get(player))
             for k, v in regions.items():
                 if len(v) > 1:
                     nums = k[1:-1]
                     row = int(nums.split(',')[0].strip())
                     col = int(nums.split(',')[1].strip())
-                    self.board[row][col] = self.board[row][col][:1] + '09'  # place hut
+                    self.board[row][col] = self.board[row][col][:1] + 'HU'  # place hut
 
     def get_income_and_wages(self, tiles):
         income = 0
         wages = 0
         for t in tiles:
-            tile_unit = int(self.board[t[0]][t[1]][1:])
-            if tile_unit != 2:  # not a tree
+            unit = self.board[t[0]][t[1]][1:]
+            if unit != 'TR':
                 income += 1
-            if tile_unit > 2 and tile_unit != 9 and tile_unit != 13:  # a unit but not a hut or castle
-                unit_name = self.UNIT_VALUES[tile_unit]
-                wages += self.UNIT_COSTS[unit_name]
+            if unit == 'MA' or unit == 'SP' or unit == 'KN' and unit == 'BA':
+                wages += self.UNIT_COSTS[unit]
         return income, wages
 
-    # currently unused
-    def get_regions_stats(self, players):
+    def get_regions_stats(self):
         regions = {}
-        for player in players:
-            color = player.color
-            player_regions = self.get_regions(color)
+        for i in range(1, self.num_players + 1):
+            color = self.PLAYER_COLORS[i]
+            player_regions = self.get_regions(self.PLAYER_COLORS[i])
             regions[color] = {}
             regions[color]['total'] = 0
             for k, v in player_regions.items():
                 regions[color][k] = {}
                 regions[color][k]['tiles'] = v
                 regions[color]['total'] += len(v)
-                income, wages = self.get_income_and_wages(v)
-                savings = json.loads(player.savings)
-                regions[color][k]['savings'] = savings[k]
-                regions[color][k]['income'] = income
-                regions[color][k]['wages'] = wages
-                regions[color][k]['balance'] = savings[k] + income - wages
         return regions
-
-    # currently unused
-    def render_to_html(self):
-        regions = {}
-        for player in range(1, self.num_players + 1):
-            regions[player] = self.get_regions(player)
-
-        html = ''
-        for row in range(len(self.board)):
-            html += f'\t<div class="hex-row{"" if row % 2 == 0 else " odd"}">\n'
-            for col in range(len(self.board[row])):
-                player = self.board[row][col][:1]
-                region = ''
-                if player != '0':
-                    player_regions = regions[int(player)]
-                    for k, v in player_regions.items():
-                        if len(v) > 1 and (row, col) in v:
-                            region = f'region{k[0]}-{k[1]}'
-                unit_id = self.board[row][col][1:3]
-                unit = f'unit-{self.UNIT_VALUES[unit_id]}'
-                color = f'color-{self.PLAYER_COLORS[player]}'
-                tile_id = f'tile-{row}-{col}'
-                html += f'\t\t<div id="{tile_id}" class="hex {color} {unit} {region}"></div>\n'
-            html += '\t</div>\n'
-        return html

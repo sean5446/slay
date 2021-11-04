@@ -20,7 +20,7 @@ function getUserList(displayName, email) {
 			var source = [];
 			var found = false;
 			for (var i = 0; i < users.length; i++) {
-				if (!users[i].username.localeCompare(displayName)) {
+				if (users[i].username === displayName) {
 					found = true;
 				}
 				else {
@@ -43,7 +43,8 @@ function createUser(username, email) {
 	$.ajax({
 		url: "/user/create",
 		type: "POST",
-		contentType: 'application/json',
+		dataType: "json",
+		contentType: 'application/json; charset=utf-8',
 		data: JSON.stringify({ 'username': username, 'email': email } ),
 		success: function(data) {
 			console.log(data.responseText);
@@ -99,19 +100,19 @@ function createGame(displayName) {
 	}
 
 	var name = prompt('Enter game name');
-	if (name === null || name.length < 4) {
-		alert('Enter a game name! (4+ characters)');
+	if (name === null || name.length < 4 || name.length > 64) {
+		alert('Enter a game name! (4-64 characters)');
 		return;
 	}
 
 	$.ajax({
 		url: "/game/create",
 		type: "POST",
-		contentType: 'application/json',
+		dataType: "json",
+		contentType: 'application/json; charset=utf-8',
 		data: JSON.stringify({ 'name': name, 'users': checkedItems } ),
 		success: function(data) {
-			const board = JSON.parse(data);
-			window.location.assign('/game/' + board.id);
+			window.location.assign('/game/' + data.current_board_id);
 		},
 		error: function(data) {
 			console.log(data.responseText);

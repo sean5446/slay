@@ -59,16 +59,16 @@ class Game:
     @staticmethod
     def create_game(name, users):
         shuffle(users)
-        if "Sean Magu" in users:
-            users.remove("Sean Magu")  # TODO remove debug code
-            users.insert(0, "Sean Magu")  # TODO remove debug code
+        if "Sean Magu" in users:  # TODO remove debug code
+            users.remove("Sean Magu")
+            users.insert(0, "Sean Magu")
         board_rand = Game.get_random_board(num_players=len(users))
         turn_colors = board_rand.get_player_turn_order()
         board_model = BoardModel(board=str(board_rand))
         db.session.add(board_model)
         db.session.commit()  # do I need to commit to get IDs?
         game_model = GameModel(name=name, current_board_id=board_model.id,
-                               turn_colors=turn_colors, current_turn_color=turn_colors[0])
+                               turn_colors=json.dumps(turn_colors), current_turn_color=turn_colors[0])
         history_model = GameHistoryModel(game_id=game_model.id, board_id=board_model.id)
         db.session.add(history_model)
         db.session.add(game_model)
@@ -76,7 +76,7 @@ class Game:
         i = 0
         for username in users:
             user_id = Game.get_user(username)['id']
-            color = turn_colors.split(',')[i]
+            color = turn_colors[i]
             i += 1
             regions = board_rand.get_regions(color)
             savings = {}
@@ -99,6 +99,19 @@ class Game:
         # game = game_schema.dump(game_model)
         # game['regions'] = regions
         return game_schema.dump(game_model)
+
+    @staticmethod
+    def get_savings(board):
+        board = Board(board)
+        regions = {}
+        for color, region in board.get_regions_stats():
+            income, wages = Board.get_income_and_wages(region['tiles'])
+            savings = 0  # TODO find fix json.loads(i.savings)
+            regions[color][region]['savings'] = savings
+            regions[color][region]['income'] = income
+            regions[color][region]['wages'] = wages
+            regions[color][region]['balance'] = savings + income - wages
+        return regions
 
     @staticmethod
     def validate_move(board, moves, user):
