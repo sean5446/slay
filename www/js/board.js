@@ -68,6 +68,10 @@ class Board {
 				$(`<div id="tile-${row}-${col}" class="hex ${color} ${unit} ${seaObj}"></div>`).appendTo(rowElem);
 			}
 		}
+		this.setupRegions(playerColorId);
+	}
+
+	setupRegions(playerColorId) {
 		// make highlight-able regions for player
 		this.getRegionsStats().done(function(regionsStats) {
 			for (const [k, v] of Object.entries(regionsStats[playerColorId])) {
@@ -77,6 +81,7 @@ class Board {
 					$(`#tile-${t[0]}-${t[1]}`).addClass(`region-${r[0]}-${r[1]}`);
 				}
 			}
+			return regionsStats;
 		});
 	}
 
@@ -90,7 +95,7 @@ class Board {
 			type: "POST",
 			dataType: "json",
 			contentType: 'application/json; charset=utf-8',
-			data: JSON.stringify({ 'board': this.board } )
+			data: JSON.stringify( { 'board': this.board } )
 		});
 	}
 

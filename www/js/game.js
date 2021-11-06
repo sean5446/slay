@@ -1,13 +1,16 @@
 
-var dragStartPosition = null;
+var _dragStartPosition = null;
+var _accessToken = null;
 
-function initGame(displayName, email) {
+function initGame(displayName, email, accessToken) {
 	$.ajax({
 		type: 'POST',
 		dataType: "json",
 		contentType: 'application/json; charset=utf-8',
 		url: `${window.location.pathname}`,  // /game/<id>
+		data: JSON.stringify({ 'token': accessToken }),
 		success: function(data) {
+			_accessToken = accessToken;
 			for (const player of data.players) {
 				if (player.user.username === displayName) {
 					const board = new Board(data.board.board);
@@ -49,7 +52,6 @@ function setupClickTouch(board, playerColorId, playerColor) {
 
 		// selected friendly tile
 		if ($(this).attr('class').includes(`color-${playerColor}`)) {
-			const regions = recolorRegions(board, playerColorId);
 			// if a region, set droppable
 			var currentRegion = getClass($(this), 'region');
 			if (currentRegion === undefined) return;  // solo square has no region
@@ -62,8 +64,8 @@ function setupClickTouch(board, playerColorId, playerColor) {
 			$(`.${currentRegion}`).each(function() {
 				$(this).removeClass(`color-${playerColor}`).addClass('color-white');
 			});
-			// const region = regions[`${c[0]},${c[1]}`];
-			// updateRegionStats(region['savings'], region['income'], region['wages'], region['balance']);
+
+			// update region stats
 
 			// allow user to drag a unit
 			$('#unit').html('<div class="unit-man draggable"></div>');
@@ -75,23 +77,6 @@ function setupClickTouch(board, playerColorId, playerColor) {
 			$('#unit').html('<div></div>');
 		}
 	});
-}
-
-function recolorRegions(board, playerColorId) {
-	// remove all regioned tiles
-	$('[class*=region]').each(function() {
-		const r = getClass($(this), 'region');
-		console.log(`removing: region-${r[0]}-${r[1]} ${$(this).attr('id')}`);
-	});
-	// reapply regions
-	const regions = {} // TODO board.getRegionsStats();
-	for (const [k, v] of Object.entries(regions)) {
-		for (const t of v) {
-			const pos = k.split(',');
-			$(`#tile-${t[0]}-${t[1]}`).addClass(`region-${pos[0]}-${pos[1]}`);
-		}
-	}
-	return regions;
 }
 
 function showRegionStats(savings, income, wages, balance) {
@@ -106,7 +91,7 @@ function setupDraggable() {
 	$('.draggable').draggable({
 		revert: 'invalid',
 		start: function(event, ui) {
-			dragStartPosition = ui.helper.position();
+			_dragStartPosition = ui.helper.position();
 		}
 	});
 }
@@ -157,75 +142,43 @@ function getClass(item, prop) {
 	}
 }
 
-function getUnitStrength(unit) {
-	if (unit === undefined) return 0;
-	for (const [k, v] of Object.entries(UnitValues)) {
-		if (v == unit) return parseInt(k);
-	}
-}
-
 function resetDraggable(draggable) {
 	draggable.detach();
 	$('#unit').append(draggable);
 	// could move it slowly here
-	draggable.css({top: dragStartPosition.top, left: dragStartPosition.left});
+	draggable.css({top: _dragStartPosition.top, left: _dragStartPosition.left});
 }
 
 function drop(draggable, droppable, board, playerColorId, playerColor, currentRegion) {
 	// get necessary stuff from drop location and drag unit
 	var dragUnit = getClass(draggable, 'unit');
-	var dragUnitStrength = getUnitStrength(dragUnit);
 	const dropUnit = getClass(droppable, 'unit');
-	const dropUnitStrength = getUnitStrength(dropUnit);
 	const dropColor = getClass(droppable, 'color');
 	const dropPos = $(droppable).attr('id').split('-');
 
-	console.log(dropPos, dragUnit, dropUnit, playerColor, dropColor, dragUnitStrength, dropUnitStrength);
+	console.log(dropPos, dragUnit, dropUnit, playerColor, dropColor);
 
-	// friendly region
-	if (playerColor == dropColor || dropColor == 'white') {
-		if (dropUnit == 'baron' || dropUnit == 'hut' || dropUnit == 'castle') {
-			resetDraggable(draggable);
-			return;
-		}
-		if (dropUnit == 'tree') {
-			droppable.removeClass('unit-tree');
-		}
-		// looking to level up
-		if (dropUnitStrength > 2) {
-			var totalStrength = dragUnitStrength + dropUnitStrength;
-			if (totalStrength < 10) totalStrength = '0' + totalStrength.toString();
-			dragUnitStrength = totalStrength;
-			dragUnit = UnitValues[dragUnitStrength];
-			droppable.removeClass(`unit-${dropUnit}`);
-		}
-		draggable.remove();
-		droppable.css('background-image', `url("../img/ground.png"), url("../img/${dragUnit}.png")`);
-		droppable.addClass([currentRegion], `unit-${dragUnit}`);
-		board.updatePosition(dropPos[1], dropPos[2], playerColorId, dragUnitStrength);
-	}
-	else {
-		// enemy tile
-		// for (const n of board.getNeighbors(dropPos[1], dropPos[2])) {
-			// if dropColor == getClass 'color' n[0] n[1] 
-			// const nUnit = getClass($(`#tile-${n[0]}-${n[1]}`), 'unit');
-			// for (const u of nUnit) {
-			// 	if (dragUnitStrength < getUnitStrength(nUnit)) resetDraggable(draggable);
-			// }
-		// }
-		if (dragUnitStrength > dropUnitStrength) {
+	// board.updatePosition(dropPos[1], dropPos[2], playerColorId);
+
+	$.ajax({
+		type: 'POST',
+		dataType: "json",
+		contentType: 'application/json; charset=utf-8',
+		url: `${window.location.pathname}/validate`,  // /game/<id>
+		data: JSON.stringify({ 'token': _accessToken, 'board': board, 'player_color_id': playerColorId, 'moves': ['test'] }),
+		success: function(data) {
+
+			// TODO fix this
 			draggable.remove();
-			droppable.removeClass([`color-${dropColor}`, `unit-${dropUnit}`]);
-			// droppable.css('background-image', `url("../img/ground.png"), url("../img/${dragUnit}.png")`);
-			droppable.addClass(['color-white', currentRegion, `unit-${dragUnit}`]);
-			if (dragUnitStrength < 10) dragUnitStrength = '0' + dragUnitStrength.toString();
-			board.updatePosition(dropPos[1], dropPos[2], playerColorId, dragUnitStrength);
+			droppable.css('background-image', `url("../img/ground.png"), url("../img/${dragUnit}.png")`);
+			droppable.addClass([currentRegion], `unit-${dragUnit}`);
+
+			console.log(data);
+		},
+		error: function(data) {
+			console.log(data);
 		}
-		else {
-			// can't win battle - reset position
-			resetDraggable(draggable);
-		}
-	}
+	});
 }
 
 function setupButtons(isPlayersTurn) {

@@ -26,7 +26,7 @@
 				if (user) {
 					// user is signed in
 					user.getIdToken().then(function(accessToken) {
-						initMainMenu(user.displayName, user.email);
+						initMainMenu(user.displayName, user.email, accessToken);
 					});
 				} else {
 					// user is signed out

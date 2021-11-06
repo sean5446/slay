@@ -1,20 +1,24 @@
 
-function initMainMenu(displayName, email) {
+
+
+function initMainMenu(displayName, email, accessToken) {
 	$('#firebaseui-auth-container').hide();
 	$('#main-menu').show();
 	$('#sign-in-status').html(`Logged in: ${displayName}`);
 	$('#button-create-game').click(function() {
 		createGame(displayName);
 	});
-	getUserList(displayName, email);
-	getGameList(displayName);
+	getUserList(displayName, email, accessToken);
+	getGameList(displayName, accessToken);
 }
 
-function getUserList(displayName, email) {
+function getUserList(displayName, email, accessToken) {
 	$.ajax({
-		type: "GET",
-		dataType: "json",
 		url: "/user",
+		type: "POST",
+		dataType: "json",
+		contentType: 'application/json; charset=utf-8',
+		data: JSON.stringify( { "token": accessToken } ),
 		success: function(data) {
 			const users = data;
 			var source = [];
@@ -29,7 +33,7 @@ function getUserList(displayName, email) {
 				}
 			}
 			if (!found) {
-				createUser(displayName, email);
+				createUser(displayName, email, accessToken);
 			}
 			$("#listbox-users").jqxListBox({ width: $(window).width()/2-10, source: source, checkboxes: true, height: 300 });
 		},
@@ -39,13 +43,13 @@ function getUserList(displayName, email) {
 	});
 }
 
-function createUser(username, email) {
+function createUser(username, email, accessToken) {
 	$.ajax({
 		url: "/user/create",
 		type: "POST",
 		dataType: "json",
 		contentType: 'application/json; charset=utf-8',
-		data: JSON.stringify({ 'username': username, 'email': email } ),
+		data: JSON.stringify( { "token": accessToken, 'username': username, 'email': email } ),
 		success: function(data) {
 			console.log(data.responseText);
 		},
@@ -55,11 +59,13 @@ function createUser(username, email) {
 	});
 }
 
-function getGameList(user) {
+function getGameList(user, accessToken) {
 	$.ajax({
-		type: "GET",
-		dataType: "json",
 		url: `/user/${user}`,
+		type: "POST",
+		dataType: "json",
+		contentType: 'application/json; charset=utf-8',
+		data: JSON.stringify( { "token": accessToken } ),
 		success: function(data) {
 			const games = data.games;
 			var source = [];

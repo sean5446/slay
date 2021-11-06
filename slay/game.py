@@ -114,7 +114,7 @@ class Game:
         return regions
 
     @staticmethod
-    def validate_move(board, moves, user):
+    def validate_move(game, moves, player_color_id):
         # is player turn?
 
         # move is not upgrading baron
@@ -125,4 +125,4 @@ class Game:
 
         # unit is strong enough to move to location
 
-        pass
+        return True
