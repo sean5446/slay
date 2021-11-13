@@ -81,7 +81,7 @@ function initGame(displayName, email, accessToken) {
 }
 
 function getRegionsStats(board) {
-	post("/regions",
+	post(`${window.location.pathname}/regions`,
 		 { 'token': _accessToken, 'board': board },
 		 function(data) {
 			console.log(data);
@@ -207,27 +207,34 @@ function drop(draggable, droppable, board, playerColorId, playerColor, currentRe
 
 	board.updatePosition(dropPos[1], dropPos[2], playerColorId, dragUnit);
 
-	post(`${window.location.pathname}/validate`,  // /game/<id>
+	post(`${window.location.pathname}/validate`,  // /game/<id>/validate
 		{ 'token': _accessToken, 'board': board, 'player_color_id': playerColorId, 'moves': ['test'] },
 		function(data) {
-			// TODO fix this
-			draggable.remove();
-			droppable.css('background-image', `url("../img/ground.png"), url("../img/${dragUnit}.png")`);
-			droppable.addClass([currentRegion], `unit-${dragUnit}`);
-
 			console.log(data);
+			if (data) {
+				draggable.remove();
+				droppable.css('background-image', `url("../img/ground.png"), url("../img/${dragUnit}.png")`);
+				droppable.addClass([currentRegion], `unit-${dragUnit}`);
+			}
+			else {
+				// display error?
+				resetDraggable(draggable)
+			}
 		}
 	);
 }
 
 function setupButtons(isPlayersTurn) {
+	// TODO: confirm and alert are being removed from browsers!?
 	if (isPlayersTurn) {
 		$('#buttonReset').click(function() {
-			window.location.reload();
+			if (confirm('Are you sure you want to reset all moves?')) {
+				// TODO: this shouldn't reload the whole page
+				window.location.reload();
+			}
 		});
 		$('#buttonEndTurn').click(function() {
-			// TODO: confirm and alert are being removed from browsers?
-			if (confirm('Are you sure you want to end the turn?')) {
+			if (confirm('Are you sure you want to end your turn?')) {
 				alert('Turn ended!');
 			}
 		});

@@ -4,7 +4,7 @@
 ## Overview
 - Can run on Heroku, see `./Procfile`
 - Uses Firebase for login and authorization
-- Uses sqlite database `./slay.db` or env var `DATABASE_URI` (as URI)
+- Uses sqlite database `./slay.db` or env var `DATABASE_URL` (heroku default) as URI
 
 
 ## Starting

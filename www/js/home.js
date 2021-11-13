@@ -20,7 +20,7 @@ function firebaseInit(data) {
 		if (user) {
 			// user is signed in
 			user.getIdToken().then(function(accessToken) {
-				initMainMenu(user.displayName, user.email, accessToken);
+				initMainMenu(firebase, user.displayName, user.email, accessToken);
 			});
 		} else {
 			// user is signed out
@@ -44,10 +44,15 @@ function firebaseInit(data) {
 	});
 }
 
-function initMainMenu(displayName, email, accessToken) {
+function initMainMenu(firebase, displayName, email, accessToken) {
 	$('#firebaseui-auth-container').hide();
 	$('#main-menu').show();
-	$('#sign-in-status').html(`Logged in: ${displayName}`);
+	$('#sign-in-status').html(`<b>${displayName}</b> [<a id='sign-out' href=#">Sign Out</a>]`);
+	$('#sign-out').click(function() {
+		firebase.auth().signOut().then(
+			window.location.assign('/')
+		)
+	});
 	$('#button-create-game').click(function() {
 		createGame(displayName, accessToken);
 	});

@@ -116,6 +116,8 @@ class Game:
     @staticmethod
     def validate_move(game, moves, player_color_id):
         # is player turn?
+        if game['current_turn_color'] is not player_color_id:
+            return False
 
         # move is not upgrading baron
 

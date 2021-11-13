@@ -22,7 +22,7 @@ def authenticate(req):
 
 
 def ok(resp):
-    return json.dumps(resp), 200, {'ContentType': 'application/json'}
+    return json.dumps(resp), 200, {'Content-Type': 'application/json'}
 
 
 _CONTENT_TYPE = {
@@ -129,7 +129,7 @@ def create_game():
         abort(500)
 
 
-@app.route('/regions', methods=['POST'])
+@app.route('/game/<game_id>/regions', methods=['POST'])
 def get_regions_stats():
     req = request.get_json()
     authenticate(req)
@@ -140,7 +140,7 @@ def get_regions_stats():
 @app.route('/game/<game_id>/savings', methods=['POST'])
 def get_savings(game_id):
     req = request.get_json()
-    #authenticate(req)
+    authenticate(req)
     game = Game.get_game(game_id)
     Game.get_savings(game.board)
     abort(500)  # TODO not implemented
@@ -149,7 +149,7 @@ def get_savings(game_id):
 @app.route('/game/<game_id>/validate', methods=['POST'])
 def validate_move(game_id):
     req = request.get_json()
-    #authenticate(req)
+    authenticate(req)
     game = Game.get_game(game_id)
     moves = req['moves']
     player_color_id = req['player_color_id']
