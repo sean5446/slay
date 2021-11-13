@@ -13,6 +13,8 @@ from . import firebase_auth
 
 
 def authenticate(req):
+    if req.get('token') == 'debug':  # TODO: remove debug code
+        return
     try:
         return auth.verify_id_token(req.get('token'))
     except Exception:
@@ -98,7 +100,7 @@ def get_all_users():
 
 @app.route('/game/<game_id>')
 def get_game_html(game_id):
-    # TODO: do we need game_id ?
+    # TODO: js uses window.url which has game id
     return render_template('game.html', title='Slay Game')
 
 
@@ -109,7 +111,10 @@ def get_game(game_id):
     game = Game.get_game(game_id)
     if not game:
         abort(404)
-    return ok(game)
+    board = Board(game['board']['board'])
+    regions = board.get_regions_stats()
+    resp = {'game': game, 'regions': regions}
+    return ok(resp)
 
 
 @app.route('/game/create', methods=['POST'])
@@ -127,7 +132,7 @@ def create_game():
 @app.route('/regions', methods=['POST'])
 def get_regions_stats():
     req = request.get_json()
-    #authenticate(req)
+    authenticate(req)
     regions = Board(req['board']).get_regions_stats()
     return ok(regions)
 

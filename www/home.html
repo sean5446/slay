@@ -18,53 +18,6 @@
 	<script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-app.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/ui/4.8.0/firebase-ui-auth.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/8.4.1/firebase-auth.js"></script>
-
-	<script type="text/javascript">
-		function firebaseInit(data) {
-			firebase.initializeApp(data);
-			firebase.auth().onAuthStateChanged(function(user) {
-				if (user) {
-					// user is signed in
-					user.getIdToken().then(function(accessToken) {
-						initMainMenu(user.displayName, user.email, accessToken);
-					});
-				} else {
-					// user is signed out
-					var uiConfig = {
-						signInSuccessUrl: '/home.html',
-						signInOptions: [
-							firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-							firebase.auth.EmailAuthProvider.PROVIDER_ID,
-						],
-						tosUrl: '<your-tos-url>',
-						privacyPolicyUrl: function() {
-							window.location.assign('<your-privacy-policy-url>');
-						}
-					};
-
-					var ui = new firebaseui.auth.AuthUI(firebase.auth());
-					ui.start('#firebaseui-auth-container', uiConfig);
-				}
-			}, function(error) {
-				console.log(error);
-			});
-		}
-
-		$(document).ready(function() {
-			$('#main-menu').hide();
-			$.ajax({
-				type: "GET",
-				dataType: "json",
-				url: `/firebase`,
-				success: function(data) {
-					firebaseInit(data);
-				},
-				error: function(data) {
-					console.log(data);
-				}
-			});
-		});
-	</script>
 </head>
 <body>
 	<img src="img/logo.png" id="logo">

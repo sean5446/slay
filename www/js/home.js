@@ -1,25 +1,78 @@
 
+$(document).ready(function() {
+	$('#main-menu').hide();
+	$.ajax({
+		type: "GET",
+		dataType: "json",
+		url: `/firebase`,
+		success: function(data) {
+			firebaseInit(data);
+		},
+		error: function(data) {
+			console.log(data);
+		}
+	});
+});
 
+function firebaseInit(data) {
+	firebase.initializeApp(data);
+	firebase.auth().onAuthStateChanged(function(user) {
+		if (user) {
+			// user is signed in
+			user.getIdToken().then(function(accessToken) {
+				initMainMenu(user.displayName, user.email, accessToken);
+			});
+		} else {
+			// user is signed out
+			let uiConfig = {
+				signInSuccessUrl: '/home.html',
+				signInOptions: [
+					firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+					firebase.auth.EmailAuthProvider.PROVIDER_ID,
+				],
+				tosUrl: '<your-tos-url>',
+				privacyPolicyUrl: function() {
+					window.location.assign('<your-privacy-policy-url>');
+				}
+			};
+
+			let ui = new firebaseui.auth.AuthUI(firebase.auth());
+			ui.start('#firebaseui-auth-container', uiConfig);
+		}
+	}, function(error) {
+		console.log(error);
+	});
+}
 
 function initMainMenu(displayName, email, accessToken) {
 	$('#firebaseui-auth-container').hide();
 	$('#main-menu').show();
 	$('#sign-in-status').html(`Logged in: ${displayName}`);
 	$('#button-create-game').click(function() {
-		createGame(displayName);
+		createGame(displayName, accessToken);
 	});
 	getUserList(displayName, email, accessToken);
 	getGameList(displayName, accessToken);
 }
 
-function getUserList(displayName, email, accessToken) {
+function post(url, data, callback) {
 	$.ajax({
-		url: "/user",
+		url: url,
 		type: "POST",
 		dataType: "json",
 		contentType: 'application/json; charset=utf-8',
-		data: JSON.stringify( { "token": accessToken } ),
-		success: function(data) {
+		data: JSON.stringify(data),
+		success: callback,
+		error: function(data) {
+			console.log(data);
+		}
+	});
+}
+
+function getUserList(displayName, email, accessToken) {
+	post("/user",
+		{ "token": accessToken },
+		function(data) {
 			const users = data;
 			var source = [];
 			var found = false;
@@ -36,37 +89,23 @@ function getUserList(displayName, email, accessToken) {
 				createUser(displayName, email, accessToken);
 			}
 			$("#listbox-users").jqxListBox({ width: $(window).width()/2-10, source: source, checkboxes: true, height: 300 });
-		},
-		error: function(data) {
-			console.log(data);
 		}
-	});
+	);
 }
 
 function createUser(username, email, accessToken) {
-	$.ajax({
-		url: "/user/create",
-		type: "POST",
-		dataType: "json",
-		contentType: 'application/json; charset=utf-8',
-		data: JSON.stringify( { "token": accessToken, 'username': username, 'email': email } ),
-		success: function(data) {
-			console.log(data.responseText);
-		},
-		error: function(data) {
+	post("/user/create",
+		{ "token": accessToken, 'username': username, 'email': email },
+		function(data) {
 			console.log(data.responseText);
 		}
-	});
+	);
 }
 
 function getGameList(user, accessToken) {
-	$.ajax({
-		url: `/user/${user}`,
-		type: "POST",
-		dataType: "json",
-		contentType: 'application/json; charset=utf-8',
-		data: JSON.stringify( { "token": accessToken } ),
-		success: function(data) {
+	post(`/user/${user}`,
+		{ "token": accessToken },
+		function(data) {
 			const games = data.games;
 			var source = [];
 			for (const [key, value] of Object.entries(games)) {
@@ -78,12 +117,8 @@ function getGameList(user, accessToken) {
 				var id = event.args.item.label.match(/^(\d+)/)[0].trim();
 				window.location.assign('/game/' + id);
 			});
-		},
-		error: function(data) {
-			console.log(data);
 		}
-	});
-
+	);
 	var source = [];
 	$("#listbox-games").jqxListBox({ width: $(window).width()/2-10, source: source, checkboxes: true, height: 300 });
 }
@@ -92,7 +127,7 @@ function reverse(s) {
     return s.split("").reverse().join("");
 }
 
-function createGame(displayName) {
+function createGame(displayName, accessToken) {
 	const items = $("#listbox-users").jqxListBox('getCheckedItems');
 	var checkedItems = [displayName];
 	$.each(items, function(index) {
@@ -111,22 +146,15 @@ function createGame(displayName) {
 		return;
 	}
 
-	$.ajax({
-		url: "/game/create",
-		type: "POST",
-		dataType: "json",
-		contentType: 'application/json; charset=utf-8',
-		data: JSON.stringify({ 'name': name, 'users': checkedItems } ),
-		success: function(data) {
+	post("/game/create",
+		{ "token": accessToken, 'name': name, 'users': checkedItems },
+		function(data) {
 			window.location.assign('/game/' + data.current_board_id);
-		},
-		error: function(data) {
-			console.log(data.responseText);
 		}
-	});
+	);
 }
 
-function setCookie(name,value,days) {
+function setCookie(name, value, days) {
 	var expires = "";
 	if (days) {
 		var date = new Date();

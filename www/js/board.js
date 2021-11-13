@@ -51,7 +51,7 @@ class Board {
 		this.numPlayers = Object.keys(numPlayers).length;
 	}
 
-	drawBoard(playerColorId, parent) {
+	drawBoard(playerColorId, regionsStats, parent) {
 		var seaObjects = [ 'ship', 'narwhal', 'walrus', 'kraken' ];
 		// draw the board units and colors
 		for (let row = 0; row < this.board.length; row++) {
@@ -68,35 +68,22 @@ class Board {
 				$(`<div id="tile-${row}-${col}" class="hex ${color} ${unit} ${seaObj}"></div>`).appendTo(rowElem);
 			}
 		}
-		this.setupRegions(playerColorId);
+		this.setupRegions(playerColorId, regionsStats);
 	}
 
-	setupRegions(playerColorId) {
-		// make highlight-able regions for player
-		this.getRegionsStats().done(function(regionsStats) {
-			for (const [k, v] of Object.entries(regionsStats[playerColorId])) {
-				if (k == 'total') continue;
-				const r = k.replace(/\(|\)|\s/g, '').split(',');
-				for (const t of v['tiles']) {
-					$(`#tile-${t[0]}-${t[1]}`).addClass(`region-${r[0]}-${r[1]}`);
-				}
+	setupRegions(playerColorId, regionsStats) {
+		for (const [k, v] of Object.entries(regionsStats[playerColorId])) {
+			if (k == 'total') continue;
+			const r = k.replace(/\(|\)|\s/g, '').split(',');
+			for (const t of v['tiles']) {
+				$(`#tile-${t[0]}-${t[1]}`).addClass(`region-${r[0]}-${r[1]}`);
 			}
-			return regionsStats;
-		});
+		}
+		return regionsStats;
 	}
 
 	popRandom(array) {
 		return array.splice(Math.floor(Math.random() * array.length), 1);
-	}
-
-	getRegionsStats() {
-		return $.ajax({
-			url: "/regions",
-			type: "POST",
-			dataType: "json",
-			contentType: 'application/json; charset=utf-8',
-			data: JSON.stringify( { 'board': this.board } )
-		});
 	}
 
 	getNeighbors(row, col) {
@@ -113,17 +100,30 @@ class Board {
 		for (const n of allPossible) {
 			if (0 <= n[0] && n[0] < this.board.length && 0 <= n[1] && n[1] < this.board[0].length) {
 				// if not transparent
-				if (this.board[n[0]][n[1]].charAt(0) != '0') neighbors.push(n);
+				if (this.board[n[0]][n[1]].charAt(0) !== Object.keys(PlayerColors)[0]) {
+					neighbors.push(n);
+				}
 			}
 		}
 		return neighbors;
+	}
+
+	updatePosition(row, col, playerColorId, dragUnit) {
+		let unitCode = '';
+		for (const [code, unit] of Object.entries(Units)) {
+			if (dragUnit == unit) {
+				unitCode = code;
+				break;
+			}
+		}
+		this.board[row][col] = `${playerColorId}${unitCode}`;
 	}
 
 	toString() {
 		var boardStr = '';
 		var count = 0;
 		for (let row = 0; row < this.board.length; row++) {
-			boardStr += ((count % 2 == 0) ? '' : '  '); count++;
+			boardStr += ((count % 2 === 0) ? '' : '  '); count++;
 			for (let col = 0; col < this.board[0].length; col++) {
 				boardStr += this.board[row][col] + ' ';
 			}

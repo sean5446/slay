@@ -2,18 +2,59 @@
 var _dragStartPosition = null;
 var _accessToken = null;
 
-function initGame(displayName, email, accessToken) {
+$(document).ready(function() {
 	$.ajax({
-		type: 'POST',
+		type: "GET",
+		dataType: "json",
+		url: `/firebase`,
+		success: function(data) {
+			firebaseInit(data);
+		},
+		error: function(data) {
+			console.log(data)
+		}
+	});
+});
+
+function firebaseInit(data) {
+	firebase.initializeApp(data);
+	firebase.auth().onAuthStateChanged(function(user) {
+		if (user) {
+			// user is signed in
+			user.getIdToken().then(function(accessToken) {
+				initGame(user.displayName, user.email, accessToken);
+			});
+		} else {
+			// user is signed out
+			window.location.replace('/');
+		}
+	}, function(error) {
+		console.log(error);
+	});
+}
+
+function post(url, data, callback) {
+	$.ajax({
+		url: url,
+		type: "POST",
 		dataType: "json",
 		contentType: 'application/json; charset=utf-8',
-		url: `${window.location.pathname}`,  // /game/<id>
-		data: JSON.stringify({ 'token': accessToken }),
-		success: function(data) {
+		data: JSON.stringify(data),
+		success: callback,
+		error: function(data) {
+			console.log(data);
+		}
+	});
+}
+
+function initGame(displayName, email, accessToken) {
+	post(`${window.location.pathname}`,  // /game/<id>
+		{ 'token': accessToken },
+		function(data) {
 			_accessToken = accessToken;
-			for (const player of data.players) {
+			for (const player of data.game.players) {
 				if (player.user.username === displayName) {
-					const board = new Board(data.board.board);
+					const board = new Board(data.game.board.board);
 					const playerColorId = player.color;
 					const playerColor = PlayerColors[player.color];
 					
@@ -23,10 +64,10 @@ function initGame(displayName, email, accessToken) {
 						$('#panel').removeClass('vertical-panel').addClass('horizontal-panel');
 					}
 
-					board.drawBoard(playerColorId, '#tiles');
-					showPlayerStats(data);
+					board.drawBoard(playerColorId, data.regions, '#tiles');
+					showPlayerStats(data.game);
 
-					if (data.current_turn_color === playerColorId) {
+					if (data.game.current_turn_color === playerColorId) {
 						setupButtons(true);
 						setupClickTouch(board, playerColorId, playerColor);
 					} else {
@@ -35,11 +76,17 @@ function initGame(displayName, email, accessToken) {
 					return;
 				}
 			}
-		},
-		error: function(data) {
-			console.log(data);
 		}
-	});
+	);
+}
+
+function getRegionsStats(board) {
+	post("/regions",
+		 { 'token': _accessToken, 'board': board },
+		 function(data) {
+			console.log(data);
+		 }
+	);
 }
 
 function setupClickTouch(board, playerColorId, playerColor) {
@@ -158,27 +205,19 @@ function drop(draggable, droppable, board, playerColorId, playerColor, currentRe
 
 	console.log(dropPos, dragUnit, dropUnit, playerColor, dropColor);
 
-	// board.updatePosition(dropPos[1], dropPos[2], playerColorId);
+	board.updatePosition(dropPos[1], dropPos[2], playerColorId, dragUnit);
 
-	$.ajax({
-		type: 'POST',
-		dataType: "json",
-		contentType: 'application/json; charset=utf-8',
-		url: `${window.location.pathname}/validate`,  // /game/<id>
-		data: JSON.stringify({ 'token': _accessToken, 'board': board, 'player_color_id': playerColorId, 'moves': ['test'] }),
-		success: function(data) {
-
+	post(`${window.location.pathname}/validate`,  // /game/<id>
+		{ 'token': _accessToken, 'board': board, 'player_color_id': playerColorId, 'moves': ['test'] },
+		function(data) {
 			// TODO fix this
 			draggable.remove();
 			droppable.css('background-image', `url("../img/ground.png"), url("../img/${dragUnit}.png")`);
 			droppable.addClass([currentRegion], `unit-${dragUnit}`);
 
 			console.log(data);
-		},
-		error: function(data) {
-			console.log(data);
 		}
-	});
+	);
 }
 
 function setupButtons(isPlayersTurn) {
