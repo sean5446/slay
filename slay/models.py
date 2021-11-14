@@ -61,7 +61,7 @@ class GameModel(db.Model):
     name = db.Column(db.String(64), unique=True)
     current_board_id = db.Column(db.Integer, db.ForeignKey('boards.id'))
     turn_colors = db.Column(db.String(256))
-    current_turn_color = db.Column(db.Integer)
+    current_turn_color = db.Column(db.String(16))
     board = db.relationship('BoardModel', backref='games')
     players = db.relationship('PlayerModel', backref='games')
 
