@@ -2,6 +2,7 @@
 var _dragStartPosition = null;
 var _accessToken = null;
 var _displayName = null;
+var _moves = [];
 
 $(document).ready(function() {
 	$.ajax({
@@ -52,11 +53,14 @@ function post(url, data, callback) {
 }
 
 function initGame() {
+	_moves = [];
+
 	post(`${window.location.pathname}`,  // /game/<id>
 		{ 'token': _accessToken },
 		function(data) {
 			for (const player of data.game.players) {
 				if (player.user.username === _displayName) {
+					$('#tiles').children().remove();
 					const board = new Board(data.game.board.board, '#tiles');
 					const playerColorId = player.color;
 					const playerColor = PlayerColors[player.color];
@@ -87,7 +91,7 @@ function setupClickTouch(board, playerColorId, playerColor, data) {
 	// mousedown touchstart are alternatives
 	$(document).on('click touch', '.hex', function() {
 		// remove all white hex (unselect)
-		$('[class*=region][class*=white]').each(function() {
+		$('[class*=white]').each(function() {
 			$(this).removeClass('white').addClass(playerColor);
 		});
 
@@ -101,7 +105,7 @@ function setupClickTouch(board, playerColorId, playerColor, data) {
 			setupDroppable(board, playerColorId, playerColor, currentRegion);
 
 			// color selected region white
-			$(`.${currentRegion}`).each(function() {
+			$(`[data-region="${currentRegion}"]`).each(function() {
 				$(this).removeClass(playerColor).addClass('white');
 			});
 
@@ -133,10 +137,9 @@ function showRegionStats(data, playerColorId, region) {
 	let wages = '';
 	let balance = '';
 	if (data && playerColorId && region) {
-		const r = `(${region.split('-')[1]}, ${region.split('-')[2]})`;
 		for (const [k, v] of Object.entries(data.game.players)) {
 			if (v.color === playerColorId) {
-				savings = JSON.parse(v.savings)[r];
+				savings = JSON.parse(v.savings)[region];
 			}
 		}
 	}
@@ -157,13 +160,12 @@ function setupDraggable() {
 }
 
 function setupDroppable(board, playerColorId, playerColor, currentRegion) {
-	const p = currentRegion.split('-');
-	$(`.region-${p[1]}-${p[2]}`).each(function() {
-		$(this).addClass('droppable');
-		const e = this.id.split('-');
-		const borderTiles = board.getNeighbors(e[1], e[2]);
+	$(`[data-region`).each(function() {
+		const elem = $(this);
+		elem.addClass('droppable');
+		const borderTiles = board.getNeighbors(elem.data('row'), elem.data('col'));
 		for (const b of borderTiles) {
-			$(`#tile-${b[0]}-${b[1]}`).addClass('droppable');
+			board.getTile(b[0], b[1]).addClass('droppable');
 		}
 	});
 
@@ -208,22 +210,25 @@ function resetDraggable(draggable) {
 function drop(draggable, droppable, board, playerColorId, playerColor, currentRegion) {
 	const from = [draggable.data().row, draggable.data().col];
 	const to = [droppable.data().row, droppable.data().col];
-	const moves = [ [to, from] ];
+	_moves.push([to, from]);
 
 	post(`${window.location.pathname}/validate`,  // /game/<id>/validate
-		{ 'token': _accessToken, 'board': board, 'player_color_id': playerColorId, 'moves': moves },
+		{ 'token': _accessToken, 'board': board, 'player_color_id': playerColorId, 'moves': _moves },
 		function(data) {
 			if (data) {
-				// TODO redo regions
-
-				const pos = droppable.offset();
+				board.setupRegions(playerColorId, data.regions);
+				const offset = droppable.offset();
 				draggable.detach().appendTo(droppable)
-					.offset({top: pos.top, left: pos.left + 25})
+					.offset({top: offset.top, left: offset.left + 25})
 					.removeClass()
-					.draggable('disable')
-					.addClass(`unit ${Units[data[3]]}`);
-				
-				board.updatePosition(data[0], data[1], data[2], data[3], data[4]);
+					.draggable('disable');
+
+				data.updates.forEach(update => {
+					board.updatePosition(update[0], update[1], update[2], update[3]);
+					if (droppable.data('row') == update[0] && droppable.data('col') == update[1]) {
+						draggable.addClass(`unit ${Units[update[3]]}`);
+					}
+				});
 			}
 			else {
 				// display error?

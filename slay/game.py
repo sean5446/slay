@@ -109,12 +109,14 @@ class Game:
             to_unit = board.get_unit(to_row, to_col)
             to_color = board.get_color(to_row, to_col)
 
-            # has enough money to place unit
+            # new unit being placed
             if [from_row, from_col] == [-1, -1]:
                 from_unit = 'MA'
             else:
                 from_unit = board.get_unit(from_row, from_col)
             
+            board.update_position(to_row, to_col, player_color_id, from_unit)
+
             # move within region or next to region
             regions = board.get_regions_stats()
 
@@ -125,5 +127,5 @@ class Game:
                 if Board.UNIT_VALUES[from_unit] > Board.UNIT_VALUES[to_unit]:
                     1+1
             
-        # dump equivalent of game schema? UI just redraws everything?
-        return [to_row, to_col, player_color_id, from_unit, regions]
+        # dump a list of cells that changed
+        return { 'regions': regions, 'updates': [ [to_row, to_col, player_color_id, from_unit] ] }

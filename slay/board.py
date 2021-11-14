@@ -219,6 +219,7 @@ class Board:
 
     def update_position(self, row, col, color, unit):
         self.board[row][col] = f'{color}{unit}'
+        # TODO if regions get combined, remove a hut
 
     def get_unit(self, row, col):
         return self.board[row][col][1:]

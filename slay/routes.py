@@ -141,7 +141,7 @@ def get_regions_stats():
 
 
 @app.route('/game/<game_id>/validate', methods=['POST'])
-def validate_moves(game_id):
+def validate_move(game_id):
     req = request.get_json()
     authenticate(req)
     game = Game.get_game(game_id)
@@ -150,4 +150,20 @@ def validate_moves(game_id):
     if not game or not player_color_id or not moves:
         abort(404)
     validate = Game.validate_moves(game, moves, player_color_id)
+    return ok(validate)
+
+
+@app.route('/game/<game_id>/end_turn', methods=['POST'])
+def end_turn(game_id):
+    req = request.get_json()
+    authenticate(req)
+    game = Game.get_game(game_id)
+    moves = req['moves']
+    player_color_id = req['player_color_id']
+    if not game or not player_color_id or not moves:
+        abort(404)
+    validate = Game.validate_moves(game, moves, player_color_id)
+
+    # TODO update game state
+
     return ok(validate)
