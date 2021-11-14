@@ -68,7 +68,7 @@ class Game:
         db.session.add(board_model)
         db.session.commit()  # do I need to commit to get IDs?
         game_model = GameModel(name=name, current_board_id=board_model.id,
-                               turn_colors=json.dumps(turn_colors), current_turn_color=turn_colors[0])
+                               turn_colors=json.dumps(turn_colors), current_turn=turn_colors[0])
         history_model = GameHistoryModel(game_id=game_model.id, board_id=board_model.id)
         db.session.add(history_model)
         db.session.add(game_model)
@@ -98,7 +98,7 @@ class Game:
     @staticmethod
     def validate_move(game, moves, player_color_id):
         # is player turn?
-        if game['current_turn_color'] is not player_color_id:
+        if game['current_turn'] is not player_color_id:
             return False
 
         # move within region or next to region

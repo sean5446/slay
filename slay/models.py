@@ -37,7 +37,7 @@ class UserSchema(ma.Schema):
 class PlayerModel(db.Model):
     __tablename__ = 'players'
     id = db.Column(db.Integer, primary_key=True)
-    color = db.Column(db.Integer)
+    color = db.Column(db.String(1))
     savings = db.Column(db.String(256))
     game_id = db.Column(db.Integer, db.ForeignKey('games.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
@@ -61,18 +61,18 @@ class GameModel(db.Model):
     name = db.Column(db.String(64), unique=True)
     current_board_id = db.Column(db.Integer, db.ForeignKey('boards.id'))
     turn_colors = db.Column(db.String(256))
-    current_turn_color = db.Column(db.String(16))
+    current_turn = db.Column(db.String(1))
     board = db.relationship('BoardModel', backref='games')
     players = db.relationship('PlayerModel', backref='games')
 
     def __repr__(self):
-        return f'game={self.id}, {self.name=}, {self.current_turn_color=}, ' + \
+        return f'game={self.id}, {self.name=}, {self.current_turn=}, ' + \
                f'{self.current_board_id=}, {self.turn_colors=}'
 
 
 class GameSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'name', 'current_board_id', 'turn_colors', 'current_turn_color', 'players', 'board')
+        fields = ('id', 'name', 'current_board_id', 'turn_colors', 'current_turn', 'players', 'board')
     players = ma.Nested(PlayerSchema, many=True)
     board = ma.Nested(BoardSchema)
 

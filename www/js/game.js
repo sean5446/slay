@@ -70,7 +70,7 @@ function initGame() {
 					board.drawBoard(playerColorId, data.regions, '#tiles');
 					showPlayersStats(data.game);
 
-					if (data.game.current_turn_color === playerColorId) {
+					if (data.game.current_turn === playerColorId) {
 						setupButtons(true);
 						setupClickTouch(board, playerColorId, playerColor, data);
 					} else {
@@ -182,7 +182,7 @@ function showPlayersStats(data) {
 	// turn colors are stored in db as a json string
 	for (const playerColorId of JSON.parse(data.turn_colors)) {
 		let bold = '';
-		if (playerColorId === data.current_turn_color) bold = 'font-weight: bold;';
+		if (playerColorId === data.current_turn) bold = 'font-weight: bold;';
 		// TODO calculate total from regions instead?
 		const total = $(`.${PlayerColors[playerColorId]}`).length;
 		let name = '??';
