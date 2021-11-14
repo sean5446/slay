@@ -96,17 +96,34 @@ class Game:
         return game_schema.dump(game_model)
 
     @staticmethod
-    def validate_move(game, moves, player_color_id):
+    def validate_moves(game, moves, player_color_id):
         # is player turn?
         if game['current_turn'] is not player_color_id:
             return False
 
-        # move within region or next to region
+        board = Board(game['board']['board'])
 
-        # has enough money to place unit
+        for move in moves:
+            to_row, to_col = move[0]
+            from_row, from_col = move[1]
+            to_unit = board.get_unit(to_row, to_col)
+            to_color = board.get_color(to_row, to_col)
 
-        # fortify or fight
-        #if 
-        
-        # need to send back updated position, updated stats/savings
-        return True
+            # has enough money to place unit
+            if [from_row, from_col] == [-1, -1]:
+                from_unit = 'MA'
+            else:
+                from_unit = board.get_unit(from_row, from_col)
+            
+            # move within region or next to region
+            regions = board.get_regions_stats()
+
+            # fortify or fight
+            if to_color == player_color_id:
+                1+1
+            else:
+                if Board.UNIT_VALUES[from_unit] > Board.UNIT_VALUES[to_unit]:
+                    1+1
+            
+        # dump equivalent of game schema? UI just redraws everything?
+        return [to_row, to_col, player_color_id, from_unit, regions]

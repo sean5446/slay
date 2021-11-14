@@ -1,5 +1,4 @@
 
-import json
 from random import randint
 
 
@@ -114,7 +113,7 @@ class Board:
         player_tiles = {}
         for row in range(len(self.board)):
             for col in range(len(self.board[0])):
-                color = self.board[row][col][:1]
+                color = self.get_color(row, col)
                 if color == self.PLAYER_COLORS[0]:
                     continue
                 if not player_tiles.get(color):
@@ -169,7 +168,7 @@ class Board:
         for t in tiles:
             neighbors = self.get_neighbors(t[0], t[1])
             for n in neighbors:
-                n_color = self.board[n[0]][n[1]][:1]
+                n_color = self.get_color(n[0], n[1])
                 if n_color == player:
                     kn = self.in_dict_of_list(n, regions)
                     kt = self.in_dict_of_list(t, regions)
@@ -192,13 +191,13 @@ class Board:
                     nums = k[1:-1]
                     row = int(nums.split(',')[0].strip())
                     col = int(nums.split(',')[1].strip())
-                    self.board[row][col] = self.board[row][col][:1] + 'HU'  # place hut
+                    self.board[row][col] = self.get_color(row, col) + 'HU'  # place hut
 
     def get_income_and_wages(self, tiles):
         income = 0
         wages = 0
         for t in tiles:
-            unit = self.board[t[0]][t[1]][1:]
+            unit = self.get_unit(t[0], t[1])
             if unit != 'TR':
                 income += 1
             if unit == 'MA' or unit == 'SP' or unit == 'KN' and unit == 'BA':
@@ -217,3 +216,13 @@ class Board:
                 regions[color][k]['tiles'] = v
                 regions[color]['total'] += len(v)
         return regions
+
+    def update_position(self, row, col, color, unit):
+        self.board[row][col] = f'{color}{unit}'
+
+    def get_unit(self, row, col):
+        return self.board[row][col][1:]
+
+    def get_color(self, row, col):
+        return self.board[row][col][:1]
+

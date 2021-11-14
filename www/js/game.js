@@ -57,11 +57,11 @@ function initGame() {
 		function(data) {
 			for (const player of data.game.players) {
 				if (player.user.username === _displayName) {
-					const board = new Board(data.game.board.board);
+					const board = new Board(data.game.board.board, '#tiles');
 					const playerColorId = player.color;
 					const playerColor = PlayerColors[player.color];
 					
-					// setup UI elements - 95 in height comes from .hex size
+					// TODO setup UI elements - 95 in height comes from .hex size
 					if (window.innerWidth > 1000) {
 						$('#map').removeClass('vertical-map').addClass('horizontal-map').height(board.numRows * 95);
 						$('#panel').removeClass('vertical-panel').addClass('horizontal-panel');
@@ -208,19 +208,22 @@ function resetDraggable(draggable) {
 function drop(draggable, droppable, board, playerColorId, playerColor, currentRegion) {
 	const from = [draggable.data().row, draggable.data().col];
 	const to = [droppable.data().row, droppable.data().col];
-	const move = [to, from];
+	const moves = [ [to, from] ];
 
 	post(`${window.location.pathname}/validate`,  // /game/<id>/validate
-		{ 'token': _accessToken, 'board': board, 'player_color_id': playerColorId, 'moves': move },
+		{ 'token': _accessToken, 'board': board, 'player_color_id': playerColorId, 'moves': moves },
 		function(data) {
 			if (data) {
+				// TODO redo regions
+
 				const pos = droppable.offset();
-				draggable.detach().appendTo(droppable);
-				draggable.offset({top: pos.top, left: pos.left + 25});
-				draggable.draggable('disable');
+				draggable.detach().appendTo(droppable)
+					.offset({top: pos.top, left: pos.left + 25})
+					.removeClass()
+					.draggable('disable')
+					.addClass(`unit ${Units[data[3]]}`);
 				
-				// update board
-				// droppable.addClass([currentRegion], `unit-${dragUnit}`);
+				board.updatePosition(data[0], data[1], data[2], data[3], data[4]);
 			}
 			else {
 				// display error?

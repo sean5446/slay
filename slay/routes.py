@@ -12,8 +12,11 @@ from firebase_admin import auth
 from . import firebase_auth
 
 
+_DEBUG_TOKEN = os.environ.get('DEBUG_TOKEN')
+
+
 def authenticate(req):
-    if req.get('token') == 'debug':  # TODO: remove debug code
+    if req.get('token') == _DEBUG_TOKEN:
         return
     try:
         return auth.verify_id_token(req.get('token'))
@@ -100,7 +103,7 @@ def get_all_users():
 
 @app.route('/game/<game_id>')
 def get_game_html(game_id):
-    # TODO: js uses window.url which has game id
+    # js uses window.url which has game_id
     return render_template('game.html', title='Slay Game')
 
 
@@ -138,7 +141,7 @@ def get_regions_stats():
 
 
 @app.route('/game/<game_id>/validate', methods=['POST'])
-def validate_move(game_id):
+def validate_moves(game_id):
     req = request.get_json()
     authenticate(req)
     game = Game.get_game(game_id)
@@ -146,5 +149,5 @@ def validate_move(game_id):
     player_color_id = req['player_color_id']
     if not game or not player_color_id or not moves:
         abort(404)
-    validate = Game.validate_move(game, moves, player_color_id)
+    validate = Game.validate_moves(game, moves, player_color_id)
     return ok(validate)

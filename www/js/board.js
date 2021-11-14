@@ -27,12 +27,14 @@ class Board {
 	numRows = 0;
 	numCols = 0;
 	numPlayers = 0;
+	parent = null;
 
-	constructor(strBoard) {
-		strBoard.replace(/^\s+|\s+$/g, '');
+	constructor(strBoard, parent) {
+		this.board = [];
+		this.parent = parent;
+		strBoard.trim();
 		this.numRows = strBoard.split('\n').length - 1;
 		this.numCols = strBoard.split('\n')[0].split(' ').length - 1;
-		this.board = [];
 		var numPlayers = {};
 
 		for (let row of strBoard.split('\n')) {
@@ -51,14 +53,14 @@ class Board {
 		this.numPlayers = Object.keys(numPlayers).length;
 	}
 
-	drawBoard(playerColorId, regionsStats, parent) {
+	drawBoard(playerColorId, regionsStats) {
 		$(parent).empty();
 		$('.draggable').remove();
 		var seaObjects = [ 'ship', 'narwhal', 'walrus', 'kraken' ];
 		// draw the board units and colors
 		for (let row = 0; row < this.board.length; row++) {
 			const odd = (row % 2 == 0) ? '' : ' odd';
-			const rowElem = $(`<div class="hex-row${odd}"></div>`).appendTo(parent);
+			const rowElem = $(`<div class="hex-row${odd}"></div>`).appendTo(this.parent);
 			for (let col = 0; col < this.board[0].length; col++) {
 				const player = this.board[row][col].charAt(0);
 				const unitId = this.board[row][col].slice(-2);
@@ -83,6 +85,13 @@ class Board {
 					.data('region', `region-${r[0]}-${r[1]}`);
 			}
 		}
+	}
+
+	updatePosition(row, col, color, unit, region) {
+		this.board[row][col] = `${color}${unit}`;
+		$(`#tile-${row}-${col}`).removeClass()
+			.addClass(['hex', 'white', region])
+			.data('region', region);
 	}
 
 	popRandom(array) {
