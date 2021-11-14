@@ -38,15 +38,15 @@ class Board:
         for i in range(num_rows):
             self.board.append([''] * num_cols)
         if type(board_type) is float:
-            self.fair_random_board(board_type)
+            self._fair_random_board(board_type)
         elif type(board_type) is list:
             self.board = board_type
         elif board_type == 'vert':
-            self.simple_board_vert()
+            self._simple_board_vert()
         elif board_type == 'horz':
-            self.simple_board_horz()
+            self._simple_board_horz()
         else:
-            self.board_from_str(board_type)
+            self._board_from_str(board_type)
         self.num_players = len(self.get_player_tiles().keys())
         self.num_rows = len(self.board)
         self.num_cols = len(self.board[0])
@@ -60,7 +60,7 @@ class Board:
             board += '\n'
         return board
 
-    def board_from_str(self, board):
+    def _board_from_str(self, board):
         for row in board.split('\n'):
             row = row.strip()
             if len(row) < 3:
@@ -72,7 +72,7 @@ class Board:
                 column.append(col)
             self.board.append(column)
 
-    def fill_board_random(self):
+    def _fill_board_random(self):
         for row in range(len(self.board)):
             for col in range(len(self.board[row])):
                 color = self.PLAYER_COLORS.get(randint(0, self.num_players))
@@ -82,13 +82,13 @@ class Board:
                         tree = 'TR'
                 self.board[row][col] = f'{color}{tree}'
 
-    def simple_board_horz(self):
+    def _simple_board_horz(self):
         for row in range(len(self.board)):
             for col in range(len(self.board[row])):
                 color = 'R' if row % 2 == 0 else 'B'
                 self.board[row][col] = color
 
-    def simple_board_vert(self):
+    def _simple_board_vert(self):
         for row in range(len(self.board)):
             for col in range(len(self.board[row])):
                 color = 'R' if col % 2 == 0 else 'B'
@@ -139,10 +139,10 @@ class Board:
             total += (v - avg) ** 2
         return (total / len(player_counts)) ** 0.5
 
-    def fair_random_board(self, accept_std_dev=1.2):
+    def _fair_random_board(self, accept_std_dev=1.2):
         num_generated = 0
         while True:
-            self.fill_board_random()
+            self._fill_board_random()
             player_tiles = self.get_player_tiles()
             std_dev = self.std_dev_player_tiles()
             num_generated += 1

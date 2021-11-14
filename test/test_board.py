@@ -24,11 +24,8 @@ class TestBoard(unittest.TestCase):
 
     def test_fair_random_board(self):
         board = Board(board_type=1.2, num_rows=5, num_cols=9, num_players=5)
-        fair_grid, player_tiles, std_dev, num_generated = board.fair_random_board(1.2)
         print(board)
-        print(f"std dev: {std_dev}")
-        print(f"num gen: {num_generated}")
-        assert std_dev <= 1.2
+        assert board.std_dev_player_tiles() <= 1.2
         assert len(board.get_player_turn_order()) == 5
         assert board.num_cols == 9
         assert board.num_rows == 5

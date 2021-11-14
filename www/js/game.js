@@ -1,6 +1,7 @@
 
 var _dragStartPosition = null;
 var _accessToken = null;
+var _displayName = null;
 
 $(document).ready(function() {
 	$.ajax({
@@ -22,7 +23,10 @@ function firebaseInit(data) {
 		if (user) {
 			// user is signed in
 			user.getIdToken().then(function(accessToken) {
-				initGame(user.displayName, user.email, accessToken);
+				// user.email, user.photoURL
+				_accessToken = accessToken;
+				_displayName = user.displayName;
+				initGame(_displayName, accessToken);
 			});
 		} else {
 			// user is signed out
@@ -47,13 +51,12 @@ function post(url, data, callback) {
 	});
 }
 
-function initGame(displayName, email, accessToken) {
+function initGame() {
 	post(`${window.location.pathname}`,  // /game/<id>
-		{ 'token': accessToken },
+		{ 'token': _accessToken },
 		function(data) {
-			_accessToken = accessToken;
 			for (const player of data.game.players) {
-				if (player.user.username === displayName) {
+				if (player.user.username === _displayName) {
 					const board = new Board(data.game.board.board);
 					const playerColorId = player.color;
 					const playerColor = PlayerColors[player.color];
@@ -65,11 +68,11 @@ function initGame(displayName, email, accessToken) {
 					}
 
 					board.drawBoard(playerColorId, data.regions, '#tiles');
-					showPlayerStats(data.game);
+					showPlayersStats(data.game);
 
 					if (data.game.current_turn_color === playerColorId) {
 						setupButtons(true);
-						setupClickTouch(board, playerColorId, playerColor);
+						setupClickTouch(board, playerColorId, playerColor, data);
 					} else {
 						setupButtons(false);
 					}
@@ -80,53 +83,63 @@ function initGame(displayName, email, accessToken) {
 	);
 }
 
-function getRegionsStats(board) {
-	post(`${window.location.pathname}/regions`,
-		 { 'token': _accessToken, 'board': board },
-		 function(data) {
-			console.log(data);
-		 }
-	);
-}
-
-function setupClickTouch(board, playerColorId, playerColor) {
+function setupClickTouch(board, playerColorId, playerColor, data) {
 	// mousedown touchstart are alternatives
 	$(document).on('click touch', '.hex', function() {
 		// remove all white hex (unselect)
 		$('[class*=region][class*=white]').each(function() {
-			$(this).removeClass('color-white').addClass(`color-${playerColor}`);
+			$(this).removeClass('white').addClass(playerColor);
 		});
 
 		// selected friendly tile
-		if ($(this).attr('class').includes(`color-${playerColor}`)) {
+		if ($(this).attr('class').includes(playerColor)) {
+			// solo square has no region
+			if (!$(this).data('region')) return;
+
 			// if a region, set droppable
-			var currentRegion = getClass($(this), 'region');
-			if (currentRegion === undefined) return;  // solo square has no region
-			const c = currentRegion;
-			currentRegion = 'region-' + currentRegion.join('-');
-			console.log(`currentRegion: ${currentRegion}`);
+			const currentRegion = $(this).data('region');
 			setupDroppable(board, playerColorId, playerColor, currentRegion);
 
 			// color selected region white
 			$(`.${currentRegion}`).each(function() {
-				$(this).removeClass(`color-${playerColor}`).addClass('color-white');
+				$(this).removeClass(playerColor).addClass('white');
 			});
 
 			// update region stats
+			showRegionStats(data, playerColorId, currentRegion);
 
-			// allow user to drag a unit
-			$('#unit').html('<div class="unit-man draggable"></div>');
+			// if they have money, allow user to drag a unit
+			const hasMoney = true;  // TODO 
+			$('#unit').children().remove();
+			if (hasMoney) {
+				$('<div class="unit man draggable"></div>')
+					.data('row', -1)
+					.data('col', -1)
+					.appendTo('#unit');
+			}
 			setupDraggable();
 		}
 		// selected enemy tile
-		else if ($(this).attr('class').match(/color-*/)) {
-			showRegionStats('', '', '', '');
-			$('#unit').html('<div></div>');
+		else {
+			$('#unit').children().remove();
+			showRegionStats();
 		}
 	});
 }
 
-function showRegionStats(savings, income, wages, balance) {
+function showRegionStats(data, playerColorId, region) {
+	let savings = '';
+	let income = '';
+	let wages = '';
+	let balance = '';
+	if (data && playerColorId && region) {
+		const r = `(${region.split('-')[1]}, ${region.split('-')[2]})`;
+		for (const [k, v] of Object.entries(data.game.players)) {
+			if (v.color === playerColorId) {
+				savings = JSON.parse(v.savings)[r];
+			}
+		}
+	}
 	$('#savings').html(`Savings: ${savings}`);
 	$('#income').html(`Income: ${income}`);
 	$('#wages').html(`Wages: ${wages}`);
@@ -164,16 +177,18 @@ function setupDroppable(board, playerColorId, playerColor, currentRegion) {
 	});
 }
 
-function showPlayerStats(data) {
+function showPlayersStats(data) {
 	$('#players').html('');
+	// turn colors are stored in db as a json string
 	for (const playerColorId of JSON.parse(data.turn_colors)) {
 		let bold = '';
 		if (playerColorId === data.current_turn_color) bold = 'font-weight: bold;';
-		const total = $(`.color-${PlayerColors[playerColorId]}`).length;
+		// TODO calculate total from regions instead?
+		const total = $(`.${PlayerColors[playerColorId]}`).length;
 		let name = '??';
-		for (let i = 0; i < data['players'].length; i++) {
-			if (data['players'][i].color === playerColorId) {
-				name = data['players'][i].user.username;
+		for (let i = 0; i < data.players.length; i++) {
+			if (data.players[i].color === playerColorId) {
+				name = data.players[i].user.username;
 				break;
 			}
 		}
@@ -183,38 +198,29 @@ function showPlayerStats(data) {
 	}
 }
 
-function getClass(item, prop) {
-	for (const cls of item.attr('class').split(/\s+/)) {
-		if (cls.startsWith(`${prop}-`)) return cls.split('-').slice(1);
-	}
-}
-
 function resetDraggable(draggable) {
-	draggable.detach();
-	$('#unit').append(draggable);
+	const pos = $('#unit').offset();
+	draggable.offset({top: pos.top, left: pos.left});
 	// could move it slowly here
 	draggable.css({top: _dragStartPosition.top, left: _dragStartPosition.left});
 }
 
 function drop(draggable, droppable, board, playerColorId, playerColor, currentRegion) {
-	// get necessary stuff from drop location and drag unit
-	var dragUnit = getClass(draggable, 'unit');
-	const dropUnit = getClass(droppable, 'unit');
-	const dropColor = getClass(droppable, 'color');
-	const dropPos = $(droppable).attr('id').split('-');
-
-	console.log(dropPos, dragUnit, dropUnit, playerColor, dropColor);
-
-	board.updatePosition(dropPos[1], dropPos[2], playerColorId, dragUnit);
+	const from = [draggable.data().row, draggable.data().col];
+	const to = [droppable.data().row, droppable.data().col];
+	const move = [to, from];
 
 	post(`${window.location.pathname}/validate`,  // /game/<id>/validate
-		{ 'token': _accessToken, 'board': board, 'player_color_id': playerColorId, 'moves': ['test'] },
+		{ 'token': _accessToken, 'board': board, 'player_color_id': playerColorId, 'moves': move },
 		function(data) {
-			console.log(data);
 			if (data) {
-				draggable.remove();
-				droppable.css('background-image', `url("../img/ground.png"), url("../img/${dragUnit}.png")`);
-				droppable.addClass([currentRegion], `unit-${dragUnit}`);
+				const pos = droppable.offset();
+				draggable.detach().appendTo(droppable);
+				draggable.offset({top: pos.top, left: pos.left + 25});
+				draggable.draggable('disable');
+				
+				// update board
+				// droppable.addClass([currentRegion], `unit-${dragUnit}`);
 			}
 			else {
 				// display error?
@@ -224,23 +230,30 @@ function drop(draggable, droppable, board, playerColorId, playerColor, currentRe
 	);
 }
 
-function setupButtons(isPlayersTurn) {
+function setupButtons(board) {
 	// TODO: confirm and alert are being removed from browsers!?
-	if (isPlayersTurn) {
-		$('#buttonReset').click(function() {
-			if (confirm('Are you sure you want to reset all moves?')) {
-				// TODO: this shouldn't reload the whole page
-				window.location.reload();
-			}
-		});
-		$('#buttonEndTurn').click(function() {
-			if (confirm('Are you sure you want to end your turn?')) {
-				alert('Turn ended!');
-			}
-		});
+	let resetButton = $('#buttonReset');
+	let endTurnButton = $('#buttonEndTurn');
+
+	if (board) {
+		resetButton.unbind().bind('click', onReset);
+		endTurnButton.unbind().bind('click', onEndTurn);
 	}
 	else {
-		$('#buttonReset').button({ disabled: true });
-		$('#buttonEndTurn').button({ disabled: true });
+		resetButton.button({ disabled: true });
+		endTurnButton.button({ disabled: true });
+	}
+}
+
+function onReset() {
+	if (confirm('Are you sure you want to reset all moves?')) {
+		initGame();
+	}
+}
+
+function onEndTurn() {
+	if (confirm('Are you sure you want to end your turn?')) {
+		// submit moves
+		alert('Turn ended!');
 	}
 }

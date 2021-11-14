@@ -93,25 +93,7 @@ class Game:
         game_model = GameModel.query.filter(GameModel.id == game_id).first()
         if not game_model:
             return None
-        # board = Board(game_model.board.board)
-        # players = game_model.players
-        # regions = board.get_regions_stats(players)
-        # game = game_schema.dump(game_model)
-        # game['regions'] = regions
         return game_schema.dump(game_model)
-
-    @staticmethod
-    def get_savings(board):
-        board = Board(board)
-        regions = {}
-        for color, region in board.get_regions_stats():
-            income, wages = Board.get_income_and_wages(region['tiles'])
-            savings = 0  # TODO find fix json.loads(i.savings)
-            regions[color][region]['savings'] = savings
-            regions[color][region]['income'] = income
-            regions[color][region]['wages'] = wages
-            regions[color][region]['balance'] = savings + income - wages
-        return regions
 
     @staticmethod
     def validate_move(game, moves, player_color_id):
@@ -119,12 +101,12 @@ class Game:
         if game['current_turn_color'] is not player_color_id:
             return False
 
-        # move is not upgrading baron
-
-        # had enough money to place unit
-
         # move within region or next to region
 
-        # unit is strong enough to move to location
+        # has enough money to place unit
 
+        # fortify or fight
+        #if 
+        
+        # need to send back updated position, updated stats/savings
         return True

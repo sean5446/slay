@@ -54,68 +54,76 @@ body {
 }
 
 /* colors based on MSWord color pallet and then adding 40% (184, 178, 156) from water.png bg */
-.color-white {
+.white {
 	background-color: rgb(227, 224, 215);
 }
 
-.color-red {
+.red {
 	background-color: rgb(164, 74, 69);
 }
 
-.color-green {
+.green {
 	background-color: rgb(108, 141, 8);
 }
 
-.color-blue {
+.blue {
 	background-color: rgb(89, 125, 188);
 }
 
-.color-yellow {
+.yellow {
 	background-color: rgb(218, 187, 103);
 }
 
-.color-black {
+.black {
 	background-color: rgb(80, 83, 80);
 }
 
-.color-transparent,
-.color-transparent:before,
-.color-transparent:after {
+.transparent,
+.transparent:before,
+.transparent:after {
 	border: none;
 	background-image: none;
 	box-shadow: none;
 	margin: 1px 1px 1px 1px;
 }
 
-.unit-hut {
+.unit {
+	position: absolute;
+	z-index: 9;
+	background-repeat: no-repeat;
+	height: 65px;
+	width: 65px;
+}
+
+.hut {
 	background-image: url("../img/ground.png"), url("../img/hut.png");
 }
 
-.unit-tree {
+.tree {
 	background-image: url("../img/ground.png"), url("../img/tree.png");
 }
 
-.unit-grave {
+.grave {
 	background-image: url("../img/ground.png"), url("../img/grave.png");
 }
 
-.unit-castle {
+.castle {
 	background-image: url("../img/castle.png");
 }
 
-.unit-man {
+.man {
 	background-image: url("../img/man.png");
 }
 
-.unit-spearman {
+.spearman {
 	background-image: url("../img/spearman.png");
 }
 
-.unit-knight {
+.knight {
 	background-image: url("../img/knight.png");
 }
 
-.unit-baron {
+.baron {
 	background-image: url("../img/baron.png");
 }
 
@@ -137,14 +145,6 @@ body {
 .ship {
 	background-image: url("../img/ship.png");
 	background-size: 60px;
-}
-
-.draggable {
-	position: absolute;
-	z-index: 9;
-	background-repeat: no-repeat;
-	height: 65px;
-	width: 65px;
 }
 
 .vertical-map {

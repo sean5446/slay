@@ -137,15 +137,6 @@ def get_regions_stats():
     return ok(regions)
 
 
-@app.route('/game/<game_id>/savings', methods=['POST'])
-def get_savings(game_id):
-    req = request.get_json()
-    authenticate(req)
-    game = Game.get_game(game_id)
-    Game.get_savings(game.board)
-    abort(500)  # TODO not implemented
-
-
 @app.route('/game/<game_id>/validate', methods=['POST'])
 def validate_move(game_id):
     req = request.get_json()
