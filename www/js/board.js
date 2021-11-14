@@ -89,8 +89,21 @@ class Board {
 			const r = k.replace(/\(|\)|\s/g, '').split(',');
 			for (const t of v.tiles) {
 				const region = `(${r[0]}, ${r[1]})`;
-				this.getTile(t[0], t[1])
-					.attr('data-region', region).data('region', region);
+				const elem = this.getTile(t[0], t[1]);
+				// because we look at all neighbors, elem will get covered as n below
+				const borderTiles = this.getNeighbors(elem.data('row'), elem.data('col'));
+				for (const b of borderTiles) {
+					const n = this.getTile(b[0], b[1]);
+					// don't drop on own stuff
+					if (n.hasClass(PlayerColors[playerColorId])) {
+						if(!n.hasClass('hut') && !n.hasClass('castle') && !n.hasClass('baron'))
+							n.addClass('droppable');
+					}
+					else {
+						n.addClass('droppable');
+					}
+				}
+				elem.attr('data-region', region).data('region', region);
 			}
 		}
 	}
@@ -101,6 +114,7 @@ class Board {
 
 	updatePosition(row, col, color, unit) {
 		this.board[row][col] = `${color}${unit}`;
+		// TODO fix droppable class? will be reset by removeClass below
 		this.getTile(row, col).removeClass()
 			.addClass(['hex', 'white']);
 	}

@@ -91,6 +91,7 @@ body {
 	position: absolute;
 	z-index: 9;
 	background-repeat: no-repeat;
+	background-size: 65px 65px;
 	height: 65px;
 	width: 65px;
 }

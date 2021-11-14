@@ -96,36 +96,49 @@ class Game:
         return game_schema.dump(game_model)
 
     @staticmethod
+    def unit_with_strength(strength):
+        for k, v in Board.UNIT_VALUES.items():
+            if v == strength:
+                return k
+
+    @staticmethod
     def validate_moves(game, moves, player_color_id):
         # is player turn?
         if game['current_turn'] is not player_color_id:
             return False
 
         board = Board(game['board']['board'])
+        updates = []
 
         for move in moves:
-            to_row, to_col = move[0]
-            from_row, from_col = move[1]
-            to_unit = board.get_unit(to_row, to_col)
-            to_color = board.get_color(to_row, to_col)
+            drag_row, drag_col = move[0]
+            drop_row, drop_col = move[1]
+            drop_unit = board.get_unit(drop_row, drop_col)
+            drop_color = board.get_color(drop_row, drop_col)
 
             # new unit being placed
-            if [from_row, from_col] == [-1, -1]:
-                from_unit = 'MA'
+            if [drag_row, drag_col] == [-1, -1]:
+                # TODO has enough money?
+                drag_unit = 'MA'
             else:
-                from_unit = board.get_unit(from_row, from_col)
-            
-            board.update_position(to_row, to_col, player_color_id, from_unit)
+                drag_unit = board.get_unit(drag_row, drag_col)
 
             # move within region or next to region
-            regions = board.get_regions_stats()
+            regions = board.get_regions(player_color_id)
+
+            # don't kill own huts
 
             # fortify or fight
-            if to_color == player_color_id:
-                1+1
+            if drop_color == player_color_id:
+                if Board.UNIT_VALUES[drop_unit] > 3:
+                    total_strength = Board.UNIT_VALUES[drop_unit] + Board.UNIT_VALUES[drag_unit]
+                    drag_unit = Game.unit_with_strength(total_strength)
             else:
-                if Board.UNIT_VALUES[from_unit] > Board.UNIT_VALUES[to_unit]:
-                    1+1
+                if Board.UNIT_VALUES[drag_unit] < Board.UNIT_VALUES[drop_unit]:
+                    return False
             
-        # dump a list of cells that changed
-        return { 'regions': regions, 'updates': [ [to_row, to_col, player_color_id, from_unit] ] }
+            board.update_position(drop_row, drop_col, player_color_id, drag_unit)
+            updates.append([drop_row, drop_col, player_color_id, drag_unit])
+        
+        regions = board.get_regions_stats()
+        return { 'regions': regions, 'updates': updates }
