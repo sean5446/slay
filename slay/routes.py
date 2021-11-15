@@ -4,6 +4,7 @@ import os
 
 from flask import send_from_directory, request, render_template, abort, Markup
 from flask import current_app as app
+from . import limiter
 
 from .game import Game
 from .board import Board
@@ -121,7 +122,7 @@ def get_game(game_id):
 
 
 @app.route('/game/create', methods=['POST'])
-# @limiter.limit("1 per day")
+@limiter.limit("10 per day")
 def create_game():
     req = request.get_json()
     authenticate(req)

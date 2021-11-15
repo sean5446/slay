@@ -65,7 +65,7 @@ function initGame() {
 					const playerColorId = player.color;
 					const playerColor = PlayerColors[player.color];
 					
-					// TODO setup UI elements - 95 in height comes from .hex size
+					// TODO setup UI elements 'properly' - 95 in height comes from .hex size
 					if (window.innerWidth > 1000) {
 						$('#map').removeClass('vertical-map').addClass('horizontal-map').height(board.numRows * 95);
 						$('#panel').removeClass('vertical-panel').addClass('horizontal-panel');
@@ -77,7 +77,6 @@ function initGame() {
 					if (data.game.current_turn === playerColorId) {
 						setupButtons(true);
 						setupClickTouch(board, playerColorId, playerColor, data);
-						setupDroppable(board, playerColorId);
 					} else {
 						setupButtons(false);
 					}
@@ -98,54 +97,45 @@ function setupClickTouch(board, playerColorId, playerColor, data) {
 
 		// selected friendly tile
 		if ($(this).attr('class').includes(playerColor)) {
-			// solo square has no region
 			const currentRegion = $(this).data('region');
-			if (!currentRegion) return;
 
 			// color selected region white
 			$(`[data-region="${currentRegion}"]`).each(function() {
 				$(this).removeClass(playerColor).addClass('white');
 			});
+			setupDroppable(board, playerColorId, currentRegion);
 
-			// update region stats
-			showRegionStats(data, playerColorId, currentRegion);
+			showRegionStats(currentRegion);
 
 			// if they have money, allow user to drag a unit
 			const hasMoney = true;  // TODO 
 			$('#unit').children().remove();
 			if (hasMoney) {
 				$('<div class="unit man draggable"></div>')
-					.data('row', -1)
-					.data('col', -1)
+					.attr('data-row', -1).data('row', -1)
+					.attr('data-col', -1).data('col', -1)
 					.appendTo('#unit');
 			}
 			setupDraggable();
 		}
 		// selected enemy tile
 		else {
-			$('#unit').children().remove();
+			$('#unit').empty();
 			showRegionStats();
 		}
 	});
 }
 
-function showRegionStats(data, playerColorId, region) {
-	let savings = '';
-	let income = '';
-	let wages = '';
-	let balance = '';
-	if (data && playerColorId && region) {
-		for (const [k, v] of Object.entries(data.game.players)) {
-			if (v.color === playerColorId) {
-				savings = JSON.parse(v.savings)[region];
-			}
-		}
-	}
+function showRegionStats(currentRegion) {
+	let savings = '', income = '', wages = '', balance = '', money = '';
+
+	// TODO savings as global?, calc others from board?
+	
 	$('#savings').html(`Savings: ${savings}`);
 	$('#income').html(`Income: ${income}`);
 	$('#wages').html(`Wages: ${wages}`);
 	$('#balance').html(`Balance: ${balance}`);
-	$('#money').html(`Money: `);
+	$('#money').html(`Money: ${money}`);
 }
 
 function setupDraggable() {
@@ -157,7 +147,27 @@ function setupDraggable() {
 	});
 }
 
-function setupDroppable(board, playerColorId) {
+function setupDroppable(board, playerColorId, currentRegion) {
+	$('.droppable').removeClass('droppable');
+
+	$(`.hex[data-region="${currentRegion}"]`).each(function() {
+		const elem = $(this);
+		// because we look at all neighbors, elem will get covered as t below
+		const borderTiles = board.getNeighbors(elem.data('row'), elem.data('col'));
+		for (const b of borderTiles) {
+			const t = board.getTile(b[0], b[1]);
+			// can't attack your own structures
+			if (t.hasClass(PlayerColors[playerColorId]) || t.hasClass('white')) {
+				if (!t.hasClass('hut') && !t.hasClass('castle') && !t.hasClass('baron')) {
+					t.addClass('droppable');
+				}
+			}
+			else {
+				t.addClass('droppable');
+			}
+		}
+	});
+
 	$('.droppable').droppable({
 		accept: '.draggable',
 		drop: function(event, ui) {
@@ -199,6 +209,7 @@ function resetDraggable(draggable) {
 function drop(draggable, droppable, board, playerColorId) {
 	const drag = [draggable.data().row, draggable.data().col];
 	const drop = [droppable.data().row, droppable.data().col];
+	const currentRegion = droppable.data().region;
 	_moves.push([drag, drop]);
 
 	post(`${window.location.pathname}/validate`,  // /game/<id>/validate
@@ -221,7 +232,7 @@ function drop(draggable, droppable, board, playerColorId) {
 						draggable.addClass(`unit ${Units[update[3]]}`);
 					}
 				});
-				setupDroppable(board, playerColorId);
+				setupDroppable(board, playerColorId, currentRegion);
 			}
 			else {
 				// display error?

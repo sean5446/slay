@@ -24,7 +24,7 @@ limiter = Limiter(
     default_limits=[]  # "200 per day", "50 per hour"]
 )
 
-# TODO should use __file__ based path?
+# should use __file__ based path?
 db_file = os.path.join(os.getcwd(), 'slay.db')
 db_uri = os.environ.get('DATABASE_URL', f'sqlite:///{db_file}')  # heroku sets DATABASE_URL
 db_uri = db_uri.replace('postgres://', 'postgresql://')  # heroku doesn't append 'ql' suffix

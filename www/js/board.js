@@ -84,25 +84,11 @@ class Board {
 	setupRegions(playerColorId, regionsStats) {
 		$(`.hex[data-region]`).removeAttr('data-region');
 
-		for (const [k, v] of Object.entries(regionsStats[playerColorId])) {
-			if (k == 'total') continue;
-			const r = k.replace(/\(|\)|\s/g, '').split(',');
+		for (const [region, v] of Object.entries(regionsStats[playerColorId])) {
+			if (region == 'total') continue;
+			
 			for (const t of v.tiles) {
-				const region = `(${r[0]}, ${r[1]})`;
 				const elem = this.getTile(t[0], t[1]);
-				// because we look at all neighbors, elem will get covered as n below
-				const borderTiles = this.getNeighbors(elem.data('row'), elem.data('col'));
-				for (const b of borderTiles) {
-					const n = this.getTile(b[0], b[1]);
-					// don't drop on own stuff
-					if (n.hasClass(PlayerColors[playerColorId])) {
-						if(!n.hasClass('hut') && !n.hasClass('castle') && !n.hasClass('baron'))
-							n.addClass('droppable');
-					}
-					else {
-						n.addClass('droppable');
-					}
-				}
 				elem.attr('data-region', region).data('region', region);
 			}
 		}

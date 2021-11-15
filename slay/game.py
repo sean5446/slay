@@ -3,6 +3,7 @@ import json
 
 from .board import Board
 from .models import *
+from .sendmail import SendMail
 
 user_schema = UserSchema()
 users_schema = UserSchema(many=True)
@@ -36,7 +37,7 @@ class Game:
     def get_user(username):
         user = UserModel.query.filter(UserModel.username == username).first()
         if not user:
-            return user
+            return None
         players = PlayerModel.query.filter(PlayerModel.user_id == user.id)
         user_with_games = user_schema.dump(user)
         games = {}
@@ -74,8 +75,10 @@ class Game:
         db.session.add(game_model)
         db.session.commit()
         i = 0
+        emails = []
         for username in users:
-            user_id = Game.get_user(username)['id']
+            user = Game.get_user(username)
+            emails.append(user['email'])
             color = turn_colors[i]
             i += 1
             regions = board_rand.get_regions(color)
@@ -83,9 +86,11 @@ class Game:
             for k, v in regions.items():
                 savings[k] = board_rand.get_income_and_wages(v)[0] * 4
             savings = json.dumps(savings)
-            player = PlayerModel(user_id=user_id, color=color, savings=savings, game_id=game_model.id, last_turn_time=0)
+            player = PlayerModel(user_id=user['id'], color=color, savings=savings, game_id=game_model.id, last_turn_time=0)
             db.session.add(player)
         db.session.commit()
+        for email in emails:
+            SendMail.send_new_game(email, game_model.id)
         return game_schema.dump(game_model)
 
     @staticmethod
