@@ -74,13 +74,11 @@ class Game:
         db.session.add(history_model)
         db.session.add(game_model)
         db.session.commit()
-        i = 0
         emails = []
-        for username in users:
+        for i, username in enumerate(users):
             user = Game.get_user(username)
             emails.append(user['email'])
             color = turn_colors[i]
-            i += 1
             regions = board_rand.get_regions(color)
             savings = {}
             for k, v in regions.items():

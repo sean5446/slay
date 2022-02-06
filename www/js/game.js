@@ -64,13 +64,6 @@ function initGame() {
 					const board = new Board(data.game.board.board, '#tiles');
 					const playerColorId = player.color;
 					const playerColor = PlayerColors[player.color];
-					
-					// TODO setup UI elements 'properly' - 95 in height comes from .hex size
-					if (window.innerWidth > 1000) {
-						$('#map').removeClass('vertical-map').addClass('horizontal-map').height(board.numRows * 95);
-						$('#panel').removeClass('vertical-panel').addClass('horizontal-panel');
-					}
-
 					board.drawBoard(playerColorId, data.regions);
 					showPlayersStats(data.game);
 
