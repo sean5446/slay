@@ -19,14 +19,14 @@ class Board:
         'MA': 4,  # man
         'SP': 8,  # spearman
         'HU': 9,  # hut
-        'KN': 12, # knight
+        'KN': 12,  # knight
         'CA': 13,  # castle
         'BA': 16,  # baron
     }
     UNIT_COSTS = {
         'MA': 2,  # man
         'SP': 6,  # spearman
-        'KN': 18, # knight
+        'KN': 18,  # knight
         'BA': 54,  # baron
         'CA': 12,  # castle
     }

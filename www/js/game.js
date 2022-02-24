@@ -38,17 +38,15 @@ function firebaseInit(data) {
 	});
 }
 
-function post(url, data, callback) {
+function post(url, data, success, error=(data)=>console.log(data)) {
 	$.ajax({
 		url: url,
 		type: "POST",
 		dataType: "json",
 		contentType: 'application/json; charset=utf-8',
 		data: JSON.stringify(data),
-		success: callback,
-		error: function(data) {
-			console.log(data);
-		}
+		success: success,
+		error: error
 	});
 }
 
@@ -221,25 +219,26 @@ function drop(draggable, droppable, board, playerColorId) {
 				// apply updates to specific parts of board
 				data.updates.forEach(update => {
 					board.updatePosition(update[0], update[1], update[2], update[3]);
-					if (droppable.data('row') == update[0] && droppable.data('col') == update[1]) {
+					if (droppable.data('row') === update[0] && droppable.data('col') === update[1]) {
 						draggable.addClass(`unit ${Units[update[3]]}`);
 					}
 				});
 				setupDroppable(board, playerColorId, currentRegion);
 			}
-			else {
-				// display error?
-				_moves.pop();
-				resetDraggable(draggable);
-			}
+		},
+		function(data) {
+			// display error?
+			console.log(data);
+			_moves.pop();
+			resetDraggable(draggable);
 		}
 	);
 }
 
 function setupButtons(board) {
 	// TODO: confirm and alert are being removed from browsers!?
-	let resetButton = $('#buttonReset');
-	let endTurnButton = $('#buttonEndTurn');
+	const resetButton = $('#buttonReset');
+	const endTurnButton = $('#buttonEndTurn');
 
 	if (board) {
 		resetButton.unbind().bind('click', onReset);
@@ -252,7 +251,7 @@ function setupButtons(board) {
 }
 
 function onReset() {
-	if (confirm('Are you sure you want to reset all moves?')) {
+	if (confirm('Are you sure you want to reset all recent moves?')) {
 		initGame();
 	}
 }

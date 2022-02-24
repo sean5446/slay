@@ -35,22 +35,22 @@ class Board {
 		strBoard.trim();
 		this.numRows = strBoard.split('\n').length - 1;
 		this.numCols = strBoard.split('\n')[0].split(' ').length - 1;
-		var numPlayers = {};
+		var players = {};
 
 		for (let row of strBoard.split('\n')) {
 			row = row.trim();
 			if (row.length < 3) continue;
 			var column = []
 			for (const col of row.split(' ')) {
-				if (col.length != 3) continue;
+				if (col.length !== 3) continue;
 				column.push(col);
-				if (col.charAt(0) != '0') {
-					numPlayers[col.charAt(0)] = '';
+				if (col.charAt(0) !== PlayerColors[0]) {
+					players[col.charAt(0)] = '';
 				}
 			}
 			this.board.push(column);
 		}
-		this.numPlayers = Object.keys(numPlayers).length;
+		this.numPlayers = Object.keys(players).length;
 	}
 
 	drawBoard(playerColorId, regionsStats) {
@@ -59,7 +59,7 @@ class Board {
 		var seaObjects = [ 'ship', 'narwhal', 'walrus', 'kraken' ];
 		// draw the board units and colors
 		for (let row = 0; row < this.board.length; row++) {
-			const odd = (row % 2 == 0) ? '' : ' odd';
+			const odd = (row % 2 === 0) ? '' : ' odd';
 			const rowElem = $(`<div class="hex-row${odd}"></div>`).appendTo(this.parent);
 			for (let col = 0; col < this.board[0].length; col++) {
 				const player = this.board[row][col].charAt(0);
@@ -67,7 +67,7 @@ class Board {
 				const color = ' ' + PlayerColors[player];
 				const unit = (Units[unitId] != ' none') ? ' ' + Units[unitId] : '';
 				var seaObj = '';
-				var randomChance = (Math.floor(Math.random() * 10) % 3 == 0);  // 30% chance
+				var randomChance = (Math.floor(Math.random() * 10) % 3 === 0);  // 30% chance
 				if (player === Object.keys(PlayerColors)[0] && randomChance) {
 					seaObj = ' ' + this.popRandom(seaObjects);
 				}
@@ -110,10 +110,10 @@ class Board {
 	}
 
 	getNeighbors(row, col) {
-		var row = parseInt(row);
-		var col = parseInt(col);
+		const row = parseInt(row);
+		const col = parseInt(col);
 		var allPossible = null;
-		if (row % 2 == 0) {
+		if (row % 2 === 0) {
 			allPossible = [ [row-1, col-1], [row-1, col], [row, col-1], [row, col+1], [row+1, col-1], [row+1, col] ];
 		}
 		else {
@@ -133,9 +133,8 @@ class Board {
 
 	toString() {
 		var boardStr = '';
-		var count = 0;
 		for (let row = 0; row < this.board.length; row++) {
-			boardStr += ((count % 2 === 0) ? '' : '  '); count++;
+			boardStr += ((row % 2 === 0) ? '' : '  ');
 			for (let col = 0; col < this.board[0].length; col++) {
 				boardStr += this.board[row][col] + ' ';
 			}

@@ -129,7 +129,7 @@ class Game:
             # move within region or next to region
             regions = board.get_regions(player_color_id)
 
-            # don't kill own huts
+            # don't kill own huts - handled in JS
 
             # fortify or fight
             if drop_color == player_color_id:

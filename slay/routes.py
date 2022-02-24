@@ -150,8 +150,11 @@ def validate_move(game_id):
     player_color_id = req['player_color_id']
     if not game or not player_color_id or not moves:
         abort(404)
-    validate = Game.validate_moves(game, moves, player_color_id)
-    return ok(validate)
+    validated = Game.validate_moves(game, moves, player_color_id)
+    if validated:
+        return ok(validated)
+    else:
+        abort(500)
 
 
 @app.route('/game/<game_id>/end_turn', methods=['POST'])
@@ -163,8 +166,11 @@ def end_turn(game_id):
     player_color_id = req['player_color_id']
     if not game or not player_color_id or not moves:
         abort(404)
-    validate = Game.validate_moves(game, moves, player_color_id)
+    validated = Game.validate_moves(game, moves, player_color_id)
 
     # TODO update game state
 
-    return ok(validate)
+    if validated:
+        return ok(validated)
+    else:
+        abort(500)
