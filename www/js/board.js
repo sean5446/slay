@@ -35,12 +35,12 @@ class Board {
 		strBoard.trim();
 		this.numRows = strBoard.split('\n').length - 1;
 		this.numCols = strBoard.split('\n')[0].split(' ').length - 1;
-		var players = {};
+		let players = {};
 
 		for (let row of strBoard.split('\n')) {
 			row = row.trim();
 			if (row.length < 3) continue;
-			var column = []
+			let column = []
 			for (const col of row.split(' ')) {
 				if (col.length !== 3) continue;
 				column.push(col);
@@ -56,7 +56,7 @@ class Board {
 	drawBoard(playerColorId, regionsStats) {
 		$(parent).empty();
 		$('.draggable').remove();
-		var seaObjects = [ 'ship', 'narwhal', 'walrus', 'kraken' ];
+		let seaObjects = [ 'ship', 'narwhal', 'walrus', 'kraken' ];
 		// draw the board units and colors
 		for (let row = 0; row < this.board.length; row++) {
 			const odd = (row % 2 === 0) ? '' : ' odd';
@@ -65,9 +65,9 @@ class Board {
 				const player = this.board[row][col].charAt(0);
 				const unitId = this.board[row][col].slice(-2);
 				const color = ' ' + PlayerColors[player];
-				const unit = (Units[unitId] != ' none') ? ' ' + Units[unitId] : '';
-				var seaObj = '';
-				var randomChance = (Math.floor(Math.random() * 10) % 3 === 0);  // 30% chance
+				const unit = (Units[unitId] != 'none') ? ' ' + Units[unitId] : '';
+				let seaObj = '';
+				let randomChance = (Math.floor(Math.random() * 10) % 3 === 0);  // 30% chance
 				if (player === Object.keys(PlayerColors)[0] && randomChance) {
 					seaObj = ' ' + this.popRandom(seaObjects);
 				}
@@ -109,17 +109,17 @@ class Board {
 		return array.splice(Math.floor(Math.random() * array.length), 1);
 	}
 
-	getNeighbors(row, col) {
-		const row = parseInt(row);
-		const col = parseInt(col);
-		var allPossible = null;
+	getNeighbors(_row, _col) {
+		const row = parseInt(_row);
+		const col = parseInt(_col);
+		let allPossible;
 		if (row % 2 === 0) {
 			allPossible = [ [row-1, col-1], [row-1, col], [row, col-1], [row, col+1], [row+1, col-1], [row+1, col] ];
 		}
 		else {
 			allPossible = [ [row-1, col], [row-1, col+1], [row, col-1], [row, col+1], [row+1, col], [row+1, col+1] ];
 		}
-		var neighbors = [];
+		let neighbors = [];
 		for (const n of allPossible) {
 			if (0 <= n[0] && n[0] < this.board.length && 0 <= n[1] && n[1] < this.board[0].length) {
 				// if not transparent
@@ -132,7 +132,7 @@ class Board {
 	}
 
 	toString() {
-		var boardStr = '';
+		let boardStr = '';
 		for (let row = 0; row < this.board.length; row++) {
 			boardStr += ((row % 2 === 0) ? '' : '  ');
 			for (let col = 0; col < this.board[0].length; col++) {

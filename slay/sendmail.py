@@ -1,12 +1,11 @@
-
 import smtplib
 import ssl
 import os
 
-
 # https://myaccount.google.com/lesssecureapps
 
 _DOMAIN = "https://slay-game.herokuapp.com"
+
 
 class SendMail:
     @staticmethod

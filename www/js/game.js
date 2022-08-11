@@ -1,10 +1,10 @@
 
-var _dragStartPosition = null;
-var _accessToken = null;
-var _displayName = null;
-var _moves = [];
+let _dragStartPosition = null;
+let _accessToken = null;
+let _displayName = null;
+let _moves = [];
 
-$(document).ready(function() {
+jQuery(function() {
 	$.ajax({
 		type: "GET",
 		dataType: "json",
@@ -67,7 +67,7 @@ function initGame() {
 
 					if (data.game.current_turn === playerColorId) {
 						setupButtons(true);
-						setupClickTouch(board, playerColorId, playerColor, data);
+						setupClickTouch(board, playerColorId, playerColor);
 					} else {
 						setupButtons(false);
 					}
@@ -78,7 +78,7 @@ function initGame() {
 	);
 }
 
-function setupClickTouch(board, playerColorId, playerColor, data) {
+function setupClickTouch(board, playerColorId, playerColor) {
 	// mousedown touchstart are alternatives
 	$(document).on('click touch', '.hex', function() {
 		// remove all white hex (unselect)
@@ -139,7 +139,8 @@ function setupDraggable() {
 }
 
 function setupDroppable(board, playerColorId, currentRegion) {
-	$('.droppable').removeClass('droppable');
+	const droppable = $('.droppable')
+	droppable.removeClass('droppable');
 
 	$(`.hex[data-region="${currentRegion}"]`).each(function() {
 		const elem = $(this);
@@ -159,7 +160,7 @@ function setupDroppable(board, playerColorId, currentRegion) {
 		}
 	});
 
-	$('.droppable').droppable({
+	droppable.droppable({
 		accept: '.draggable',
 		drop: function(event, ui) {
 			const draggable = $(ui.draggable[0]);
@@ -170,7 +171,9 @@ function setupDroppable(board, playerColorId, currentRegion) {
 }
 
 function showPlayersStats(data) {
-	$('#players').html('');
+	const players = $('#players');
+
+	players.html('');
 	// turn colors are stored in db as a json string
 	for (const playerColorId of JSON.parse(data.turn_colors)) {
 		let bold = '';
@@ -184,7 +187,7 @@ function showPlayersStats(data) {
 				break;
 			}
 		}
-		$('#players').append(
+		players.append(
 			`<div style="${bold} color: ${PlayerColors[playerColorId]}">${name}: ${total}</div>`
 		);
 	}

@@ -9,5 +9,6 @@
 **/*egg-info
 .coverage
 
+venv
 firebase_auth.json
 firebase_admin.json

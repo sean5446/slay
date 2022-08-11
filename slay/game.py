@@ -84,7 +84,8 @@ class Game:
             for k, v in regions.items():
                 savings[k] = board_rand.get_income_and_wages(v)[0] * 4
             savings = json.dumps(savings)
-            player = PlayerModel(user_id=user['id'], color=color, savings=savings, game_id=game_model.id, last_turn_time=0)
+            player = PlayerModel(user_id=user['id'], color=color, savings=savings, game_id=game_model.id,
+                                 last_turn_time=0)
             db.session.add(player)
         db.session.commit()
         for email in emails:
@@ -139,9 +140,13 @@ class Game:
             else:
                 if Board.UNIT_VALUES[drag_unit] < Board.UNIT_VALUES[drop_unit]:
                     return False
-            
+
             board.update_position(drop_row, drop_col, player_color_id, drag_unit)
             updates.append([drop_row, drop_col, player_color_id, drag_unit])
-        
+
         regions = board.get_regions_stats()
-        return { 'regions': regions, 'updates': updates }
+        return {'regions': regions, 'updates': updates}
+
+    @staticmethod
+    def get_board_html(board_id):
+        pass
