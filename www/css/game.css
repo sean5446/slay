@@ -1,5 +1,5 @@
 body {
-	font-family: Sans-Serif;
+	font-family: sans-serif;
 	font-size: 24px;
 	background-color: #CCC;
 }
@@ -8,8 +8,8 @@ body {
 	float: left;
 	position: relative;
 	width: 104px;
-	height: 60.04px;
-	margin: 15.01px 0;
+	height: 60px;
+	margin: 15px 0;
 	border-left: solid 1px #444444;
 	border-right: solid 1px #444444;
 	background-position: 50% 50%;
@@ -22,9 +22,9 @@ body {
 	content: "";
 	z-index: -1;
 	position: absolute;
-	width: 73.54px;
-	height: 73.54px;
-	left: 14.2304px;
+	width: 74px;
+	height: 74px;
+	left: 14px;
 	-webkit-transform: scaleY(0.5774) rotate(-45deg);
 	-ms-transform: scaleY(0.5774) rotate(-45deg);
 	transform: scaleY(0.5774) rotate(-45deg);
@@ -33,15 +33,15 @@ body {
 }
 
 .hex:before {
-	top: -36.7696px;
-	border-top: solid 1.4142px #333333;
-	border-right: solid 1.4142px #333333;
+	top: -37px;
+	border-top: solid 2px #333333;
+	border-right: solid 2px #333333;
 }
 
 .hex:after {
 	bottom: -36.7696px;
-	border-bottom: solid 1.4142px #333333;
-	border-left: solid 1.4142px #333333;
+	border-bottom: solid 2px #333333;
+	border-left: solid 2px #333333;
 	box-shadow: 0 15px 30px rgb(197, 192, 177);
 }
 
