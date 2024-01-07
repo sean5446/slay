@@ -45,7 +45,7 @@ class PlayerModel(db.Model):
     user = db.relationship('UserModel', backref='users')
 
     def __repr__(self):
-        return f'player={self.id}, {self.color=}, {self.savings=} {self.game_id=}, ' + \
+        return f'player={self.id}, {self.color=}, {self.savings=}, {self.game_id=}, ' + \
                f'{self.user_id=}, {self.last_turn_time=}'
 
 

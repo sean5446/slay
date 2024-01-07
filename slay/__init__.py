@@ -19,8 +19,8 @@ template_dir = os.path.abspath(os.path.join(os.getcwd(), 'www'))
 app = Flask(__name__, template_folder=template_dir)
 
 limiter = Limiter(
-    app,
-    key_func=get_remote_address,
+    get_remote_address,
+    app=app,
     default_limits=[]  # "200 per day", "50 per hour"]
 )
 

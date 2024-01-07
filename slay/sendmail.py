@@ -4,7 +4,7 @@ import os
 
 # https://myaccount.google.com/lesssecureapps
 
-_DOMAIN = "https://slay-game.herokuapp.com"
+_DOMAIN = os.environ.get('DOMAIN', "https://slay-game.herokuapp.com")
 
 
 class SendMail:
@@ -28,7 +28,7 @@ class SendMail:
         msg = f"""
         Subject: Slay - new game
         
-        You've been invited to play a game of slay! {link}
+        You've been invited to play a game of Slay! {link}
         """
         if 'computer' not in to_email:
             try:

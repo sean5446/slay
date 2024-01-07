@@ -1,28 +1,28 @@
 
-// Match Python objects in board.py
-Units = Object.freeze({
-	'MT': 'none',
-	'GR': 'grave',
-	'TR': 'tree',
-	'MA': 'man',
-	'SP': 'spearman',
-	'HU': 'hut',
-	'KN': 'knight',
-	'CA': 'castle',
-	'BA': 'baron',
-});
-
-PlayerColors = Object.freeze({
-	'T': 'transparent',
-	'R': 'red',
-	'G': 'green',
-	'B': 'blue',
-	'Y': 'yellow',
-	'C': 'black',
-});
-
-
 class Board {
+
+	// Match Python objects in board.py
+	static unitKinds = Object.freeze({
+		'MT': 'none',
+		'GR': 'grave',
+		'TR': 'tree',
+		'MA': 'man',
+		'SP': 'spearman',
+		'HU': 'hut',
+		'KN': 'knight',
+		'CA': 'castle',
+		'BA': 'baron',
+	});
+
+	static playerColors = Object.freeze({
+		'T': 'transparent',
+		'R': 'red',
+		'G': 'green',
+		'B': 'blue',
+		'Y': 'yellow',
+		'C': 'black',
+	});
+
 	board = [];
 	numRows = 0;
 	numCols = 0;
@@ -44,7 +44,7 @@ class Board {
 			for (const col of row.split(' ')) {
 				if (col.length !== 3) continue;
 				column.push(col);
-				if (col.charAt(0) !== PlayerColors[0]) {
+				if (col.charAt(0) !== Board.playerColors[0]) {
 					players[col.charAt(0)] = '';
 				}
 			}
@@ -64,11 +64,11 @@ class Board {
 			for (let col = 0; col < this.board[0].length; col++) {
 				const player = this.board[row][col].charAt(0);
 				const unitId = this.board[row][col].slice(-2);
-				const color = ' ' + PlayerColors[player];
-				const unit = (Units[unitId] != 'none') ? ' ' + Units[unitId] : '';
+				const color = ' ' + Board.playerColors[player];
+				const unit = (Board.unitKinds[unitId] != 'none') ? ' ' + Board.unitKinds[unitId] : '';
 				let seaObj = '';
 				let randomChance = (Math.floor(Math.random() * 10) % 3 === 0);  // 30% chance
-				if (player === Object.keys(PlayerColors)[0] && randomChance) {
+				if (player === Object.keys(Board.playerColors)[0] && randomChance) {
 					seaObj = ' ' + this.popRandom(seaObjects);
 				}
 				// TODO: if player, append unit (tag with position), else just draw:
@@ -100,9 +100,7 @@ class Board {
 
 	updatePosition(row, col, color, unit) {
 		this.board[row][col] = `${color}${unit}`;
-		// TODO fix droppable class? will be reset by removeClass below
-		this.getTile(row, col).removeClass()
-			.addClass(['hex', 'white']);
+		this.getTile(row, col).removeClass().addClass(['hex', Board.playerColors[color], Board.unitKinds[unit]]);
 	}
 
 	popRandom(array) {
@@ -123,7 +121,7 @@ class Board {
 		for (const n of allPossible) {
 			if (0 <= n[0] && n[0] < this.board.length && 0 <= n[1] && n[1] < this.board[0].length) {
 				// if not transparent
-				if (this.board[n[0]][n[1]].charAt(0) !== Object.keys(PlayerColors)[0]) {
+				if (this.board[n[0]][n[1]].charAt(0) !== Object.keys(Board.playerColors)[0]) {
 					neighbors.push(n);
 				}
 			}

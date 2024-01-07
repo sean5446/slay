@@ -3,7 +3,7 @@ from random import randint
 
 
 class Board:
-    # these enums correspond to Javascript objects in game.js - using strings to format directly to css
+    # these enums correspond to Javascript objects in board.js
     PLAYER_COLORS = {
         0: 'T',  # transparent
         1: 'R',  # red
@@ -34,7 +34,7 @@ class Board:
     def __init__(self, board_type, num_rows=0, num_cols=0, num_players=0):
         self.board = []
         self.num_players = num_players
-        for i in range(num_rows):
+        for _ in range(num_rows):
             self.board.append([''] * num_cols)
         if type(board_type) is float:
             self._fair_random_board(board_type)

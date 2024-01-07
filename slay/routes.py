@@ -2,7 +2,7 @@
 import json
 import os
 
-from flask import send_from_directory, request, render_template, abort, Markup
+from flask import send_from_directory, request, render_template, abort
 from flask import current_app as app
 from . import limiter
 
@@ -54,18 +54,6 @@ def serve_index():
 @app.route('/firebase')
 def get_firebase():
     return firebase_auth
-
-
-# unused
-@app.route('/board/<board_id>', methods=['POST'])
-def get_board(board_id):
-    req = request.get_json()
-    authenticate(req)
-    board = Game.get_board_html(board_id)
-    if not board:
-        abort(404)
-    board_html = Game.get_board_html(board)
-    return render_template('game.html', title='Slay Game', tiles=Markup(board_html))
 
 
 @app.route('/user/create', methods=['POST'])
@@ -154,7 +142,7 @@ def validate_move(game_id):
     if validated:
         return ok(validated)
     else:
-        abort(500)
+        abort(405)
 
 
 @app.route('/game/<game_id>/end_turn', methods=['POST'])

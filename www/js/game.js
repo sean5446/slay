@@ -1,4 +1,5 @@
 
+// global state bad?
 let _dragStartPosition = null;
 let _accessToken = null;
 let _displayName = null;
@@ -61,7 +62,7 @@ function initGame() {
 					$('#tiles').empty();
 					const board = new Board(data.game.board.board, '#tiles');
 					const playerColorId = player.color;
-					const playerColor = PlayerColors[player.color];
+					const playerColor = Board.playerColors[player.color];
 					board.drawBoard(playerColorId, data.regions);
 					showPlayersStats(data.game);
 
@@ -81,25 +82,28 @@ function initGame() {
 function setupClickTouch(board, playerColorId, playerColor) {
 	// mousedown touchstart are alternatives
 	$(document).on('click touch', '.hex', function() {
+		const clickedTile = $(this);
+
 		// remove all white hex (unselect)
-		$('[class*=white]').each(function() {
+		$('.white').each(function() {
 			$(this).removeClass('white').addClass(playerColor);
 		});
 
 		// selected friendly tile
-		if ($(this).attr('class').includes(playerColor)) {
-			const currentRegion = $(this).data('region');
+		if (clickedTile.attr('class').includes(playerColor)) {
+			const currentRegion = clickedTile.data('region');
 
 			// color selected region white
 			$(`[data-region="${currentRegion}"]`).each(function() {
 				$(this).removeClass(playerColor).addClass('white');
 			});
-			setupDroppable(board, playerColorId, currentRegion);
 
+			setupDroppable(board, playerColorId, currentRegion);
 			showRegionStats(currentRegion);
 
 			// if they have money, allow user to drag a unit
-			const hasMoney = true;  // TODO 
+			const hasMoney = true;  // TODO
+
 			$('#unit').children().remove();
 			if (hasMoney) {
 				$('<div class="unit man draggable"></div>')
@@ -112,21 +116,8 @@ function setupClickTouch(board, playerColorId, playerColor) {
 		// selected enemy tile
 		else {
 			$('#unit').empty();
-			showRegionStats();
 		}
 	});
-}
-
-function showRegionStats(currentRegion) {
-	let savings = '', income = '', wages = '', balance = '', money = '';
-
-	// TODO savings as global?, calc others from board?
-	
-	$('#savings').html(`Savings: ${savings}`);
-	$('#income').html(`Income: ${income}`);
-	$('#wages').html(`Wages: ${wages}`);
-	$('#balance').html(`Balance: ${balance}`);
-	$('#money').html(`Money: ${money}`);
 }
 
 function setupDraggable() {
@@ -139,8 +130,8 @@ function setupDraggable() {
 }
 
 function setupDroppable(board, playerColorId, currentRegion) {
-	const droppable = $('.droppable')
-	droppable.removeClass('droppable');
+	$('.droppable').droppable('destroy');
+	$('.droppable').removeClass('droppable');
 
 	$(`.hex[data-region="${currentRegion}"]`).each(function() {
 		const elem = $(this);
@@ -160,7 +151,7 @@ function setupDroppable(board, playerColorId, currentRegion) {
 		}
 	});
 
-	droppable.droppable({
+	$('.droppable').droppable({
 		accept: '.draggable',
 		drop: function(event, ui) {
 			const draggable = $(ui.draggable[0]);
@@ -168,36 +159,6 @@ function setupDroppable(board, playerColorId, currentRegion) {
 			drop(draggable, droppable, board, playerColorId);
 		}
 	});
-}
-
-function showPlayersStats(data) {
-	const players = $('#players');
-
-	players.html('');
-	// turn colors are stored in db as a json string
-	for (const playerColorId of JSON.parse(data.turn_colors)) {
-		let bold = '';
-		if (playerColorId === data.current_turn) bold = 'font-weight: bold;';
-		// TODO calculate total from regions instead?
-		const total = $(`.${PlayerColors[playerColorId]}`).length;
-		let name = '??';
-		for (let i = 0; i < data.players.length; i++) {
-			if (data.players[i].color === playerColorId) {
-				name = data.players[i].user.username;
-				break;
-			}
-		}
-		players.append(
-			`<div style="${bold} color: ${PlayerColors[playerColorId]}">${name}: ${total}</div>`
-		);
-	}
-}
-
-function resetDraggable(draggable) {
-	const pos = $('#unit').offset();
-	draggable.offset({top: pos.top, left: pos.left});
-	// could move it slowly here
-	draggable.css({top: _dragStartPosition.top, left: _dragStartPosition.left});
 }
 
 function drop(draggable, droppable, board, playerColorId) {
@@ -222,9 +183,6 @@ function drop(draggable, droppable, board, playerColorId) {
 				// apply updates to specific parts of board
 				data.updates.forEach(update => {
 					board.updatePosition(update[0], update[1], update[2], update[3]);
-					if (droppable.data('row') === update[0] && droppable.data('col') === update[1]) {
-						draggable.addClass(`unit ${Units[update[3]]}`);
-					}
 				});
 				setupDroppable(board, playerColorId, currentRegion);
 			}
@@ -236,6 +194,48 @@ function drop(draggable, droppable, board, playerColorId) {
 			resetDraggable(draggable);
 		}
 	);
+}
+
+function showPlayersStats(data) {
+	const players = $('#players');
+
+	players.html('');
+	// turn colors are stored in db as a json string
+	for (const playerColorId of JSON.parse(data.turn_colors)) {
+		let bold = '';
+		if (playerColorId === data.current_turn) bold = 'font-weight: bold;';
+		// TODO calculate total from regions instead?
+		const total = $(`.${Board.playerColors[playerColorId]}`).length;
+		let name = '??';
+		for (let i = 0; i < data.players.length; i++) {
+			if (data.players[i].color === playerColorId) {
+				name = data.players[i].user.username;
+				break;
+			}
+		}
+		players.append(
+			`<div style="${bold} color: ${Board.playerColors[playerColorId]}">${name}: ${total}</div>`
+		);
+	}
+}
+
+function resetDraggable(draggable) {
+	const pos = $('#unit').offset();
+	draggable.offset({top: pos.top, left: pos.left});
+	// could move it slowly here
+	draggable.css({top: _dragStartPosition.top, left: _dragStartPosition.left});
+}
+
+function showRegionStats(currentRegion) {
+	let savings = '', income = '', wages = '', balance = '', money = '';
+
+	// TODO savings as global?, calc others from board?
+	
+	$('#savings').html(`Savings: ${savings}`);
+	$('#income').html(`Income: ${income}`);
+	$('#wages').html(`Wages: ${wages}`);
+	$('#balance').html(`Balance: ${balance}`);
+	$('#money').html(`Money: ${money}`);
 }
 
 function setupButtons(board) {
