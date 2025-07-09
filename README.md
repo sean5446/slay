@@ -1,5 +1,6 @@
 # Slay
 
+[openhex ](https://github.com/alcalyn/openhex) is a much more complete version of what I was going for
 
 ## Overview
 - Can run on Heroku, see `./Procfile`
